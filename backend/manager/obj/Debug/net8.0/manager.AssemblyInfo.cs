@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BimasaktiWebManager")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+362982dcdd65853b2538b7cff215bbf8b21336df")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+85f0ae1f1a305feb3519028f272ad17e38722691")]
 [assembly: System.Reflection.AssemblyProductAttribute("BimasaktiWebManager")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BimasaktiWebManager")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

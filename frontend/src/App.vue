@@ -79,7 +79,7 @@ const handleLogout = async () => {
   // Await the asynchronous logout call to clear the server-side cookie 
   // and update the Pinia auth state before attempting the redirect.
   await authStore.logout()
-  router.push('/login')
+  router.push('/')
 }
 
 // --- GLOBAL EXCEL EXPORT LOGIC ---
@@ -231,64 +231,63 @@ const triggerPdfExport = async () => {
 </script>
 
 <template>
-  <div class="h-screen flex flex-col font-sans text-slate-800 overflow-hidden relative bg-slate-50">
+  <div class="h-screen flex flex-col font-sans text-slate-800 overflow-hidden relative bg-[#f4f6fa]">
     
     <!-- ONLY show navigation if the user is logged in -->
-    <nav v-if="authStore.isAuthenticated" class="shrink-0 z-40 w-full bg-sky-600 shadow-md relative">
+    <nav v-if="authStore.isAuthenticated" class="shrink-0 z-40 w-full bg-white/70 border-b border-slate-200/80 backdrop-blur-md shadow-sm relative">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12">
         <div class="flex items-center justify-between h-14">
           
           <!-- LEFT SIDE: Logo & Menus -->
-          <!-- Removed 'w-full' so it stops pushing the right section off-screen -->
           <div class="flex items-center gap-6 h-full">
-            <div class="flex items-center gap-3 pr-6 border-r border-sky-500 h-full">
-              <div v-if="activeLogoUrl" class="bg-white rounded p-1 flex items-center justify-center shadow-sm">
+            <div class="flex items-center gap-3 pr-6 border-r border-slate-200/80 h-full">
+              <div v-if="activeLogoUrl" class="bg-white rounded p-1 flex items-center justify-center shadow-sm border border-slate-100">
                 <img :src="activeLogoUrl" @error="handleLogoError" alt="Company Logo" class="h-6 w-auto object-contain">
               </div>
-              <h1 class="text-[15px] font-bold text-white tracking-wide uppercase">{{ companyName }}</h1>
+              <h1 class="text-[14px] font-black text-slate-900 tracking-wide uppercase">{{ companyName }}</h1>
             </div>
 
-            <div class="hidden md:flex items-center h-full space-x-2">
+            <div class="hidden md:flex items-center h-full space-x-1">
               <div v-if="hasFinancialDashboard || hasOperationDashboard || hasMaintenanceDashboard" class="group relative h-full flex items-center">
-                <button class="flex items-center gap-1 text-[13px] font-medium text-sky-50 px-3 py-2 rounded-md hover:bg-sky-700 hover:text-white transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" /></svg>
+                <button class="flex items-center gap-1 text-[13px] font-bold text-slate-600 px-3 py-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-950 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" /></svg>
                   Dashboard
-                  <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                  <svg class="w-4 h-4 text-slate-400 transition-transform group-hover:rotate-180" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                 </button>
                 <div class="absolute top-14 left-0 pt-1 hidden group-hover:block w-56 z-50">
-                  <div class="bg-white shadow-lg border border-slate-200 rounded-b-md overflow-hidden py-1">
-                    <RouterLink v-if="hasFinancialDashboard" to="/dashboard" class="block px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition-colors">Financial Dashboard</RouterLink>
-                    <RouterLink v-if="hasOperationDashboard" to="/dashboard/operation" class="block px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition-colors">Operation Dashboard</RouterLink>
-                    <RouterLink v-if="hasMaintenanceDashboard" to="/dashboard/maintenance" class="block px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition-colors">Service & Maintenance</RouterLink>
+                  <div class="bg-white/95 backdrop-blur-md shadow-xl border border-slate-200/60 rounded-b-xl overflow-hidden py-1">
+                    <RouterLink v-if="hasFinancialDashboard" to="/dashboard" class="block px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Financial Dashboard</RouterLink>
+                    <RouterLink v-if="hasOperationDashboard" to="/dashboard/operation" class="block px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Operation Dashboard</RouterLink>
+                    <RouterLink v-if="hasMaintenanceDashboard" to="/dashboard/maintenance" class="block px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Service & Maintenance</RouterLink>
                   </div>
                 </div>
               </div>
 
               <div v-if="hasBalanceSheet || hasIncomeStatement" class="group relative h-full flex items-center">
-                <button class="flex items-center gap-1 text-[13px] font-medium text-sky-50 px-3 py-2 rounded-md hover:bg-sky-700 hover:text-white transition-colors">
+                <button class="flex items-center gap-1 text-[13px] font-bold text-slate-600 px-3 py-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-950 transition-colors">
                   Reports
-                  <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                  <svg class="w-4 h-4 text-slate-400 transition-transform group-hover:rotate-180" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                 </button>
                 <div class="absolute top-14 left-0 pt-1 hidden group-hover:block w-56 z-50">
-                  <div class="bg-white shadow-lg border border-slate-200 rounded-b-md overflow-hidden py-1">
-                    <RouterLink v-if="hasBalanceSheet" to="/balance-sheet" class="block px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition-colors">Balance Sheet</RouterLink>
-                    <RouterLink v-if="hasIncomeStatement" to="/income-statement" class="block px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition-colors">Income Statement</RouterLink>
+                  <div class="bg-white/95 backdrop-blur-md shadow-xl border border-slate-200/60 rounded-b-xl overflow-hidden py-1">
+                    <RouterLink v-if="hasBalanceSheet" to="/balance-sheet" class="block px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Balance Sheet</RouterLink>
+                    <RouterLink v-if="hasIncomeStatement" to="/income-statement" class="block px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Income Statement</RouterLink>
                     <div class="border-t border-slate-100 my-1"></div>
-                    <a href="#" class="block px-4 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-sky-700 transition-colors">General Ledger</a>
-                    <a href="#" class="block px-4 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-sky-700 transition-colors">Trial Balance</a>
+                    <a href="#" class="block px-4 py-2.5 text-sm font-medium text-slate-400 hover:bg-slate-50 hover:text-blue-600 transition-colors">General Ledger</a>
+                    <a href="#" class="block px-4 py-2.5 text-sm font-medium text-slate-400 hover:bg-slate-50 hover:text-blue-600 transition-colors">Trial Balance</a>
                   </div>
                 </div>
               </div>
 
               <div class="group relative h-full flex items-center">
-                <button class="flex items-center gap-1 text-[13px] font-medium text-sky-50 px-3 py-2 rounded-md hover:bg-sky-700 hover:text-white transition-colors">
+                <button class="flex items-center gap-1 text-[13px] font-bold text-slate-600 px-3 py-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-950 transition-colors">
                   Settings
-                  <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                  <svg class="w-4 h-4 text-slate-400 transition-transform group-hover:rotate-180" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                 </button>
                 
                 <div class="absolute top-14 left-0 pt-1 hidden group-hover:block w-64 z-50">
-                  <div class="bg-white shadow-lg border border-slate-200 rounded-b-md overflow-hidden py-1">
-                    <RouterLink to="/settings" class="block px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition-colors">
+                  <div class="bg-white/95 backdrop-blur-md shadow-xl border border-slate-200/60 rounded-b-xl overflow-hidden py-1">
+                    <RouterLink to="/settings" class="block px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
                       Account Mapping Wizard
                     </RouterLink>
                     <div class="border-t border-slate-100 my-1"></div>
@@ -305,7 +304,7 @@ const triggerPdfExport = async () => {
                 </div>
               </div>
               <div class="group relative h-full flex items-center" v-if="authStore.isAdmin">
-                <RouterLink to="/admin" class="flex items-center gap-1 text-[13px] font-medium text-sky-50 px-3 py-2 rounded-md hover:bg-sky-700 hover:text-white transition-colors">
+                <RouterLink to="/admin" class="flex items-center gap-1 text-[13px] font-bold text-slate-600 px-3 py-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-950 transition-colors">
                   Admin Panel
                 </RouterLink>
               </div>
@@ -314,18 +313,18 @@ const triggerPdfExport = async () => {
           </div>
           
           <!-- RIGHT SIDE: User Profile & Logout -->
-          <div class="flex items-center gap-4 shrink-0 pl-4 border-l border-sky-500 h-8">
+          <div class="flex items-center gap-4 shrink-0 pl-4 border-l border-slate-200/80 h-8">
             <div class="flex items-center gap-2.5" v-if="authStore.user">
               <!-- Avatar Circle -->
-              <div class="w-7 h-7 rounded-full bg-sky-800 text-sky-100 flex items-center justify-center text-xs font-black uppercase shadow-inner border border-sky-700/50">
+              <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center text-xs font-black uppercase shadow-inner border border-blue-200/30">
                 {{ authStore.user.username.charAt(0) }}
               </div>
-              <span class="text-[13px] font-bold text-sky-50 tracking-wide">{{ authStore.user.username }}</span>
+              <span class="text-[13px] font-bold text-slate-700 tracking-wide">{{ authStore.user.username }}</span>
             </div>
 
             <!-- Logout Button -->
-            <button @click="handleLogout" class="flex items-center gap-1.5 text-[12px] font-bold text-sky-200 hover:text-white hover:bg-sky-700 px-3 py-1.5 rounded-lg transition-colors group">
-              <svg class="w-4 h-4 text-sky-400 group-hover:text-rose-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            <button @click="handleLogout" class="flex items-center gap-1.5 text-[12px] font-bold text-slate-500 hover:text-red-600 hover:bg-slate-100 px-3 py-1.5 rounded-lg transition-colors group">
+              <svg class="w-4 h-4 text-slate-400 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
               Logout
             </button>
           </div>

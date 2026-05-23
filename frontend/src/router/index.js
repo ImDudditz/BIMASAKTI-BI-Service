@@ -7,6 +7,7 @@ import IncomeStatement from '@/views/Reports/Financial/IncomeStatement.vue'
 // THE FIX: Added the /Settings/ directory to the import path
 import AccountMapping from '@/views/Settings/AccountMapping.vue'
 import Login from '@/views/Login.vue'
+import Landing from '@/views/Landing.vue'
 
 const routes = [
   {
@@ -17,7 +18,9 @@ const routes = [
   },
   {
     path: '/',
-    redirect: '/dashboard'
+    name: 'Landing',
+    component: Landing,
+    meta: { requiresAuth: false }
   },
   {
     path: '/dashboard',
