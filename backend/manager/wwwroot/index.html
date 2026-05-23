@@ -740,6 +740,7 @@
         <nav class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
             <button class="tab-btn" onclick="switchTab('tenants')">Tenants</button>
+            <button class="tab-btn" onclick="switchTab('access')">Access Control</button>
             <button class="tab-btn" onclick="switchTab('terminal')">Live Console</button>
         </nav>
     </header>
@@ -905,7 +906,221 @@
             </div>
         </div>
 
-        <!-- --- 3. LIVE TERMINAL TAB --- -->
+        <!-- --- 3. ACCESS CONTROL TAB --- -->
+        <div id="tab-access" class="tab-content">
+            <div class="glass-card">
+                <div class="card-header">
+                    <h2>🛡️ TENANT ACCESS CONTROL & PERMISSIONS</h2>
+                </div>
+                
+                <div class="tenant-grid">
+                    <!-- Left: Dropdown Selectors -->
+                    <div>
+                        <div class="form-group">
+                            <label for="access-company-select">Select Company:</label>
+                            <select id="access-company-select" class="select-input" onchange="handleAccessCompanyChange()">
+                                <option value="">-- Select Company --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="access-user-group" style="display: none;">
+                            <label for="access-user-select">Select User:</label>
+                            <select id="access-user-select" class="select-input" onchange="handleAccessUserChange()">
+                                <option value="">-- Select User --</option>
+                            </select>
+                        </div>
+                        
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6; margin-top: 1.5rem;">
+                            <p><strong>Permissions Management:</strong> Managers can configure dashboard widgets and report permissions for specific users of a tenant company. The system <code>admin</code> user retains default access to all resources and is excluded from this list.</p>
+                        </div>
+                    </div>
+
+                    <!-- Right: Permissions Checklist Panel -->
+                    <div id="access-permissions-panel" style="border-left: 1px solid rgba(255,255,255,0.06); padding-left: 1.5rem; display: none;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                            <div>
+                                <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary);" id="access-username-title">User Permissions</h3>
+                                <p style="font-size: 0.75rem; color: var(--text-secondary);">Toggle items to grant or revoke access</p>
+                            </div>
+                            <button class="btn btn-primary" onclick="saveAccessPermissions()">
+                                💾 Save Permissions
+                            </button>
+                        </div>
+
+                        <!-- Checklist Container with custom scroll -->
+                        <div class="custom-scroll" style="max-height: 480px; overflow-y: auto; padding-right: 0.5rem; display: flex; flex-direction: column; gap: 1.5rem;">
+                            
+                            <!-- Widgets Checklist Group -->
+                            <div>
+                                <h4 style="font-size: 0.75rem; font-weight: 800; color: #d8b4fe; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 6px; height: 12px; background: var(--color-accent); border-radius: 2px;"></span>
+                                    Executive Dashboard Widgets
+                                </h4>
+                                
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+                                    <!-- KPI Cards -->
+                                    <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+                                        <div>
+                                            <h5 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem;">KPI Cards</h5>
+                                            <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">YTD high-level metrics for Revenue, Expenses, Net Growth.</p>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="perm-widget-kpi_cards">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    
+                                    <!-- Capital Growth -->
+                                    <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+                                        <div>
+                                            <h5 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem;">Capital Growth</h5>
+                                            <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">Equity and capital growth trends ledger details.</p>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="perm-widget-capital_growth">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+
+                                    <!-- Cash Flow -->
+                                    <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+                                        <div>
+                                            <h5 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem;">Operating Cash Flow</h5>
+                                            <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">Visualizes operating cash inflows and outflows over time.</p>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="perm-widget-operating_cash_flow">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+
+                                    <!-- Revenue Budget -->
+                                    <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+                                        <div>
+                                            <h5 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem;">Revenue Budget</h5>
+                                            <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">Displays comparative revenue performance vs budget metrics.</p>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="perm-widget-revenue_budget">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+
+                                    <!-- Expense Budget -->
+                                    <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+                                        <div>
+                                            <h5 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem;">Expense Budget</h5>
+                                            <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">Displays comparative expense performance vs budget metrics.</p>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="perm-widget-expense_budget">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+
+                                    <!-- Operation Metrics -->
+                                    <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+                                        <div>
+                                            <h5 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem;">Operation Metrics</h5>
+                                            <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">Tenant occupancy and traffic operations statistics.</p>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="perm-widget-operation_metrics">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+
+                                    <!-- Lease Expirations -->
+                                    <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+                                        <div>
+                                            <h5 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem;">Lease Expirations</h5>
+                                            <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">Contract terminations schedule and expirations map.</p>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="perm-widget-lease_expirations">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+
+                                    <!-- Tickets KPI -->
+                                    <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+                                        <div>
+                                            <h5 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem;">Tickets KPI</h5>
+                                            <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">Support ticket counts, resolutions and requests.</p>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="perm-widget-tickets_kpi">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+
+                                    <!-- Maintenance Status -->
+                                    <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+                                        <div>
+                                            <h5 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem;">Maintenance Status</h5>
+                                            <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">Facility health indicators and equipment reliability state.</p>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="perm-widget-maintenance_status">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+
+                                    <!-- Tickets by Category -->
+                                    <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+                                        <div>
+                                            <h5 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem;">Tickets by Category</h5>
+                                            <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">Department ticket volume distribution categories chart.</p>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="perm-widget-tickets_by_category">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Reports Checklist Group -->
+                            <div>
+                                <h4 style="font-size: 0.75rem; font-weight: 800; color: #10b981; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 6px; height: 12px; background: var(--color-success); border-radius: 2px;"></span>
+                                    Report Access Permissions
+                                </h4>
+                                
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+                                    <!-- Balance Sheet -->
+                                    <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+                                        <div>
+                                            <h5 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem;">Balance Sheet</h5>
+                                            <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">Enables Balance Sheet financial positions ledger under Reports.</p>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="perm-report-balance_sheet">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+
+                                    <!-- Income Statement -->
+                                    <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+                                        <div>
+                                            <h5 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem;">Income Statement</h5>
+                                            <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4;">Enables Income Statement revenues/expenses sheets under Reports.</p>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" id="perm-report-income_statement">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- --- 4. LIVE TERMINAL TAB --- -->
         <div id="tab-terminal" class="tab-content">
             <div class="terminal-container">
                 <div class="terminal-header">
@@ -970,6 +1185,8 @@
 
             if (tabId === 'tenants') {
                 fetchCompanies();
+            } else if (tabId === 'access') {
+                fetchAccessCompanies();
             }
         }
 
@@ -1306,6 +1523,175 @@
                 }
             } catch (err) {
                 showToast("Network error triggering synchronization.", 'error');
+            }
+        }
+
+        // --- Access Control Panel Functions ---
+        async function fetchAccessCompanies() {
+            try {
+                const res = await fetch('/api/companies');
+                if (!res.ok) return;
+                const companies = await res.json();
+                const select = document.getElementById('access-company-select');
+                select.innerHTML = '<option value="">-- Select Company --</option>';
+                companies.forEach(company => {
+                    const opt = document.createElement('option');
+                    opt.value = company;
+                    opt.textContent = company;
+                    select.appendChild(opt);
+                });
+            } catch (err) {
+                showToast("Failed to fetch companies for access control", 'error');
+            }
+        }
+
+        function handleAccessCompanyChange() {
+            const companyId = document.getElementById('access-company-select').value;
+            const userGroup = document.getElementById('access-user-group');
+            const permPanel = document.getElementById('access-permissions-panel');
+            
+            permPanel.style.display = 'none';
+            if (!companyId) {
+                userGroup.style.display = 'none';
+                return;
+            }
+            
+            userGroup.style.display = 'flex';
+            fetchAccessUsers(companyId);
+        }
+
+        async function fetchAccessUsers(companyId) {
+            try {
+                const res = await fetch(`/api/manager/companies/${companyId}/users`);
+                if (!res.ok) {
+                    showToast("Failed to fetch company users", 'error');
+                    return;
+                }
+                const users = await res.json();
+                const select = document.getElementById('access-user-select');
+                select.innerHTML = '<option value="">-- Select User --</option>';
+                
+                users.forEach(user => {
+                    const opt = document.createElement('option');
+                    opt.value = user.id;
+                    opt.textContent = `${user.username} (${user.role})`;
+                    opt.dataset.username = user.username;
+                    select.appendChild(opt);
+                });
+            } catch (err) {
+                showToast("Network error fetching company users", 'error');
+            }
+        }
+
+        function handleAccessUserChange() {
+            const companyId = document.getElementById('access-company-select').value;
+            const select = document.getElementById('access-user-select');
+            const userId = select.value;
+            const permPanel = document.getElementById('access-permissions-panel');
+            
+            if (!companyId || !userId) {
+                permPanel.style.display = 'none';
+                return;
+            }
+            
+            const selectedOpt = select.options[select.selectedIndex];
+            const username = selectedOpt.dataset.username || '';
+            document.getElementById('access-username-title').textContent = `Permissions: ${username}`;
+            
+            permPanel.style.display = 'block';
+            fetchUserPermissions(companyId, userId);
+        }
+
+        async function fetchUserPermissions(companyId, userId) {
+            showToast("Loading user permissions...", 'info');
+            try {
+                const res = await fetch(`/api/manager/companies/${companyId}/users/${userId}/permissions`);
+                if (!res.ok) {
+                    showToast("Failed to load permissions", 'error');
+                    return;
+                }
+                const data = await res.json();
+                
+                const widgetKeys = [
+                    'kpi_cards', 'capital_growth', 'operating_cash_flow', 'revenue_budget', 'expense_budget',
+                    'operation_metrics', 'lease_expirations',
+                    'tickets_kpi', 'maintenance_status', 'tickets_by_category'
+                ];
+                const reportKeys = ['balance_sheet', 'income_statement'];
+                
+                const defaultFinancials = ['kpi_cards', 'capital_growth', 'operating_cash_flow', 'revenue_budget', 'expense_budget'];
+                
+                widgetKeys.forEach(key => {
+                    const chk = document.getElementById(`perm-widget-${key}`);
+                    if (data.widgets && data.widgets.hasOwnProperty(key)) {
+                        chk.checked = data.widgets[key] === true;
+                    } else {
+                        chk.checked = defaultFinancials.includes(key);
+                    }
+                });
+                
+                reportKeys.forEach(key => {
+                    const chk = document.getElementById(`perm-report-${key}`);
+                    if (data.reports && data.reports.hasOwnProperty(key)) {
+                        chk.checked = data.reports[key] === true;
+                    } else {
+                        chk.checked = true;
+                    }
+                });
+                
+                showToast("User permissions loaded successfully", 'success');
+            } catch (err) {
+                showToast("Network error loading permissions", 'error');
+            }
+        }
+
+        async function saveAccessPermissions() {
+            const companyId = document.getElementById('access-company-select').value;
+            const userId = document.getElementById('access-user-select').value;
+            
+            if (!companyId || !userId) {
+                showToast("Please select both company and user first", 'error');
+                return;
+            }
+            
+            const widgetKeys = [
+                'kpi_cards', 'capital_growth', 'operating_cash_flow', 'revenue_budget', 'expense_budget',
+                'operation_metrics', 'lease_expirations',
+                'tickets_kpi', 'maintenance_status', 'tickets_by_category'
+            ];
+            const reportKeys = ['balance_sheet', 'income_statement'];
+            
+            const widgetsPayload = {};
+            widgetKeys.forEach(key => {
+                widgetsPayload[key] = document.getElementById(`perm-widget-${key}`).checked;
+            });
+            
+            const reportsPayload = {};
+            reportKeys.forEach(key => {
+                reportsPayload[key] = document.getElementById(`perm-report-${key}`).checked;
+            });
+            
+            const payload = {
+                widgets: widgetsPayload,
+                reports: reportsPayload
+            };
+            
+            showToast("Saving user permissions...", 'info');
+            try {
+                const res = await fetch(`/api/manager/companies/${companyId}/users/${userId}/permissions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (res.ok) {
+                    showToast("Permissions updated successfully!", 'success');
+                } else {
+                    const data = await res.json();
+                    showToast(data.error || "Failed to save permissions.", 'error');
+                }
+            } catch (err) {
+                showToast("Network error when saving permissions.", 'error');
             }
         }
 

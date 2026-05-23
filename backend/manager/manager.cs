@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using BimasaktiReports.FinancialReports.Backend.Engines;
 
 namespace BimasaktiReports.FinancialReports.Manager
 {
@@ -200,6 +202,145 @@ namespace BimasaktiReports.FinancialReports.Manager
                     Log("Error listing companies: " + ex.Message);
                 }
                 return Results.Ok(list);
+            });
+
+            // 8.1 List users for a company (excluding admin role)
+            app.MapGet("/api/manager/companies/{companyId}/users", async (string companyId) =>
+            {
+                string id = companyId.Trim().ToUpperInvariant();
+                if (id.Length != 5 || !IsValidId(id))
+                {
+                    return Results.BadRequest(new { error = "Invalid Company ID." });
+                }
+
+                string databasePath = svcDbUtils.GetSafeDbPath(id);
+                try
+                {
+                    using (var dbContext = new TenantDbContext(databasePath))
+                    {
+                        await dbContext.Database.EnsureCreatedAsync();
+                        var usersList = await dbContext.Users
+                            .Where(u => u.CompanyId == id && u.Role != "admin")
+                            .ToListAsync();
+                        
+                        return Results.Ok(usersList.Select(u => new { id = u.Id, username = u.Username, role = u.Role }));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log("Error listing users for company " + id + ": " + ex.Message);
+                    return Results.StatusCode(500);
+                }
+            });
+
+            // 8.2 Get permissions for a specific user in a company
+            app.MapGet("/api/manager/companies/{companyId}/users/{userId:int}/permissions", async (string companyId, int userId) =>
+            {
+                string id = companyId.Trim().ToUpperInvariant();
+                if (id.Length != 5 || !IsValidId(id))
+                {
+                    return Results.BadRequest(new { error = "Invalid Company ID." });
+                }
+
+                string databasePath = svcDbUtils.GetSafeDbPath(id);
+                try
+                {
+                    using (var dbContext = new TenantDbContext(databasePath))
+                    {
+                        await dbContext.Database.EnsureCreatedAsync();
+                        
+                        var targetUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId && u.CompanyId == id);
+                        if (targetUser == null)
+                        {
+                            return Results.NotFound(new { error = "User not found." });
+                        }
+
+                        var widgetsList = await dbContext.UserWidgets.Where(w => w.UserId == userId).ToListAsync();
+                        var reportsList = await dbContext.UserReports.Where(r => r.UserId == userId).ToListAsync();
+
+                        return Results.Ok(new
+                        {
+                            widgets = widgetsList.ToDictionary(w => w.WidgetKey, w => w.IsActive),
+                            reports = reportsList.ToDictionary(r => r.ReportKey, r => r.IsActive)
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log("Error loading permissions for user " + userId + " in company " + id + ": " + ex.Message);
+                    return Results.StatusCode(500);
+                }
+            });
+
+            // 8.3 Save permissions for a user in a company
+            app.MapPost("/api/manager/companies/{companyId}/users/{userId:int}/permissions", async (string companyId, int userId, PermissionSettingsSpecification permissions) =>
+            {
+                string id = companyId.Trim().ToUpperInvariant();
+                if (id.Length != 5 || !IsValidId(id))
+                {
+                    return Results.BadRequest(new { error = "Invalid Company ID." });
+                }
+
+                if (permissions == null)
+                {
+                    return Results.BadRequest(new { error = "Permissions body cannot be null." });
+                }
+
+                string databasePath = svcDbUtils.GetSafeDbPath(id);
+                try
+                {
+                    using (var dbContext = new TenantDbContext(databasePath))
+                    {
+                        await dbContext.Database.EnsureCreatedAsync();
+
+                        var targetUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId && u.CompanyId == id);
+                        if (targetUser == null)
+                        {
+                            return Results.NotFound(new { error = "User not found." });
+                        }
+
+                        // Save widgets
+                        var existingWidgets = await dbContext.UserWidgets.Where(w => w.UserId == userId).ToListAsync();
+                        var existingWidgetsMap = existingWidgets.ToDictionary(w => w.WidgetKey);
+
+                        foreach (var kvp in permissions.Widgets)
+                        {
+                            if (existingWidgetsMap.TryGetValue(kvp.Key, out var w))
+                            {
+                                w.IsActive = kvp.Value;
+                            }
+                            else
+                            {
+                                dbContext.UserWidgets.Add(new UserWidget { UserId = userId, WidgetKey = kvp.Key, IsActive = kvp.Value });
+                            }
+                        }
+
+                        // Save reports
+                        var existingReports = await dbContext.UserReports.Where(r => r.UserId == userId).ToListAsync();
+                        var existingReportsMap = existingReports.ToDictionary(r => r.ReportKey);
+
+                        foreach (var kvp in permissions.Reports)
+                        {
+                            if (existingReportsMap.TryGetValue(kvp.Key, out var r))
+                            {
+                                r.IsActive = kvp.Value;
+                            }
+                            else
+                            {
+                                dbContext.UserReports.Add(new UserReport { UserId = userId, ReportKey = kvp.Key, IsActive = kvp.Value });
+                            }
+                        }
+
+                        await dbContext.SaveChangesAsync();
+                        Log($"Saved permissions successfully for user: {targetUser.Username} in company: {id}");
+                        return Results.Ok(new { message = "Permissions updated successfully." });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log("Error saving permissions for user " + userId + " in company " + id + ": " + ex.Message);
+                    return Results.StatusCode(500);
+                }
             });
 
             // 9. Load company configuration sync URLs

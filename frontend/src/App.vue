@@ -52,7 +52,6 @@ const activePageTitle = computed(() => {
   if (path === '/balance-sheet') return 'Balance Sheet'
   if (path === '/income-statement') return 'Income Statement'
   if (path === '/settings') return 'Account Mapping Wizard'
-  if (path === '/admin') return 'System Administrator Panel'
   return 'Property Management Dashboard'
 })
 
@@ -64,7 +63,6 @@ const activePageSubtitle = computed(() => {
   if (path === '/balance-sheet') return 'Financial Position & Assets Ledger'
   if (path === '/income-statement') return 'Revenue, Expenses & Net Profit'
   if (path === '/settings') return 'Configure Accounts & Financial Groups'
-  if (path === '/admin') return 'Manage Permissions, Users & Roles'
   return 'Financials & Operations Overview'
 })
 
@@ -489,18 +487,6 @@ const triggerPdfExport = async () => {
             <span>Settings</span>
           </RouterLink>
 
-          <!-- ADMIN PANEL (Utility Link) -->
-          <RouterLink 
-            v-if="authStore.isAdmin" 
-            to="/admin" 
-            class="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-[11px] font-bold border transition-all duration-200 group"
-            :class="router.currentRoute.value.path === '/admin' 
-              ? 'bg-[#d2f3ee]/40 text-[#0d5952] border-[#a2e8da]/40 shadow-sm' 
-              : 'text-slate-400 border-transparent hover:text-slate-600 hover:bg-white/30'"
-          >
-            <span class="text-xs group-hover:scale-110 transition-transform">🛡️</span>
-            <span>Admin Panel</span>
-          </RouterLink>
 
         </nav>
 

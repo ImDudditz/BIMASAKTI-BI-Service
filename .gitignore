@@ -1,0 +1,17 @@
+# C# / dotnet build folders
+[Bb]in/
+[Oo]bj/
+
+# Node/Vite frontend folders
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# IDEs and OS metadata
+.vs/
+.vscode/
+*.user
+*.suo
+.DS_Store
+Thumbs.db

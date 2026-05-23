@@ -8,4 +8,7 @@
     <AssemblyName>BimasaktiWebManager</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="../BimasaktiReports.csproj" />
+  </ItemGroup>
 </Project>
