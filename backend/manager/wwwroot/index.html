@@ -12,13 +12,13 @@
             --border-glow: rgba(255, 255, 255, 0.08);
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
-            --color-primary: #3b82f6;
-            --color-primary-hover: #2563eb;
+            --color-primary: #3c56d6;
+            --color-primary-hover: #2d43be;
             --color-success: #10b981;
             --color-warning: #f59e0b;
             --color-danger: #ef4444;
             --color-inactive: #475569;
-            --color-accent: #a855f7;
+            --color-accent: #6366f1;
         }
 
         * {
@@ -30,7 +30,7 @@
         }
 
         body {
-            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var-color-primary 50%, var(--bg-base) 100%);
+            background: radial-gradient(circle at 50% 0%, #16182c 0%, var(--color-primary) 50%, var(--bg-base) 100%);
             background-color: var(--bg-base);
             color: var(--text-primary);
             min-height: 100vh;
@@ -73,7 +73,7 @@
             font-size: 1.25rem;
             font-weight: 800;
             letter-spacing: 0.05em;
-            background: linear-gradient(to right, #3b82f6, #a855f7);
+            background: linear-gradient(to right, #3c56d6, #6366f1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -113,7 +113,7 @@
         .tab-btn.active {
             background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
             color: var(--text-primary);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(60, 86, 214, 0.3);
         }
 
         main {
@@ -652,8 +652,8 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #3b82f6;
-            box-shadow: 0 0 6px #3b82f6;
+            background: #3c56d6;
+            box-shadow: 0 0 6px #3c56d6;
         }
 
         .terminal-body {
@@ -675,7 +675,7 @@
         }
 
         /* Color code log outputs */
-        .log-line[data-type="backend"] { color: #3b82f6; }
+        .log-line[data-type="backend"] { color: #4b69ff; }
         .log-line[data-type="backend-err"] { color: #f43f5e; font-weight: 700; }
         .log-line[data-type="vite"] { color: #a855f7; }
         .log-line[data-type="vite-err"] { color: #f43f5e; font-weight: 700; }

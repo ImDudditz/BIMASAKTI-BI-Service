@@ -36,7 +36,7 @@ const handleLogout = async () => {
             <select 
               :value="router.currentRoute.value.path" 
               @change="event => router.push(event.target.value)"
-              class="bg-white border border-slate-200/80 rounded-xl px-3 py-1.5 text-xs font-black text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-cyan-500 shadow-sm transition-all"
+              class="bg-white border border-slate-200/80 rounded-xl px-3 py-1.5 text-xs font-black text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-[#3c56d6] shadow-sm transition-all"
             >
               <option value="/balance-sheet">📑 Balance Sheet</option>
               <option value="/income-statement">📊 Income Statement</option>
@@ -58,7 +58,7 @@ const handleLogout = async () => {
           <!-- Notification Bell -->
           <button class="w-8 h-8 rounded-full bg-white/60 border border-slate-200/40 hover:bg-white hover:border-slate-200 flex items-center justify-center shadow-sm relative transition-all active:scale-95 group">
             <span class="text-sm group-hover:rotate-12 transition-transform">🔔</span>
-            <span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#00b0ff] ring-1 ring-white"></span>
+            <span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#3c56d6] ring-1 ring-white"></span>
           </button>
 
           <!-- Divider -->
@@ -67,7 +67,7 @@ const handleLogout = async () => {
           <!-- Profile Info & Logout -->
           <div class="flex items-center gap-2.5 pl-1" v-if="authStore.user">
             <!-- Avatar Circle -->
-            <div class="w-7 h-7 rounded-full bg-[#d2f3ee]/60 border border-[#a2e8da] text-[#0d5952] flex items-center justify-center text-[11px] font-black uppercase shadow-inner">
+            <div class="w-7 h-7 rounded-full bg-[#3c56d6]/10 border border-[#3c56d6]/20 text-[#3c56d6] flex items-center justify-center text-[11px] font-black uppercase shadow-inner">
               {{ authStore.user.username.charAt(0) }}
             </div>
             <div class="flex flex-col text-left hidden lg:block leading-none">

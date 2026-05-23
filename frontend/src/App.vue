@@ -289,16 +289,16 @@ const triggerPdfExport = async () => {
     
     <!-- BACKGROUND PASTEL BLUR CIRLCES - Only shown on authenticated dashboard shell -->
     <template v-if="isAuthPage">
-      <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-cyan-200/40 blur-[130px] pointer-events-none z-0"></div>
-      <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-200/35 blur-[130px] pointer-events-none z-0"></div>
-      <div class="absolute top-[30%] right-[20%] w-[35%] h-[35%] rounded-full bg-blue-100/40 blur-[110px] pointer-events-none z-0"></div>
+      <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-300/30 blur-[130px] pointer-events-none z-0"></div>
+      <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-200/30 blur-[130px] pointer-events-none z-0"></div>
+      <div class="absolute top-[30%] right-[20%] w-[35%] h-[35%] rounded-full bg-[#3c56d6]/12 blur-[110px] pointer-events-none z-0"></div>
     </template>
 
     <!-- AUTHENTICATED PREMIUM GLASSMORPHIC DASHBOARD SHELL -->
     <div v-if="isAuthPage" class="flex-1 flex gap-6 p-6 overflow-hidden h-full w-full relative z-10">
       
       <!-- LEFT-HAND GLASS SIDEBAR -->
-      <aside class="w-[260px] bg-white/45 backdrop-blur-xl border border-white/60 shadow-2xl rounded-[32px] flex flex-col p-6 shrink-0 z-40 transition-all duration-500 hover:shadow-cyan-100/40">
+      <aside class="w-[260px] bg-white/45 backdrop-blur-xl border border-white/60 shadow-2xl rounded-[32px] flex flex-col p-6 shrink-0 z-40 transition-all duration-500 hover:shadow-indigo-100/40">
         
         <!-- Brand section with Company Logo & Name -->
         <div class="flex flex-col items-center justify-center text-center pb-6 border-b border-slate-200/40 shrink-0 gap-3">
@@ -320,7 +320,7 @@ const triggerPdfExport = async () => {
             to="/overview" 
             class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[13px] font-bold border transition-all duration-300 group"
             :class="router.currentRoute.value.path === '/overview' 
-              ? 'bg-[#d2f3ee]/60 text-[#0d5952] border-[#a2e8da]/60 shadow-sm' 
+              ? 'bg-[#3c56d6]/10 text-[#3c56d6] border-[#3c56d6]/20 shadow-sm' 
               : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/40'"
           >
             <span class="text-base group-hover:scale-110 transition-transform">🏠</span>
@@ -351,7 +351,7 @@ const triggerPdfExport = async () => {
                 to="/dashboard" 
                 class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200"
                 :class="router.currentRoute.value.path === '/dashboard'
-                  ? 'bg-[#d2f3ee]/50 text-[#0d5952] border-[#a2e8da]/50 shadow-sm'
+                  ? 'bg-[#3c56d6]/8 text-[#3c56d6] border-[#3c56d6]/15 shadow-sm'
                   : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/30'"
               >
                 <span>•</span>
@@ -363,7 +363,7 @@ const triggerPdfExport = async () => {
                 to="/balance-sheet" 
                 class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200"
                 :class="['/balance-sheet', '/income-statement'].includes(router.currentRoute.value.path)
-                  ? 'bg-[#d2f3ee]/50 text-[#0d5952] border-[#a2e8da]/50 shadow-sm'
+                  ? 'bg-[#3c56d6]/8 text-[#3c56d6] border-[#3c56d6]/15 shadow-sm'
                   : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/30'"
               >
                 <span>•</span>
@@ -375,7 +375,7 @@ const triggerPdfExport = async () => {
                 to="/print" 
                 class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200"
                 :class="router.currentRoute.value.path === '/print'
-                  ? 'bg-[#d2f3ee]/50 text-[#0d5952] border-[#a2e8da]/50 shadow-sm'
+                  ? 'bg-[#3c56d6]/8 text-[#3c56d6] border-[#3c56d6]/15 shadow-sm'
                   : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/30'"
               >
                 <span>•</span>
@@ -407,7 +407,7 @@ const triggerPdfExport = async () => {
                 to="/dashboard/operation" 
                 class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200"
                 :class="router.currentRoute.value.path === '/dashboard/operation'
-                  ? 'bg-[#d2f3ee]/50 text-[#0d5952] border-[#a2e8da]/50 shadow-sm'
+                  ? 'bg-[#3c56d6]/8 text-[#3c56d6] border-[#3c56d6]/15 shadow-sm'
                   : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/30'"
               >
                 <span>•</span>
@@ -419,7 +419,7 @@ const triggerPdfExport = async () => {
                 to="/tenancy-report" 
                 class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200"
                 :class="router.currentRoute.value.path === '/tenancy-report'
-                  ? 'bg-[#d2f3ee]/50 text-[#0d5952] border-[#a2e8da]/50 shadow-sm'
+                  ? 'bg-[#3c56d6]/8 text-[#3c56d6] border-[#3c56d6]/15 shadow-sm'
                   : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/30'"
               >
                 <span>•</span>
@@ -451,7 +451,7 @@ const triggerPdfExport = async () => {
                 to="/dashboard/maintenance" 
                 class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200"
                 :class="router.currentRoute.value.path === '/dashboard/maintenance'
-                  ? 'bg-[#d2f3ee]/50 text-[#0d5952] border-[#a2e8da]/50 shadow-sm'
+                  ? 'bg-[#3c56d6]/8 text-[#3c56d6] border-[#3c56d6]/15 shadow-sm'
                   : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/30'"
               >
                 <span>•</span>
@@ -463,7 +463,7 @@ const triggerPdfExport = async () => {
                 to="/services-report" 
                 class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200"
                 :class="router.currentRoute.value.path === '/services-report'
-                  ? 'bg-[#d2f3ee]/50 text-[#0d5952] border-[#a2e8da]/50 shadow-sm'
+                  ? 'bg-[#3c56d6]/8 text-[#3c56d6] border-[#3c56d6]/15 shadow-sm'
                   : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/30'"
               >
                 <span>•</span>
@@ -480,7 +480,7 @@ const triggerPdfExport = async () => {
             to="/settings" 
             class="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-[11px] font-bold border transition-all duration-200 group"
             :class="router.currentRoute.value.path === '/settings' 
-              ? 'bg-[#d2f3ee]/40 text-[#0d5952] border-[#a2e8da]/40 shadow-sm' 
+              ? 'bg-[#3c56d6]/6 text-[#3c56d6] border-[#3c56d6]/12 shadow-sm' 
               : 'text-slate-400 border-transparent hover:text-slate-600 hover:bg-white/30'"
           >
             <span class="text-xs group-hover:scale-110 transition-transform">⚙️</span>
