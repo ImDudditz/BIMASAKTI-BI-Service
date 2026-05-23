@@ -63,6 +63,30 @@ const routes = [
     name: 'AdminAccess',
     component: () => import('../views/AdminPanels/AdminAccess.vue'),
     meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/overview',
+    name: 'Overview',
+    component: () => import('@/views/Overview.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/print',
+    name: 'PrintReports',
+    component: () => import('@/views/Reports/Print.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/tenancy-report',
+    name: 'TenancyReport',
+    component: () => import('@/views/Reports/TenancyReportPlaceholder.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/services-report',
+    name: 'ServicesReport',
+    component: () => import('@/views/Reports/ServicesReportPlaceholder.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 
