@@ -46,7 +46,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite($"Data Source={_databasePath}");
+            optionsBuilder.UseSqlite($"Data Source={_databasePath};Foreign Keys=True");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

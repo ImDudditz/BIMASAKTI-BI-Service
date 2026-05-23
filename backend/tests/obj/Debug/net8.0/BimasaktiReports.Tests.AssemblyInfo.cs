@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BimasaktiReports.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aeafdbcfa973b61d781f5f51d7db5ad8bc6153c9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+09bf212d9225f703c3a4d62e3320fd80ec417c4c")]
 [assembly: System.Reflection.AssemblyProductAttribute("BimasaktiReports.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BimasaktiReports.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

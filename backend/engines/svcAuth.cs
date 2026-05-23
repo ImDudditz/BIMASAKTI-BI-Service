@@ -52,14 +52,6 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
                 using (var dbContext = new TenantDbContext(databasePath))
                 {
-                    // Enforce foreign key constraints inside SQLite
-                    await dbContext.Database.OpenConnectionAsync();
-                    using (var pragmaCommand = dbContext.Database.GetDbConnection().CreateCommand())
-                    {
-                        pragmaCommand.CommandText = "PRAGMA foreign_keys=ON;";
-                        await pragmaCommand.ExecuteNonQueryAsync();
-                    }
-
                     // Equivalent to SQLAlchemy's create_all
                     await dbContext.Database.EnsureCreatedAsync();
 

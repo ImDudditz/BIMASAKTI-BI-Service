@@ -611,6 +611,7 @@ namespace BimasaktiReports.FinancialReports.Manager
             {
                 Log("Stopping C# Backend process tree...");
                 KillProcessTree(_backendProcess);
+                _backendProcess.Dispose();
                 _backendProcess = null;
                 Log("C# Backend stopped.");
             }
@@ -697,6 +698,7 @@ namespace BimasaktiReports.FinancialReports.Manager
             {
                 Log("Stopping Vue Frontend process tree...");
                 KillProcessTree(_frontendProcess);
+                _frontendProcess.Dispose();
                 _frontendProcess = null;
                 Log("Vue Frontend stopped.");
             }
@@ -950,18 +952,21 @@ namespace BimasaktiReports.FinancialReports.Manager
         {
             try
             {
-                Process netstat = new Process();
-                netstat.StartInfo = new ProcessStartInfo
+                string output;
+                using (Process netstat = new Process())
                 {
-                    FileName = "cmd.exe",
-                    Arguments = "/c netstat -ano | findstr :" + port,
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-                netstat.Start();
-                string output = netstat.StandardOutput.ReadToEnd();
-                netstat.WaitForExit();
+                    netstat.StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = "/c netstat -ano | findstr :" + port,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                    netstat.Start();
+                    output = netstat.StandardOutput.ReadToEnd();
+                    netstat.WaitForExit();
+                }
 
                 if (string.IsNullOrEmpty(output)) return;
 

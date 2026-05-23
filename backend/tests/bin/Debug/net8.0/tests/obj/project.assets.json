@@ -3152,15 +3152,14 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\Projects\\IDEs\\BIMASAKTI Reports\\Financial Reports\\backend\\tests\\BimasaktiReports.Tests.csproj",
+      "projectUniqueName": "E:\\Projects\\IDEs\\BIMASAKTI BI Service\\backend\\tests\\BimasaktiReports.Tests.csproj",
       "projectName": "BimasaktiReports.Tests",
-      "projectPath": "E:\\Projects\\IDEs\\BIMASAKTI Reports\\Financial Reports\\backend\\tests\\BimasaktiReports.Tests.csproj",
+      "projectPath": "E:\\Projects\\IDEs\\BIMASAKTI BI Service\\backend\\tests\\BimasaktiReports.Tests.csproj",
       "packagesPath": "C:\\Users\\Dudditz\\.nuget\\packages\\",
-      "outputPath": "E:\\Projects\\IDEs\\BIMASAKTI Reports\\Financial Reports\\backend\\tests\\obj\\",
+      "outputPath": "E:\\Projects\\IDEs\\BIMASAKTI BI Service\\backend\\tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "E:\\Projects\\IDEs\\BIMASAKTI Reports\\Financial Reports\\backend\\NuGet.Config",
-        "E:\\Projects\\IDEs\\BIMASAKTI Reports\\Financial Reports\\NuGet.Config",
+        "E:\\Projects\\IDEs\\BIMASAKTI BI Service\\NuGet.Config",
         "C:\\Users\\Dudditz\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
@@ -3174,8 +3173,8 @@
           "framework": "net8.0",
           "targetAlias": "net8.0",
           "projectReferences": {
-            "E:\\Projects\\IDEs\\BIMASAKTI Reports\\Financial Reports\\backend\\BimasaktiReports.csproj": {
-              "projectPath": "E:\\Projects\\IDEs\\BIMASAKTI Reports\\Financial Reports\\backend\\BimasaktiReports.csproj"
+            "E:\\Projects\\IDEs\\BIMASAKTI BI Service\\backend\\BimasaktiReports.csproj": {
+              "projectPath": "E:\\Projects\\IDEs\\BIMASAKTI BI Service\\backend\\BimasaktiReports.csproj"
             }
           }
         }
