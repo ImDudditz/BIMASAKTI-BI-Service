@@ -1,0 +1,24 @@
+# ==========================================
+# GENERAL TEXT AUTO-DETECT
+# ==========================================
+* text=auto eol=lf
+
+# ==========================================
+# PYTHON SOURCE CODE
+# ==========================================
+*.py text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+
+# ==========================================
+# MEDIA AND BINARY PRESERVATION
+# ==========================================
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.svg text eol=lf
+*.db binary

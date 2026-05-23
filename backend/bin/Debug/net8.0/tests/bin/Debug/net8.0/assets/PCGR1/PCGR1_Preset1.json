@@ -1,0 +1,2039 @@
+[
+  {
+    "company_id": "PCGR1",
+    "account_no": "10.00.0000",
+    "account_name": "ASSET",
+    "account_cat": "Assets",
+    "group_name": "Assets"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.00.0000",
+    "account_name": "CURRENT ASSET",
+    "account_cat": "Assets",
+    "group_name": "Current Asset"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.10.0000",
+    "account_name": "CASH ON HAND IN BANK",
+    "account_cat": "Assets",
+    "group_name": "Cash on Hand in Bank"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.10.1000",
+    "account_name": "BANK",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.10.1001",
+    "account_name": "BANK MANDIRI-1010006570913",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.10.1002",
+    "account_name": "BANK MANDIRI VA-1240006263801",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.10.1003",
+    "account_name": "BANK CIMB-800118383100",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.10.1998",
+    "account_name": "CASH ADVANCE",
+    "account_cat": "Assets",
+    "group_name": "Cash Advance"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.10.1999",
+    "account_name": "CONTRA ACCOUNT",
+    "account_cat": "Assets",
+    "group_name": "Cash Advance"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.10.2000",
+    "account_name": "PETTY CASH",
+    "account_cat": "Assets",
+    "group_name": "Petty Cash"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.10.2001",
+    "account_name": "PETTY CASH-BM \u0026 PROJECT",
+    "account_cat": "Assets",
+    "group_name": "Petty Cash"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.10.2002",
+    "account_name": "PETTY CASH-TRANSIT (CASHIER)",
+    "account_cat": "Assets",
+    "group_name": "Petty Cash"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.10.2003",
+    "account_name": "PETTY CASH-TRANSIT",
+    "account_cat": "Assets",
+    "group_name": "Petty Cash"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.20.0000",
+    "account_name": "TIME DEPOSIT",
+    "account_cat": "Assets",
+    "group_name": "Deposit"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.20.1001",
+    "account_name": "BANK MANDIRI",
+    "account_cat": "Assets",
+    "group_name": "Deposit"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.20.1002",
+    "account_name": "CIMB NIAGA",
+    "account_cat": "Assets",
+    "group_name": "Deposit"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.20.1003",
+    "account_name": "BANK BJB",
+    "account_cat": "Assets",
+    "group_name": "Deposit"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "11.20.1004",
+    "account_name": "BANK BTN",
+    "account_cat": "Assets",
+    "group_name": "Deposit"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "12.00.0000",
+    "account_name": "ACCOUNT RECEIVABLE",
+    "account_cat": "Assets",
+    "group_name": "Account Receivable"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "12.10.0000",
+    "account_name": "ACCOUNT RECEIVABLE-TOWER AVALON",
+    "account_cat": "Assets",
+    "group_name": "Account Receivable Avalon"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "12.10.1000",
+    "account_name": "ALLOWANCE FOR DOUBTFULL ACCT AVALON",
+    "account_cat": "Assets",
+    "group_name": "ALLOWANCE FOR DOUBTFULL ACCT AVALON"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "12.20.0000",
+    "account_name": "ACCOUNT RECEIVABLE-TOWER MIRAGE",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "12.20.1000",
+    "account_name": "ALLOWANCE FOR DOUBTFULL ACCT MIRAGE",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "12.30.0000",
+    "account_name": "ACCOUNT RECEIVABLE-TOWER MONTREAL",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "12.30.1000",
+    "account_name": "ALLOWANCE FOR DOUBTFULL ACCT MONTREAL",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "12.40.0000",
+    "account_name": "ACCOUNT RECEIVABLE-TOWER MONTANA",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "12.40.1000",
+    "account_name": "ALLOWANCE FOR DOUBTFULL ACCT MONTANA",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "12.50.0000",
+    "account_name": "ACCOUNT RECEIVABLE-CGR 2",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "12.50.9999",
+    "account_name": "ACCOUNT RECEIVABLE-OTHERS",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "12.60.0000",
+    "account_name": "ACCOUNT RECEIVABLE - PUBLIC AREA",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "13.00.0000",
+    "account_name": "PREPAID EXPENSES",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "13.10.1000",
+    "account_name": "INSURANCE",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "13.10.9999",
+    "account_name": "OTHERS",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "14.00.0000",
+    "account_name": "UANG MUKA SUPPLIER",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "14.10.1000",
+    "account_name": "UANG MUKA SUPPLIER",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.00.0000",
+    "account_name": "FIXED ASSET",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.0000",
+    "account_name": "COST",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.0001",
+    "account_name": "BUILDING",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.0002",
+    "account_name": "ENGINEERING EQUIPMENT",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.0003",
+    "account_name": "ELECTRICAL SYSTEM",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.0004",
+    "account_name": "WATER SYSTEM",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.0005",
+    "account_name": "LIFT SYSTEM",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.0006",
+    "account_name": "OFFICE EQUIPMENT",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.0007",
+    "account_name": "FURNITURE, FIXTURE \u0026 FITTING OFFICE",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.0008",
+    "account_name": "FURNITURE \u0026 FIXTURE COMM AREA",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.0009",
+    "account_name": "FACILITY IMPROVEMENT",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.0010",
+    "account_name": "SECURITY EQUIPMENT",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.0011",
+    "account_name": "CAR",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.0012",
+    "account_name": "MOTORCYCLE",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.9998",
+    "account_name": "PRA FIXED ASSET",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.10.9999",
+    "account_name": "OTHERS",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.20.0000",
+    "account_name": "ACC. DEPRECIATION",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.20.0001",
+    "account_name": "BUILDING",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.20.0002",
+    "account_name": "ENGINEERING EQUIPMENT",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.20.0003",
+    "account_name": "ELECTRICAL SYSTEM",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.20.0004",
+    "account_name": "WATER SYSTEM",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.20.0005",
+    "account_name": "LIFT SYSTEM",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.20.0006",
+    "account_name": "OFFICE EQUIPMENT",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.20.0007",
+    "account_name": "FURNITURE, FIXTURE \u0026 FITTING OFFICE",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.20.0008",
+    "account_name": "FURNITURE \u0026 FIXTURE COMM AREA",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.20.0009",
+    "account_name": "FACILITY IMPROVEMENT",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.20.0010",
+    "account_name": "SECURITY EQUIPMENT",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.20.0011",
+    "account_name": "CAR",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.20.0012",
+    "account_name": "MOTORCYCLE",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "15.20.9999",
+    "account_name": "OTHERS",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "16.00.0000",
+    "account_name": "OTHER ASSET",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "16.10.1000",
+    "account_name": "BEBAN EST. MANFAAT KARYAWAN",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "16.10.9999",
+    "account_name": "OTHERS",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "17.00.0000",
+    "account_name": "PERSEDIAAN",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "17.10.1000",
+    "account_name": "GOODS IN TRANSIT",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "17.10.2000",
+    "account_name": "MUTASI PERSEDIAAN",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "17.10.3000",
+    "account_name": "PERSEDIAAN MATERAI",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "17.10.9999",
+    "account_name": "OTHER INVENTORY",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "18.00.0000",
+    "account_name": "PREPAID TAX",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "18.10.1000",
+    "account_name": "PREPAID PPH 4 AYAT 2",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "18.10.1001",
+    "account_name": "Prepaid PPH 23",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "19.00.0000",
+    "account_name": "INTANGIBLE ASSETS",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "19.10.0000",
+    "account_name": "COST INTANGIBLE ASSETS",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "19.10.0001",
+    "account_name": "SOFTWARE LICENSE",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "19.10.9999",
+    "account_name": "OTHER INTANGIBLE ASSETS",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "19.20.0000",
+    "account_name": "ACC. AMORT. INTANGIBLE ASSETS",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "19.20.0001",
+    "account_name": "ACC. AMORT. SOFTWARE LISENCE",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "19.20.9999",
+    "account_name": "ACC.AMORT.OTHER INTANGIBLE AST",
+    "account_cat": "Assets",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "20.00.0000",
+    "account_name": "LIABILITIES",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.00.0000",
+    "account_name": "CURRENT LIABILITIES",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.10.0000",
+    "account_name": "ACCOUNT PAYABLE",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.10.0001",
+    "account_name": "ACCOUNT PAYABLE-SUPPLIER",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.10.0002",
+    "account_name": "CGR-2",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.10.0003",
+    "account_name": "AP - VENDOR",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.10.9999",
+    "account_name": "OTHERS",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.20.0000",
+    "account_name": "TAX PAYABLE",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.20.0001",
+    "account_name": "PPH ARTICLE 21",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.20.0002",
+    "account_name": "PPH ARTICLE 23 (NPWP)",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.20.0003",
+    "account_name": "PPH ARTICLE 23 (NOT NPWP)",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.20.0004",
+    "account_name": "PPH ARTICLE 4 FINAL",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.20.0005",
+    "account_name": "PPH ARTICLE 21 (SUPPLIER)",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.20.0006",
+    "account_name": "PPH ARTICLE 21 (NOT NPWP)",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.20.0007",
+    "account_name": "PPh Article Final 0.5% UMKM",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.20.9999",
+    "account_name": "OTHERS",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.30.0000",
+    "account_name": "ACCRUED EXPENSES",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.30.0001",
+    "account_name": "ACCRUED EXPENSES",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.30.9999",
+    "account_name": "OTHERS",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.40.0000",
+    "account_name": "DEFFERED INCOME",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.40.1001",
+    "account_name": "DEFF. INCOME-TOWER AVALON",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.40.1002",
+    "account_name": "DEFF. INCOME-TOWER MIRAGE",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.40.1003",
+    "account_name": "DEFF. INCOME-TOWER MONTREAL",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.40.1004",
+    "account_name": "DEFF. INCOME-TOWER MONTANA",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.40.1005",
+    "account_name": "DEFF. INCOME RENT COMMON AREA",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.40.1006",
+    "account_name": "DEFF INCOME SC PUBLIC AREA",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.50.0000",
+    "account_name": "OTHERS PAYABLE",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.50.1001",
+    "account_name": "OTHERS PAYABLE-TITIPAN TENANT",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.50.1002",
+    "account_name": "OTHERS PAYABLE-SHARING PROFIT",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.50.1999",
+    "account_name": "OTHERS PAYABLE",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.60.0000",
+    "account_name": "ACCOUNT PAYABLE-PBB",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.60.1001",
+    "account_name": "OTHER PAYABLE PBB-TOWER AVALON",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.60.1002",
+    "account_name": "OTHER PAYABLE PBB-TOWER MIRAGE",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.60.1003",
+    "account_name": "OTHER PAYABLE PBB-TWR MONTREAL",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.60.1004",
+    "account_name": "OTHER PAYABLE PBB-TWR MONTANA",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "21.60.1999",
+    "account_name": "OTHERS PAYABLE",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.00.0000",
+    "account_name": "LONG TERM LIABILITIES",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.0000",
+    "account_name": "DEPOSIT",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.1000",
+    "account_name": "SECURITY DEPOSIT",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.1001",
+    "account_name": "SECURITY DEPST.-TOWER AVALON",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.1002",
+    "account_name": "SECURITY DEPST.-TOWER MIRAGE",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.1003",
+    "account_name": "SECURITY DEPST.-TOWER MONTREAL",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.1004",
+    "account_name": "SECURITY DEPST.-TOWER MONTANA",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.2000",
+    "account_name": "DEPOSIT FIT OUT",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.2001",
+    "account_name": "DEPST. FO-TOWER AVALON",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.2002",
+    "account_name": "DEPST. FO-TOWER MIRAGE",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.2003",
+    "account_name": "DEPST. FO-TOWER MONTREAL",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.2004",
+    "account_name": "DEPST. FO-TOWER MONTANA",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.3000",
+    "account_name": "DEPOSIT LOADING BARANG",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.3001",
+    "account_name": "DEPS.LOADING BRG.-TOWER AVALON",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.3002",
+    "account_name": "DEPS.LOADING BRG.-TOWER MIRAGE",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.3003",
+    "account_name": "DEPS.LOADING BRG.-TWR MONTREAL",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.3004",
+    "account_name": "DEPS.LOADING BRG.-TWR MONTANA",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.4000",
+    "account_name": "DEPOSIT PUBLIC AREA",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.4001",
+    "account_name": "DEPOSIT PA - TOWER AVALON",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.4002",
+    "account_name": "DEPOSIT PA - TOWER MIRAGE",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.4003",
+    "account_name": "DEPOSIT PA - TOWER MONTREAL",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.10.4004",
+    "account_name": "DEPOSIT PA - TOWER MONTANA",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.20.0000",
+    "account_name": "WORKING CAPITAL PAYABLE",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.20.1001",
+    "account_name": "DEVELOPER LOAN-PT EPH",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.20.1999",
+    "account_name": "OTHERS",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.30.0000",
+    "account_name": "OTHERS",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "22.30.1001",
+    "account_name": "LIABILITAS IMBALAN KERJA",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "23.00.0000",
+    "account_name": "SINKING FUND",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "23.10.1000",
+    "account_name": "SINKING FUND",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "23.10.1001",
+    "account_name": "SINKING FUND-TOWER AVALON",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "23.10.1002",
+    "account_name": "SINKING FUND-TOWER MIRAGE",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "23.10.1003",
+    "account_name": "SINKING FUND-TOWER MONTREAL",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "23.10.1004",
+    "account_name": "SINKING FUND-TOWER MONTANA",
+    "account_cat": "Liabilities",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "50.00.0000",
+    "account_name": "CAPITAL",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "55.00.0000",
+    "account_name": "RETAINED EARNING",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "55.01.0000",
+    "account_name": "R/E PREVIOUS YEAR",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "55.02.0000",
+    "account_name": "R/E CURRENT YEAR",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "55.03.0000",
+    "account_name": "ASSET BERSIH TERIKAT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.00.0000",
+    "account_name": "INCOME",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.10.0000",
+    "account_name": "OPERATIONAL INCOME",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.10.1000",
+    "account_name": "RENTAL",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.10.1001",
+    "account_name": "RENTAL COMMON AREA",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.10.1002",
+    "account_name": "INCOME FROM BTS",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.10.2000",
+    "account_name": "SERVICE CHARGE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.10.2001",
+    "account_name": "INCOME SERVICE CHARGE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.10.3000",
+    "account_name": "UTILITIES",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.10.3001",
+    "account_name": "INCOME UTILITIES",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.0000",
+    "account_name": "NON OPERATIONAL INCOME",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.1001",
+    "account_name": "SERVICE AC",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.1002",
+    "account_name": "ACCESS CARD",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.1003",
+    "account_name": "PARKING CARD",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.1004",
+    "account_name": "MEMBERSHIP PARKING MOBIL",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.1005",
+    "account_name": "MEMBERSHIP PARKING MOTOR",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.1006",
+    "account_name": "PARKING AT LOBBY",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.1007",
+    "account_name": "Penggantian Listrik dan Kebersihan",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.1008",
+    "account_name": "NAIK/TURUN DAYA LISTRIK",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.1009",
+    "account_name": "UTILITIES PROJECT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.1010",
+    "account_name": "BALIK NAMA",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.1011",
+    "account_name": "ROMPI \u0026 ID CARD FO, SANKSI FO",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.1012",
+    "account_name": "ROMPI \u0026 ID CARD FO, SANKSI FO",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.1013",
+    "account_name": "INCOME METERAI",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "60.20.1999",
+    "account_name": "OTHER INCOME",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "70.00.0000",
+    "account_name": "EXPENSE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.00.0000",
+    "account_name": "OPERATIONAL EXPENSES",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0000",
+    "account_name": "BUILDING EXPENSES",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0001",
+    "account_name": "TOOLS \u0026 EQUIPMENT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0002",
+    "account_name": "LAMP \u0026 BULB REPLACEMENT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0003",
+    "account_name": "CIVIL/FITTING OUT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0004",
+    "account_name": "AC SPAREPART",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0005",
+    "account_name": "GENERAL/BUILDING MATERIALS",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0006",
+    "account_name": "ELEVATOR \u0026 ESCALATOR PART",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0007",
+    "account_name": "CHEMICAL/SOLAR",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0008",
+    "account_name": "LANSCAPING MATERIALS",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0009",
+    "account_name": "ELECTRICAL MATERIAL",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0010",
+    "account_name": "FURNITURE MATERIALS",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0011",
+    "account_name": "MAINTENANCE OF BUILDING",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0012",
+    "account_name": "CLEANING SERVICE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0013",
+    "account_name": "INDOOR PLANT RENTAL",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0014",
+    "account_name": "MAINT. ELEVATOR \u0026 ESCALATOR",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0015",
+    "account_name": "SECURITY SERVICE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0016",
+    "account_name": "PARKING SERVICE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0017",
+    "account_name": "PEST CONTROL",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0018",
+    "account_name": "POOL SERVICE \u0026 MAINTENANCE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0019",
+    "account_name": "SAFETY EXPENSE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0020",
+    "account_name": "PLN ELECTRICITY",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0021",
+    "account_name": "PAM WATER",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0022",
+    "account_name": "FOTOCOPY SERVICE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0023",
+    "account_name": "PBL (IURAN KAWASAN)",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0024",
+    "account_name": "MANAGEMENT FEE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0025",
+    "account_name": "KONSULTAN FEE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0026",
+    "account_name": "STATUTORY LICENSE \u0026 PERMIT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0027",
+    "account_name": "PROPERTY ALL RISK",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.0028",
+    "account_name": "LAND \u0026 BUILDING TAXES",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "71.10.9999",
+    "account_name": "OTHERS",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0000",
+    "account_name": "EMPLOYEE EXPENSES",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0001",
+    "account_name": "BASIC SALARY",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0002",
+    "account_name": "OVERTIME",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0003",
+    "account_name": "THR/BONUS",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0004",
+    "account_name": "BPJS TENAGA KERJA",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0005",
+    "account_name": "BPJS JAMINAN PENSIUN",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0006",
+    "account_name": "BPJS KESEHATAN",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0007",
+    "account_name": "EMPLOYEE BENEFIT EXPENSE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0008",
+    "account_name": "PESANGON KARYAWAN PKWT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0009",
+    "account_name": "UNIFORM \u0026 SHOES",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0010",
+    "account_name": "MEDICAL DOCTOR \u0026 REIMBURSMENT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0011",
+    "account_name": "TRAINING",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0012",
+    "account_name": "SPORT \u0026 RECREATION",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0013",
+    "account_name": "IURAN KOPERASI",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0014",
+    "account_name": "BPJS TK-JHT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0015",
+    "account_name": "BPJS TK-JKK",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.0016",
+    "account_name": "BPJS TK-JKM",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "72.10.9999",
+    "account_name": "OTHERS",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0000",
+    "account_name": "GENERAL \u0026 ADMINISTRATION EXPENSES",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0001",
+    "account_name": "STATIONARY \u0026 PRINTING",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0002",
+    "account_name": "OFFICE SUPPLIES",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0003",
+    "account_name": "SECURITY EQUIPMENT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0004",
+    "account_name": "TELEPHONE,TELEX,FAX",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0005",
+    "account_name": "STAMP DUTY,MAIL,POSTAGE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0006",
+    "account_name": "STAFF/OFFICE AMENITIES",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0007",
+    "account_name": "ENTERTAINMENT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0008",
+    "account_name": "GIFT \u0026 DONATION",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0009",
+    "account_name": "ADVERTISING \u0026 PROMOTION",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0010",
+    "account_name": "EVENT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0011",
+    "account_name": "BANK CHARGE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0012",
+    "account_name": "TV CABLE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0013",
+    "account_name": "VEHICLE RENTAL",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0014",
+    "account_name": "VEHICLE REPAIR \u0026 REPLACEMENT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0015",
+    "account_name": "VEHICLE FUEL",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0016",
+    "account_name": "PARKING \u0026 TOL",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0017",
+    "account_name": "ACOMODATION",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0018",
+    "account_name": "TRAVEL ALLOWANCE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0019",
+    "account_name": "VEHICLE INSURANCE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0020",
+    "account_name": "PPH PASAL 21",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0021",
+    "account_name": "OTHER TAX EXPENSE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0022",
+    "account_name": "ADVERTISEMENT PERMIT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0023",
+    "account_name": "TENANT GATHERING",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0024",
+    "account_name": "AGM (ANNUAL GENERAL MEEITNG)",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.0025",
+    "account_name": "BEBAN NATURA",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "73.10.9999",
+    "account_name": "OTHERS",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "74.10.0000",
+    "account_name": "DEPRECIATION EXPENSES",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "74.10.0001",
+    "account_name": "BUILDING",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "74.10.0002",
+    "account_name": "ENGINEERING EQUIPMENT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "74.10.0003",
+    "account_name": "ELECTRICAL SYSTEM",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "74.10.0004",
+    "account_name": "WATER SYSTEM",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "74.10.0005",
+    "account_name": "LIFT SYSTEM",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "74.10.0006",
+    "account_name": "OFFICE EQUIPMENT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "74.10.0007",
+    "account_name": "FURNITURE, FIXTURE \u0026 FITTING OFFICE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "74.10.0008",
+    "account_name": "FURNITURE \u0026 FIXTURE COMM AREA",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "74.10.0009",
+    "account_name": "FACILITY IMPROVEMENT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "74.10.0010",
+    "account_name": "SECURITY EQUIPMENT",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "74.10.0011",
+    "account_name": "CAR",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "74.10.0012",
+    "account_name": "MOTORCYCLE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "74.10.9999",
+    "account_name": "OTHERS",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "80.00.0000",
+    "account_name": "NON OPERATIONAL INCOME",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "80.10.0000",
+    "account_name": "NON OPERATIONAL INCOME",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "80.10.1001",
+    "account_name": "GIRO INTEREST INCOME",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "80.10.1002",
+    "account_name": "INTEREST DEPOSITO",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "80.10.1003",
+    "account_name": "(RUGI)/LABA SELISIH KURS",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "80.10.1999",
+    "account_name": "OTHER INCOME (SELISIH PEMBULATAN)",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "80.10.2999",
+    "account_name": "PERUBAHAN METODE DISTRIBUSI",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "80.20.0000",
+    "account_name": "OTHER COMPREHENSIVE INCOME",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "80.20.1001",
+    "account_name": "OCI-LIABLT.IMBALAN PASCA KERJA",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "80.20.1002",
+    "account_name": "OCI-TAKSIRAN PAJAK TANGGUHAN",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "90.00.0000",
+    "account_name": "NON OPERATIONAL EXPENSES",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "90.10.0000",
+    "account_name": "NON OPERATIONAL EXPENSES",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "90.10.1001",
+    "account_name": "TAKSIRAN PAJAK PENGHASILAN",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "90.10.1002",
+    "account_name": "PAJAK JASA GIRO",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "90.10.1003",
+    "account_name": "BAD DEBT EXPENSE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "90.10.1999",
+    "account_name": "OTHER EXPENSE",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "99.99.9999",
+    "account_name": "Suspend Account",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "Current Earning",
+    "account_name": "Current Earning Last Year",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  },
+  {
+    "company_id": "PCGR1",
+    "account_no": "Current Earning",
+    "account_name": "Current Earning Last Year",
+    "account_cat": "Expenses",
+    "group_name": "Uncategorized"
+  }
+]

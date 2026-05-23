@@ -1,0 +1,21 @@
+{
+    "sync_urls": {
+        "APRX0100": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/1ece0efd-36e8-49f6-9ad3-5318a1395521/APRX0100.json",
+        "ARRX0100": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/29bb2c2d-9944-43aa-91f8-07ec68d3c985/ARRX0100.json",
+        "CBRX0200": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/9cf00b25-dfa2-4eeb-a83b-4dcf17bc6ea9/CBRX0200.json",
+        "CBRX7000": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/8f7b2c32-8b09-43f8-a5a1-f0ef18d9093e/CBRX7000.json",
+        "GLRX0300": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/63749e0f-e051-477d-be19-aca5fc268239/GLRX0300.json",
+        "GLRX0310": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/c3d0deb6-6e21-4540-835a-0d348f91818b/GLRX0310.json",
+        "ICRX0700": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/71849946-b972-4c2d-9fc9-772e612cf9a7/ICRX0700.json",
+        "LMRX0220": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/0f5aff33-7716-4071-a498-bcd890dba0b9/LMRX0220.json",
+        "LMRX0400": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/17ae1b91-bd53-43a8-ad14-1210cca3e14f/LMRX0400.json",
+        "LMRX0710": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/5541c342-0c59-4332-880b-189d2f5a6ebb/LMRX0710.json",
+        "LMRX0800": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/a368fbff-ec47-40b8-bf77-bdc9e0d11aaf/LMRX0800.json",
+        "LMRX1000": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/0aee186b-6e48-4de8-bccf-c463cee87b5d/LMRX1000.json",
+        "LMRX2100": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/a93c0bd1-6c91-4cc3-8fc5-c5d0185f4b32/LMRX2100.json",
+        "PJRX0100": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/694e8253-e917-4f85-9198-780613ca247a/PJRX0100.json",
+        "PJRX1100": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/300ad38b-1bc1-4247-bb94-db1d0873727c/PJRX1100.json",
+        "SSRX7100": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/12093d3c-30c8-4aa9-8bb6-0e2772e1e4e2/SSRX7100.json",
+        "SSRX7200": "https://saktistorageacc.blob.core.windows.net/bimasakti/powerbi/ashmd/9fa60dad-8961-4514-9085-115c3b52338a/SSRX7200.json"
+    }
+}

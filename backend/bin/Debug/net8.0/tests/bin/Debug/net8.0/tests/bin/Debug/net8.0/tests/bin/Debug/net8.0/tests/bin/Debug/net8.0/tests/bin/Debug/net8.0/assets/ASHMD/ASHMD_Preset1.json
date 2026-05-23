@@ -1,0 +1,3369 @@
+[
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.00.000",
+    "account_name": "Aktiva Lancar",
+    "account_cat": "Assets",
+    "group_name": "Aktiva Lancar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.01.000",
+    "account_name": "KAS",
+    "account_cat": "Assets",
+    "group_name": "Kas Kecil"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.01.100",
+    "account_name": "Kas  Besar",
+    "account_cat": "Assets",
+    "group_name": "Kas Kecil"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.01.200",
+    "account_name": "Kas  Kecil",
+    "account_cat": "Assets",
+    "group_name": "Kas Kecil"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.01.201",
+    "account_name": "Kas  Kecil - Pusat",
+    "account_cat": "Assets",
+    "group_name": "Kas Kecil"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.01.202",
+    "account_name": "Kas  Kecil - Properti.Management",
+    "account_cat": "Assets",
+    "group_name": "Kas Kecil"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.01.203",
+    "account_name": "Kas  Kecil - Admin",
+    "account_cat": "Assets",
+    "group_name": "Kas Kecil"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.01.204",
+    "account_name": "Kas - Piutang",
+    "account_cat": "Assets",
+    "group_name": "Kas Kecil"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.01.205",
+    "account_name": "Kas - CS Parkir",
+    "account_cat": "Assets",
+    "group_name": "Kas Kecil"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.000",
+    "account_name": "BANK",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.100",
+    "account_name": "Bank Artha Graha ( BAG )",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.101",
+    "account_name": "BAG No.Rek",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.102",
+    "account_name": "BAG Virtual Account No.Rek",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.200",
+    "account_name": "Bank Central Asia ( BCA )",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.201",
+    "account_name": "BCA No.Rek",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.202",
+    "account_name": "BCA Virtual Account No.Rek",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.300",
+    "account_name": "Bank Mandiri",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.301",
+    "account_name": "Bank Mandiri No.rek 1150001096595",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.302",
+    "account_name": "Bank Mandiri Virtual Acc Rek 11500010965",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.400",
+    "account_name": "Bank Negara Indonesia ( BNI )",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.401",
+    "account_name": "Bank BNI Transfer",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.500",
+    "account_name": "Bank DOKU",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.501",
+    "account_name": "Bank DOKU",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.02.999",
+    "account_name": "Cash Bank Intransit",
+    "account_cat": "Assets",
+    "group_name": "Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.03.000",
+    "account_name": "DEPOSITO",
+    "account_cat": "Assets",
+    "group_name": "Deposito"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.03.100",
+    "account_name": "Deposito  Bank Artha Graha",
+    "account_cat": "Assets",
+    "group_name": "Deposito"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.03.200",
+    "account_name": "Deposito  Bank Central Asia",
+    "account_cat": "Assets",
+    "group_name": "Deposito"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.03.300",
+    "account_name": "Deposito  Bank Mandiri",
+    "account_cat": "Assets",
+    "group_name": "Deposito"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.03.400",
+    "account_name": "Deposito Bank BTN",
+    "account_cat": "Assets",
+    "group_name": "Deposito"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.000",
+    "account_name": "Piutang Usaha Pihak 3",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.100",
+    "account_name": "Piutang Usaha Counter",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.200",
+    "account_name": "Piutang Usaha Kios",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.300",
+    "account_name": "Piutang Usaha Area",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.400",
+    "account_name": "Piutang Usaha Kantin",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.500",
+    "account_name": "Piutang Usaha Boulevard",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.600",
+    "account_name": "Piutang Usaha Teras Gedung",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.700",
+    "account_name": "Piutang Usaha Ruko",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.710",
+    "account_name": "Piutang Usaha Ditangguhkan",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.720",
+    "account_name": "Piutang Usaha Gudang",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.730",
+    "account_name": "Piutang Usaha Office",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.740",
+    "account_name": "Piutang Usaha Pujasera",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.750",
+    "account_name": "Piutang Usaha Antena",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.760",
+    "account_name": "Piutang Usaha Office",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.770",
+    "account_name": "Piutang Usaha Parkir Susun",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.780",
+    "account_name": "Piutang Usaha Reklame",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.790",
+    "account_name": "Piutang Usaha Lain_lain",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Pihak ke 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.800",
+    "account_name": "Piutang Usaha Pihak 3 - Allowance",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Lain-lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.900",
+    "account_name": "Piutang Usaha Ruko",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Lain-lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.998",
+    "account_name": "Piutang Deposit",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Lain-lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.04.999",
+    "account_name": "Piutang Yang Belum Dialokasi",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Lain-lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.05.000",
+    "account_name": "Piutang Usaha Afiliasi",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.05.100",
+    "account_name": "Piutang Usaha Afiliasi - Office",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.05.200",
+    "account_name": "Piutang Usaha Afiliasi - Kios",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.05.300",
+    "account_name": "Piutang Usaha Afiliasi - Allowance",
+    "account_cat": "Assets",
+    "group_name": "Piutang Usaha Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.000",
+    "account_name": "Piutang Lain - Lain",
+    "account_cat": "Assets",
+    "group_name": "Piutang Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.100",
+    "account_name": "Piutang  Karyawan",
+    "account_cat": "Assets",
+    "group_name": "Piutang Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.101",
+    "account_name": "Piutang  Karyawan - Pak Solihin",
+    "account_cat": "Assets",
+    "group_name": "Piutang Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.102",
+    "account_name": "Piutang  Karyawan - B",
+    "account_cat": "Assets",
+    "group_name": "Piutang Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.103",
+    "account_name": "Piutang  Karyawan - C",
+    "account_cat": "Assets",
+    "group_name": "Piutang Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.200",
+    "account_name": "Piutang  Kas Bon",
+    "account_cat": "Assets",
+    "group_name": "Piutang Kas Bon"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.201",
+    "account_name": "Piutang  Kas Bon - A",
+    "account_cat": "Assets",
+    "group_name": "Piutang Kas Bon"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.202",
+    "account_name": "Piutang  Kas Bon - B",
+    "account_cat": "Assets",
+    "group_name": "Piutang Kas Bon"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.203",
+    "account_name": "Piutang  Kas Bon - C",
+    "account_cat": "Assets",
+    "group_name": "Piutang Kas Bon"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.204",
+    "account_name": "Piutang  Kas Bon - D",
+    "account_cat": "Assets",
+    "group_name": "Piutang Kas Bon"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.300",
+    "account_name": "Piutang  Bunga Deposito",
+    "account_cat": "Assets",
+    "group_name": "Piutang Bunga Deposito"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.301",
+    "account_name": "Piutang  Bunga Deposito  - BAG",
+    "account_cat": "Assets",
+    "group_name": "Piutang Bunga Deposito"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.302",
+    "account_name": "Piutang  Bunga Deposito  - Mandiri",
+    "account_cat": "Assets",
+    "group_name": "Piutang Bunga Deposito"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.500",
+    "account_name": "Piutang  Lain - Lainnya",
+    "account_cat": "Assets",
+    "group_name": "Piutang Lain-lainnya"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.501",
+    "account_name": "Tukar giro",
+    "account_cat": "Assets",
+    "group_name": "Piutang Lain-lainnya"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.502",
+    "account_name": "Perpanjangan HGB",
+    "account_cat": "Assets",
+    "group_name": "Piutang Lain-lainnya"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.503",
+    "account_name": "Piutang  Asuransi",
+    "account_cat": "Assets",
+    "group_name": "Piutang Lain-lainnya"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.504",
+    "account_name": "Piutang  Neon - Box",
+    "account_cat": "Assets",
+    "group_name": "Piutang Lain-lainnya"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.505",
+    "account_name": "Piutang  Renovasi",
+    "account_cat": "Assets",
+    "group_name": "Piutang Lain-lainnya"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.06.506",
+    "account_name": "Piutang  PBB",
+    "account_cat": "Assets",
+    "group_name": "Piutang Lain-lainnya"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.07.000",
+    "account_name": "Persediaan",
+    "account_cat": "Assets",
+    "group_name": "Persediaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.07.100",
+    "account_name": "Persediaan - Peralatan Kantor",
+    "account_cat": "Assets",
+    "group_name": "Persediaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.07.200",
+    "account_name": "Persediaan - BBM",
+    "account_cat": "Assets",
+    "group_name": "Persediaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.07.300",
+    "account_name": "Persediaan - Gudang HK",
+    "account_cat": "Assets",
+    "group_name": "Persediaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.07.400",
+    "account_name": "Persediaan - Gudang BM \u002B ME",
+    "account_cat": "Assets",
+    "group_name": "Persediaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.07.500",
+    "account_name": "Persediaan - Gudang Umum",
+    "account_cat": "Assets",
+    "group_name": "Persediaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.07.600",
+    "account_name": "Persediaan - Gudang Lainnya",
+    "account_cat": "Assets",
+    "group_name": "Persediaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.07.700",
+    "account_name": "Persediaan - Telpon",
+    "account_cat": "Assets",
+    "group_name": "Persediaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.07.800",
+    "account_name": "Persediaan - Lainnya",
+    "account_cat": "Assets",
+    "group_name": "Persediaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.07.999",
+    "account_name": "Mutasi Persediaan",
+    "account_cat": "Assets",
+    "group_name": "Persediaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.08.000",
+    "account_name": "Biaya dibayar di muka",
+    "account_cat": "Assets",
+    "group_name": "Biaya dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.08.100",
+    "account_name": "Biaya Asuransi",
+    "account_cat": "Assets",
+    "group_name": "Biaya dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.08.200",
+    "account_name": "Biaya Sewa",
+    "account_cat": "Assets",
+    "group_name": "Biaya dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.08.300",
+    "account_name": "Biaya Maintenant Fee",
+    "account_cat": "Assets",
+    "group_name": "Biaya dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.08.400",
+    "account_name": "Biaya Iklan / Promosi / Ijin",
+    "account_cat": "Assets",
+    "group_name": "Biaya dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.08.500",
+    "account_name": "Biaya Discount",
+    "account_cat": "Assets",
+    "group_name": "Biaya dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.08.600",
+    "account_name": "Biaya Lain - Lain",
+    "account_cat": "Assets",
+    "group_name": "Biaya dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.09.000",
+    "account_name": "Pajak dibayar di muka",
+    "account_cat": "Assets",
+    "group_name": "Pajak dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.09.100",
+    "account_name": "PPh Pasal 21  /26",
+    "account_cat": "Assets",
+    "group_name": "Pajak dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.09.200",
+    "account_name": "PPh Pasal 22",
+    "account_cat": "Assets",
+    "group_name": "Pajak dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.09.300",
+    "account_name": "PPh Pasal 23",
+    "account_cat": "Assets",
+    "group_name": "Pajak dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.09.400",
+    "account_name": "PPh Pasal 25 / 29",
+    "account_cat": "Assets",
+    "group_name": "Pajak dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.09.500",
+    "account_name": "PPN Masukan",
+    "account_cat": "Assets",
+    "group_name": "Pajak dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.09.501",
+    "account_name": "PPN Masukan Terealisasi",
+    "account_cat": "Assets",
+    "group_name": "Pajak dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.09.502",
+    "account_name": "PPN Masukan Belum Terealisasi",
+    "account_cat": "Assets",
+    "group_name": "Pajak dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.09.600",
+    "account_name": "PPN Masukan Lain",
+    "account_cat": "Assets",
+    "group_name": "Pajak dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.09.700",
+    "account_name": "PPN Lebih Bayar",
+    "account_cat": "Assets",
+    "group_name": "Pajak dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.09.800",
+    "account_name": "PPh  4  ( 2 )",
+    "account_cat": "Assets",
+    "group_name": "Pajak dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.09.900",
+    "account_name": "Property Tax ( PBB )",
+    "account_cat": "Assets",
+    "group_name": "Pajak dibayar di muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.10.000",
+    "account_name": "Beban ditangguhkan",
+    "account_cat": "Assets",
+    "group_name": "Beban ditangguhkan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.10.100",
+    "account_name": "Discount",
+    "account_cat": "Assets",
+    "group_name": "Beban ditangguhkan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.10.200",
+    "account_name": "Perbaikan Sarana dan Prasarana",
+    "account_cat": "Assets",
+    "group_name": "Beban ditangguhkan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.10.300",
+    "account_name": "Biaya iklan",
+    "account_cat": "Assets",
+    "group_name": "Beban ditangguhkan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.10.400",
+    "account_name": "Biaya Komisi",
+    "account_cat": "Assets",
+    "group_name": "Beban ditangguhkan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.10.500",
+    "account_name": "Biaya ditangguhkan Lainnya",
+    "account_cat": "Assets",
+    "group_name": "Beban ditangguhkan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.11.000",
+    "account_name": "Aktiva Lancar Lainnya",
+    "account_cat": "Assets",
+    "group_name": "Surat Berharga"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.11.100",
+    "account_name": "Surat Berharga ( Saham /Obligasi )",
+    "account_cat": "Assets",
+    "group_name": "Surat Berharga"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.11.200",
+    "account_name": "Uang Muka Pembelian",
+    "account_cat": "Assets",
+    "group_name": "Uang Muka Pembelian"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.20.000",
+    "account_name": "Aktiva Tidak Lancar",
+    "account_cat": "Assets",
+    "group_name": "Aktiva Tidak Lancar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.21.000",
+    "account_name": "Piutang Afiliasi",
+    "account_cat": "Assets",
+    "group_name": "Piutang Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.21.100",
+    "account_name": "Piutang Afiliasi - Developer",
+    "account_cat": "Assets",
+    "group_name": "Piutang Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.21.101",
+    "account_name": "Piutang Afiliasi - Developer  PT.ASPr",
+    "account_cat": "Assets",
+    "group_name": "Piutang Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.21.200",
+    "account_name": "Piutang Afiliasi - Pom",
+    "account_cat": "Assets",
+    "group_name": "Piutang Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.21.201",
+    "account_name": "Piutang Afiliasi - Pom A",
+    "account_cat": "Assets",
+    "group_name": "Piutang Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.21.202",
+    "account_name": "Piutang Afiliasi - Pom B",
+    "account_cat": "Assets",
+    "group_name": "Piutang Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.21.300",
+    "account_name": "Piutang Afiliasi - Lainnya",
+    "account_cat": "Assets",
+    "group_name": "Piutang Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.22.000",
+    "account_name": "Aktiva Tetap  - Harga Perolehan",
+    "account_cat": "Assets",
+    "group_name": "Aktiva Tetap"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.22.100",
+    "account_name": "Tanah",
+    "account_cat": "Assets",
+    "group_name": "Aktiva Tetap"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.22.200",
+    "account_name": "Gedung \u0026 Prasarana",
+    "account_cat": "Assets",
+    "group_name": "Aktiva Tetap"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.22.300",
+    "account_name": "Mesin \u0026 Peralatan Kantor/Proyek",
+    "account_cat": "Assets",
+    "group_name": "Aktiva Tetap"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.22.400",
+    "account_name": "Kendaraan",
+    "account_cat": "Assets",
+    "group_name": "Aktiva Tetap"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.22.500",
+    "account_name": "Fixed Asset  Lainnya",
+    "account_cat": "Assets",
+    "group_name": "Aktiva Tetap"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.22.999",
+    "account_name": "Pra Aktiva Tetap",
+    "account_cat": "Assets",
+    "group_name": "Aktiva Tetap"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.23.000",
+    "account_name": "Aktiva Tetap  -  Akum Penyusutan",
+    "account_cat": "Assets",
+    "group_name": "Akum. Penyusutan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.23.100",
+    "account_name": "Akum Penyusutan - Tanah",
+    "account_cat": "Assets",
+    "group_name": "Akum. Penyusutan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.23.200",
+    "account_name": "Akum Penyusutan - Gedung \u0026 Prasarana",
+    "account_cat": "Assets",
+    "group_name": "Akum. Penyusutan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.23.300",
+    "account_name": "Akum Penyusutan - Mesin \u0026 Perlatan Produ",
+    "account_cat": "Assets",
+    "group_name": "Akum. Penyusutan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.23.400",
+    "account_name": "Akum Penyusutan - Kendaraan",
+    "account_cat": "Assets",
+    "group_name": "Akum. Penyusutan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "1.23.500",
+    "account_name": "Akum Penyusutan - Lainnya",
+    "account_cat": "Assets",
+    "group_name": "Akum. Penyusutan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.00.000",
+    "account_name": "Passiva  Lancar",
+    "account_cat": "Liabilities",
+    "group_name": "Passiva Lancar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.000",
+    "account_name": "Hutang Usaha Pihak Ke -3",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.100",
+    "account_name": "Hutang Usaha Pihak Ke -3 - Jasa Service.",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.110",
+    "account_name": "Hutang Usaha Pihak Ke -3 - Jasa Keamanan",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.120",
+    "account_name": "Hutang Usaha Pihak Ke -3 - Jasa Kebersih",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.130",
+    "account_name": "Hutang Usaha Pihak Ke -3 - Jasa Perbaika",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.200",
+    "account_name": "Hutang Usaha Pihak Ke -3 - Utility",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.210",
+    "account_name": "Hutang Usaha Pihak Ke -3 - Utility - Lis",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.220",
+    "account_name": "Hutang Usaha Pihak Ke -3 - Utility - Air",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.300",
+    "account_name": "Hutang Usaha Pihak Ke -3 - Lainnya",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.400",
+    "account_name": "Hutang Usaha Pihak ke 3 - Produk",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.410",
+    "account_name": "Hutang Usaha - Produk Engineering",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.420",
+    "account_name": "Hutang Usaha - Produk Umum",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.430",
+    "account_name": "Hutang Usaha - Produk Housekeeping",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.440",
+    "account_name": "Hutang Usaha - Produk Admin",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.500",
+    "account_name": "Hutang Uang Muka Pembelian",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.998",
+    "account_name": "Pra Hutang Usaha",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.01.999",
+    "account_name": "Hutang Yang Belum Dialokasi",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak ke - 3"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.02.000",
+    "account_name": "Hutang Usaha Pihak Afiliasi",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak Afilisiasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.02.100",
+    "account_name": "Hutang Usaha Pihak Afiliasi - Jasa Servi",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak Afilisiasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.02.110",
+    "account_name": "Hutang Usaha Pihak Afiliasi - Jasa Keama",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak Afilisiasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.02.120",
+    "account_name": "Hutang Usaha Pihak Afiliasi - Jasa Keber",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak Afilisiasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.02.130",
+    "account_name": "Hutang Usaha Pihak Afiliasi - Jasa Perba",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak Afilisiasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.02.200",
+    "account_name": "Hutang Usaha Pihak Afiliasi - Utility",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak Afilisiasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.02.210",
+    "account_name": "Hutang Usaha Pihak Afiliasi - Utility -",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak Afilisiasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.02.220",
+    "account_name": "Hutang Usaha Pihak Afiliasi - Utility -",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak Afilisiasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.02.300",
+    "account_name": "Hutang Usaha Pihak Afiliasi - Lainnya",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Usaha Pihak Afilisiasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.03.000",
+    "account_name": "Hutang Lain",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.03.100",
+    "account_name": "Hutang Lain - Karyawan",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.03.200",
+    "account_name": "Hutang Lain - Jamsostek",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.03.300",
+    "account_name": "Hutang Lain - Lainnya",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.04.000",
+    "account_name": "Hutang Pajak",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Pajak"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.04.100",
+    "account_name": "Hutang Pajak  - PPh Pasal 21",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Pajak"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.04.200",
+    "account_name": "Hutang Pajak  - PPh Pasal 22",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Pajak"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.04.300",
+    "account_name": "Hutang Pajak  - PPh Pasal 23",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Pajak"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.04.400",
+    "account_name": "Hutang Pajak  - PPh Pasal  4 ( 2 )",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Pajak"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.04.500",
+    "account_name": "Hutang Pajak  - PPh Pasal  25",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Pajak"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.04.600",
+    "account_name": "Hutang Pajak  - PPh Pasal  29",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Pajak"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.04.700",
+    "account_name": "Hutang Pajak  - PPN",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Pajak"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.04.800",
+    "account_name": "Hutang Pajak  - PBB Milik Perusahaan",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Pajak"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.04.900",
+    "account_name": "Hutang Pajak  - Lainnya",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Pajak"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.05.000",
+    "account_name": "Uang Muka  ( Pend diterima dimuka )",
+    "account_cat": "Liabilities",
+    "group_name": "Uang Muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.05.100",
+    "account_name": "Uang Muka - Service.Charges",
+    "account_cat": "Liabilities",
+    "group_name": "Uang Muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.05.200",
+    "account_name": "Uang Muka - IKKR",
+    "account_cat": "Liabilities",
+    "group_name": "Uang Muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.05.300",
+    "account_name": "Uang Muka - Listrik",
+    "account_cat": "Liabilities",
+    "group_name": "Uang Muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.05.400",
+    "account_name": "Uang Muka - Sewa",
+    "account_cat": "Liabilities",
+    "group_name": "Uang Muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.05.500",
+    "account_name": "Uang Muka - Iklan",
+    "account_cat": "Liabilities",
+    "group_name": "Uang Muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.05.600",
+    "account_name": "Uang Muka - Promisi",
+    "account_cat": "Liabilities",
+    "group_name": "Uang Muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.05.700",
+    "account_name": "Uang Muka - Jaminan",
+    "account_cat": "Liabilities",
+    "group_name": "Uang Muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.05.800",
+    "account_name": "Uang Muka - Lain lain",
+    "account_cat": "Liabilities",
+    "group_name": "Uang Muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.05.900",
+    "account_name": "Uang Muka Pendapatan DTM Lama",
+    "account_cat": "Liabilities",
+    "group_name": "Uang Muka"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.06.000",
+    "account_name": "Biaya Yang Masih Harus Dibayar",
+    "account_cat": "Liabilities",
+    "group_name": "Biaya Yang Masih Harus Dibayar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.06.110",
+    "account_name": "Gaji Karyawan",
+    "account_cat": "Liabilities",
+    "group_name": "Biaya Yang Masih Harus Dibayar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.06.120",
+    "account_name": "Listrik \u002B Air \u002B Telpon \u002B Internet",
+    "account_cat": "Liabilities",
+    "group_name": "Biaya Yang Masih Harus Dibayar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.06.130",
+    "account_name": "Jasa Keamanan",
+    "account_cat": "Liabilities",
+    "group_name": "Biaya Yang Masih Harus Dibayar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.06.140",
+    "account_name": "Jasa Kebersihan",
+    "account_cat": "Liabilities",
+    "group_name": "Biaya Yang Masih Harus Dibayar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.06.150",
+    "account_name": "Jasa Pekerjaan dan Perbaikan",
+    "account_cat": "Liabilities",
+    "group_name": "Biaya Yang Masih Harus Dibayar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.06.160",
+    "account_name": "Jasa Profesional (konsultan)",
+    "account_cat": "Liabilities",
+    "group_name": "Biaya Yang Masih Harus Dibayar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.06.170",
+    "account_name": "Medical",
+    "account_cat": "Liabilities",
+    "group_name": "Biaya Yang Masih Harus Dibayar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.06.180",
+    "account_name": "Insurance",
+    "account_cat": "Liabilities",
+    "group_name": "Biaya Yang Masih Harus Dibayar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.06.190",
+    "account_name": "Sewa Mesin Fotocopy",
+    "account_cat": "Liabilities",
+    "group_name": "Biaya Yang Masih Harus Dibayar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.06.200",
+    "account_name": "Audit Fee",
+    "account_cat": "Liabilities",
+    "group_name": "Biaya Yang Masih Harus Dibayar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.06.210",
+    "account_name": "CSR",
+    "account_cat": "Liabilities",
+    "group_name": "Biaya Yang Masih Harus Dibayar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.06.220",
+    "account_name": "Parking",
+    "account_cat": "Liabilities",
+    "group_name": "Biaya Yang Masih Harus Dibayar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.06.230",
+    "account_name": "Lain - Lain",
+    "account_cat": "Liabilities",
+    "group_name": "Biaya Yang Masih Harus Dibayar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.07.000",
+    "account_name": "Deposit / Ttipan",
+    "account_cat": "Liabilities",
+    "group_name": "Deposit"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.07.100",
+    "account_name": "Security - Deposit",
+    "account_cat": "Liabilities",
+    "group_name": "Deposit"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.07.200",
+    "account_name": "Deposit  Sewa",
+    "account_cat": "Liabilities",
+    "group_name": "Deposit"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.07.300",
+    "account_name": "Deposit  Renovasi  ( Kios / Ruko )",
+    "account_cat": "Liabilities",
+    "group_name": "Deposit"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.07.400",
+    "account_name": "Deposit  Transfer ( Mr. X )",
+    "account_cat": "Liabilities",
+    "group_name": "Deposit"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.07.500",
+    "account_name": "Deposit  Perbaikan  Lain - Lain",
+    "account_cat": "Liabilities",
+    "group_name": "Deposit"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.07.600",
+    "account_name": "Deposit / Ttipan Lama",
+    "account_cat": "Liabilities",
+    "group_name": "Deposit"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.20.000",
+    "account_name": "Passiva  Tidak Lancar",
+    "account_cat": "Liabilities",
+    "group_name": "Passiva Tidak Lancar"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.21.000",
+    "account_name": "Hutang - Afiliasi",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.21.100",
+    "account_name": "Hutang - Afiliasi - Pom",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.21.200",
+    "account_name": "Hutang - Afiliasi - Management  Fee",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.21.300",
+    "account_name": "Hutang - Afiliasi - Tzu Chi",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.21.400",
+    "account_name": "Hutang - Afiliasi - PT.ASPr",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang Afiliasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.22.000",
+    "account_name": "Sinking Fund",
+    "account_cat": "Liabilities",
+    "group_name": "Sinking Fund"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.22.100",
+    "account_name": "Sinking Fund - Kios",
+    "account_cat": "Liabilities",
+    "group_name": "Sinking Fund"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.22.200",
+    "account_name": "Sinking Fund - Ruko",
+    "account_cat": "Liabilities",
+    "group_name": "Sinking Fund"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.23.000",
+    "account_name": "Hutang ( Pinjaman ) Jangka Panjang",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang (Pinjaman) Jangka Panjang"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.23.100",
+    "account_name": "Hutang JP - Bank",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang (Pinjaman) Jangka Panjang"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.23.200",
+    "account_name": "Hutang JP - Leasing",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang (Pinjaman) Jangka Panjang"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.23.300",
+    "account_name": "Hutang JP - Pom",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang (Pinjaman) Jangka Panjang"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.23.400",
+    "account_name": "Hutang JP - PT.ASPr",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang (Pinjaman) Jangka Panjang"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.23.500",
+    "account_name": "Hutang JP - Lainnya",
+    "account_cat": "Liabilities",
+    "group_name": "Hutang (Pinjaman) Jangka Panjang"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.24.000",
+    "account_name": "Modal",
+    "account_cat": "Equity",
+    "group_name": "Laba Ditahan Tahun Lalu"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.24.100",
+    "account_name": "Laba ditahan tahun lalu",
+    "account_cat": "Equity",
+    "group_name": "Laba Ditahan Tahun Lalu"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.24.200",
+    "account_name": "Laba ditahan tahun Berjalan",
+    "account_cat": "Equity",
+    "group_name": "Laba ditahan tahun Berjalan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.24.300",
+    "account_name": "Laba Periode Berjalan",
+    "account_cat": "Equity",
+    "group_name": "Laba Periode Berjalan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.25.000",
+    "account_name": "Deviden",
+    "account_cat": "Equity",
+    "group_name": "Deviden"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "2.25.100",
+    "account_name": "Deviden  Pemegang Saham",
+    "account_cat": "Equity",
+    "group_name": "Deviden"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.000",
+    "account_name": "Pendapatan  Sewa",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.100",
+    "account_name": "Pendapatan Sewa  Counter",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.200",
+    "account_name": "Pendapatan Sewa  Kios",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.300",
+    "account_name": "Pendapatan Sewa  Gudang",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.400",
+    "account_name": "Pendapatan Sewa  Kantor",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.500",
+    "account_name": "Pendapatan Sewa - BTS",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.600",
+    "account_name": "Pendapatan Sewa - ATM",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.601",
+    "account_name": "Pend sewa - ATM - BCA",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.602",
+    "account_name": "Pend sewa - ATM - Mandiri",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.603",
+    "account_name": "Pend sewa - ATM - BRI",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.604",
+    "account_name": "Pend sewa - ATM - BNI",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.605",
+    "account_name": "Pend sewa - ATM - Danamon",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.606",
+    "account_name": "Pend sewa - ATM - Panin",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.607",
+    "account_name": "Pend Sewa -ATM - CIMB NIAGA",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.700",
+    "account_name": "Pendapatan Sewa - Exhibition  Hall",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.800",
+    "account_name": "Pendapatan Sewa - Reklame",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.801",
+    "account_name": "Pend Sewa - Reklame  - Mading",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.802",
+    "account_name": "Pend Sewa - Reklame  - Neon Box",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.803",
+    "account_name": "Pend Sewa - Reklame  - Sign  Box",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.804",
+    "account_name": "Pend Sewa - Reklame  - Billboard",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.805",
+    "account_name": "Pend Sewa - Reklame  - Spanduk",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.806",
+    "account_name": "Pend Sewa - Reklame  - Umbul - umbul",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.900",
+    "account_name": "Pendapatan Sewa - Lain - Lain",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.901",
+    "account_name": "Pend Sewa -  Toilet  KM \u002B FH",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.902",
+    "account_name": "Pend Sewa -  Fasilitas MATV",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.01.903",
+    "account_name": "Pend Sewa -  Bagi hasil",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Sewa"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.02.400",
+    "account_name": "Pendapatan Service .Charges",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Usaha Lainnya"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.03.500",
+    "account_name": "Pendapatan  Listrik",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Usaha Lainnya"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.04.600",
+    "account_name": "Pendapatan  Air",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Usaha Lainnya"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.05.700",
+    "account_name": "Pendapatan  IKKR",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Usaha Lainnya"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.06.000",
+    "account_name": "Pendapatan  Telpon",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Telpon"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.06.100",
+    "account_name": "Penjualan Line Telpon",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Telpon"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.06.200",
+    "account_name": "Pemindahan Line Telpon",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Telpon"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.06.300",
+    "account_name": "Instalasi Telpon",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Telpon"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.06.400",
+    "account_name": "Profit Sharing",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Telpon"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.07.000",
+    "account_name": "Pendapatan  Parkir",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Parkir"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.07.100",
+    "account_name": "Stiker Parkir",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Parkir"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.07.200",
+    "account_name": "Subsidi Parkir ( PT.ASPr )",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Parkir"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.07.300",
+    "account_name": "Bagi hasil",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Parkir"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.07.400",
+    "account_name": "Parkir - Mobil Menginap",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Parkir"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.07.500",
+    "account_name": "Parkir - Mobil",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Parkir"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.07.600",
+    "account_name": "Parkir - Motor",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Parkir"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.07.700",
+    "account_name": "Parkir - Berlangganan",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Parkir"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.07.800.",
+    "account_name": "Subsidi Tenaga Kebersihan(PRIMA HARKAT)",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Parkir"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.08.000",
+    "account_name": "Pendapatan  Perbaikan \u0026 Pekerjaan",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Perbaikan \u0026 Pekerjaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.08.100",
+    "account_name": "Renovasi Kios",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Perbaikan \u0026 Pekerjaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.08.200",
+    "account_name": "Tambah Daya /Access card",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Perbaikan \u0026 Pekerjaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.08.300",
+    "account_name": "Re-aktivasi Utilitas",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Perbaikan \u0026 Pekerjaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.08.400",
+    "account_name": "Work Orders",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Perbaikan \u0026 Pekerjaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.08.500",
+    "account_name": "Perbaikan  Lain - Lain",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Perbaikan \u0026 Pekerjaan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.09.000",
+    "account_name": "Pendapatan  Denda",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.09.100",
+    "account_name": "Denda Keterlambatan",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.10.000",
+    "account_name": "Pendapatan  Lain - Lain",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.10.100",
+    "account_name": "Ijin pekerjaan / Potong deposit",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.10.200",
+    "account_name": "Bongkar muat barang",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.10.300",
+    "account_name": "Pendapatan Asuransi",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.10.400",
+    "account_name": "Pendapatan Lainnya",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.10.410",
+    "account_name": "Pendapatan Lainnya Marketing",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.10.420",
+    "account_name": "Pendapatan Lainnya CS",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "4.10.430",
+    "account_name": "Pendapatan Lainnya GSA",
+    "account_cat": "Revenue",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.000",
+    "account_name": "Potongan / Discount",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.100",
+    "account_name": "Discount  - Sewa",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.200",
+    "account_name": "Discount  - Service . Charges",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.300",
+    "account_name": "Discount  - IKKR",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.400",
+    "account_name": "Discount  - Listrik",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.401",
+    "account_name": "Discount  - Listrik - Pemakaian",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.402",
+    "account_name": "Discount  - Listrik - Admin",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.403",
+    "account_name": "Discount  - Listrik - Pasang Baru / Peng",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.500",
+    "account_name": "Discount  - Air",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.501",
+    "account_name": "Discount  - Air - Pemakaian",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.502",
+    "account_name": "Discount  - Air - Admin",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.503",
+    "account_name": "Discount  - Air - Pasang Baru / Penggant",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.600",
+    "account_name": "Discount  - Parkir",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.700",
+    "account_name": "Discount  - Perbaikan dan Pekerjaan",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.01.800",
+    "account_name": "Discount  - Denda",
+    "account_cat": "Expenses",
+    "group_name": "Discount"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.000",
+    "account_name": "Beban Jasa ( HPP )",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.100",
+    "account_name": "Beban Jasa ( HPP ) - Sewa",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.101",
+    "account_name": "Komisi Sewa",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.200",
+    "account_name": "Beban Jasa ( HPP ) - Service Charges",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.201",
+    "account_name": "Jasa Keamanan",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.202",
+    "account_name": "Jasa Kebersihan",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.203",
+    "account_name": "Landscape",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.204",
+    "account_name": "Pest \u0026 Rodent Control",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.205",
+    "account_name": "Hygiene \u0026 Sanitary",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.206",
+    "account_name": "Chemical / Kep.Cleaning Service",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.207",
+    "account_name": "Kontrak service AC",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.208",
+    "account_name": "Kontrak service STP",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.209",
+    "account_name": "Pekerjaan dan Perbaikan",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.210",
+    "account_name": "RM - Ventilation \u0026 AC",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.211",
+    "account_name": "RM - Elevator, Escalator \u0026 Travelator",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.212",
+    "account_name": "RM - Lighting Electrical \u0026 Electronic",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.213",
+    "account_name": "RM - Genset \u0026 Diesel",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.214",
+    "account_name": "RM - Mekanical",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.215",
+    "account_name": "RM - Electrical \u0026 Elctronic",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.216",
+    "account_name": "RM - Fire Safety",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.217",
+    "account_name": "RM - Civil / Building Work",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.218",
+    "account_name": "RM - Peralatan Kerja",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.219",
+    "account_name": "RM - Perkakas / Tools",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.220",
+    "account_name": "RM - Fasilitas",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.221",
+    "account_name": "RM - Common Area",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.222",
+    "account_name": "RM - Parkir Area",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.223",
+    "account_name": "RM - TV Kabel",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.224",
+    "account_name": "Material",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.225",
+    "account_name": "Listrik - Common Area",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.226",
+    "account_name": "Air - Common Area",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.227",
+    "account_name": "Jasa Pekerjaan",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.300",
+    "account_name": "Beban Jasa ( HPP ) - Listrik",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.301",
+    "account_name": "Pemakaian Listrik",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.400",
+    "account_name": "Beban Jasa ( HPP ) - Air",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.401",
+    "account_name": "Pemakaian Air",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.500",
+    "account_name": "Beban Jasa ( HPP ) - Telpon",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.501",
+    "account_name": "Beli line telpon ke Telkom",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.502",
+    "account_name": "Abudement stok line telpon (blm jual)\u002Bad",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.600",
+    "account_name": "Beban Jasa ( HPP ) - Parkir",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.601",
+    "account_name": "Biaya Free Parkir  / By. Tetap",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.602",
+    "account_name": "Pajak Parkir (20%)",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.700",
+    "account_name": "Beban Jasa ( HPP ) - Perbaikan \u002B Pekerja",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.701",
+    "account_name": "Renovasi Kios ( Rolling door dll )",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.800",
+    "account_name": "Beban Jasa ( HPP ) - Pend Lain - Lain",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "5.02.801",
+    "account_name": "HPP Kartu Pass Parkir",
+    "account_cat": "Expenses",
+    "group_name": "Total Diskon dan HPP"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.00.000",
+    "account_name": "Biaya  Operasional",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.000",
+    "account_name": "Gaji dan Tunjangan Karyawan",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.001",
+    "account_name": "Gaji",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.002",
+    "account_name": "Tunjangan Hari Raya",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.003",
+    "account_name": "BPJS KESEHATAN",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.004",
+    "account_name": "Tunjangan Kesehatan (Asuransi)",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.005",
+    "account_name": "Insentif (bonus)",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.006",
+    "account_name": "Biaya Seragam",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.007",
+    "account_name": "Training dan Seminar",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.008",
+    "account_name": "Lembur",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.009",
+    "account_name": "koperasi karyawan",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.010",
+    "account_name": "Pesangon",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.011",
+    "account_name": "Transport",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.012",
+    "account_name": "Uang Makan",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.013",
+    "account_name": "Acara Cap Go Meh",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.01.014",
+    "account_name": "JAMSOSTEK",
+    "account_cat": "Expenses",
+    "group_name": "Gaji dan Tunjangan Karyawan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.02.000",
+    "account_name": "Biaya Utilities",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Utilities"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.02.001",
+    "account_name": "Listrik",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Utilities"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.02.002",
+    "account_name": "Air",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Utilities"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.03.000",
+    "account_name": "Biaya Telepon \u002B Internet \u002B jasa pengirim",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Telepeon, Internet dan Jasa Pengirim"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.03.001",
+    "account_name": "Telepon dan Fax",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Telepeon, Internet dan Jasa Pengirim"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.03.002",
+    "account_name": "Pos dan kurir",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Telepeon, Internet dan Jasa Pengirim"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.03.003",
+    "account_name": "Internet, Website, Domain",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Telepeon, Internet dan Jasa Pengirim"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.04.000",
+    "account_name": "Biaya Asuransi",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Asuransi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.04.001",
+    "account_name": "Property All Risk",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Asuransi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.04.002",
+    "account_name": "Public Liability",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Asuransi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.04.003",
+    "account_name": "Mesin \u0026 Peralatan",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Asuransi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.04.004",
+    "account_name": "Kendaraan (Motor / Mobil)",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Asuransi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.05.000",
+    "account_name": "Biaya Perjalanan dan Akomodasi",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Perjalanan dan Akomodasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.05.001",
+    "account_name": "Transport (Bensin, Parkir, toll)",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Perjalanan dan Akomodasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.05.002",
+    "account_name": "Sewa kendaraan",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Perjalanan dan Akomodasi"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.06.000",
+    "account_name": "Biaya Keperluan Kantor",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keperluan Kantor"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.06.001",
+    "account_name": "ATK",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keperluan Kantor"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.06.002",
+    "account_name": "Percetakan \u0026 Foto Copy",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keperluan Kantor"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.06.003",
+    "account_name": "Konsumsi Pantry",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keperluan Kantor"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.06.004",
+    "account_name": "Pengadaan Obat- P3K",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keperluan Kantor"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.06.005",
+    "account_name": "Update data tenant",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keperluan Kantor"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.06.006",
+    "account_name": "Koordinasi Kantor Pusat",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keperluan Kantor"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.06.007",
+    "account_name": "Perpanjangan domain",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keperluan Kantor"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.06.008",
+    "account_name": "Kordinasi lingk.",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keperluan Kantor"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.06.009",
+    "account_name": "Materai",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keperluan Kantor"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.06.010",
+    "account_name": "Biaya buku, Majalah,Surat kabar",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keperluan Kantor"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.06.011",
+    "account_name": "Biaya Sewa",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keperluan Kantor"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.06.012",
+    "account_name": "Peralatan \u0026 Perlengkapan Kantor",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keperluan Kantor"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.06.013",
+    "account_name": "Biaya Rapat",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keperluan Kantor"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.07.000",
+    "account_name": "Biaya Pemeliharaan dan Perbaikan",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Pemeliharan dan Perbaikan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.07.001",
+    "account_name": "Pemeliharaan  - Gedung",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Pemeliharan dan Perbaikan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.07.002",
+    "account_name": "Pemeliharaan  - Kendaraan",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Pemeliharan dan Perbaikan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.07.003",
+    "account_name": "Pemeliharaan  - Peralatan Kantor",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Pemeliharan dan Perbaikan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.08.000",
+    "account_name": "Biaya Penyusutan Aktiva Tetap",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Penyusutan Aktiva Tetap"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.08.001",
+    "account_name": "Gedung, Sarana dan Prasarana",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Penyusutan Aktiva Tetap"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.08.002",
+    "account_name": "Peralatan Kantor",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Penyusutan Aktiva Tetap"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.08.003",
+    "account_name": "Kendaraan",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Penyusutan Aktiva Tetap"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.08.004",
+    "account_name": "Mesin",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Penyusutan Aktiva Tetap"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.09.000",
+    "account_name": "Biaya Donasi  dan Entertainment",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Donasi dan Entertainment"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.09.001",
+    "account_name": "Donasi hewan kurban",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Donasi dan Entertainment"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.09.002",
+    "account_name": "Donor Darah",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Donasi dan Entertainment"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.09.003",
+    "account_name": "CSR (2,5%)",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Donasi dan Entertainment"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.09.004",
+    "account_name": "Tarung derajat",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Donasi dan Entertainment"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.09.005",
+    "account_name": "Donatur Klinik Sehat",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Donasi dan Entertainment"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.09.006",
+    "account_name": "Futsal",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Donasi dan Entertainment"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.09.007",
+    "account_name": "Polisi",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Donasi dan Entertainment"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.09.008",
+    "account_name": "RT  dan RW dan Lurah",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Donasi dan Entertainment"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.09.009",
+    "account_name": "Duka Cita",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Donasi dan Entertainment"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.09.010",
+    "account_name": "Melahirkan",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Donasi dan Entertainment"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.09.011",
+    "account_name": "Pernikahan",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Donasi dan Entertainment"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.09.012",
+    "account_name": "Pernikahan..",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Donasi dan Entertainment"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.10.000",
+    "account_name": "Biaya Jasa Profesional",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Jasa Professional"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.10.001",
+    "account_name": "Management Fee (Outsourcing)",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Jasa Professional"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.10.002",
+    "account_name": "Man. Fee - APL",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Jasa Professional"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.10.003",
+    "account_name": "Man. Fee - IT",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Jasa Professional"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.10.004",
+    "account_name": "Konsultan Pajak",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Jasa Professional"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.10.005",
+    "account_name": "Konsultan Hukum",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Jasa Professional"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.10.006",
+    "account_name": "Performance Insentif",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Jasa Professional"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.10.007",
+    "account_name": "Eksternal Auditor",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Jasa Professional"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.11.000",
+    "account_name": "Biaya Keamanan dan Kebersihan",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keamanan dan Kebersihan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.11.001",
+    "account_name": "Keamanan",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keamanan dan Kebersihan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.11.002",
+    "account_name": "Kebersihan",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Keamanan dan Kebersihan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.12.000",
+    "account_name": "Biaya Perizinan",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Perizinan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.12.001",
+    "account_name": "Lift \u002B Escalator",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Perizinan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.12.002",
+    "account_name": "Gondola",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Perizinan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.12.003",
+    "account_name": "Penangkal Petir",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Perizinan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.12.004",
+    "account_name": "Genset",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Perizinan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.12.005",
+    "account_name": "Biaya perpanjangan HGB  / IMB",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Perizinan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.12.006",
+    "account_name": "Laporan Kelayakan penggunaan air \u002B list",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Perizinan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.12.007",
+    "account_name": "Pajak Kendaraan Inventaris",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Perizinan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.12.008",
+    "account_name": "Tenaga kerja",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Perizinan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.12.009",
+    "account_name": "Pemadam kebakaran ( SKK )",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Perizinan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.12.010",
+    "account_name": "Iuran Keanggotaan APPBI",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Perizinan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.13.000",
+    "account_name": "Biaya Sales dan Marketing",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Sales dan Marketing"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.13.001",
+    "account_name": "Lomba 17 Agustus 2020 \u0026 Halal Bihalal dg",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Sales dan Marketing"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.13.002",
+    "account_name": "Buka Puasa Bersama",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Sales dan Marketing"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.13.003",
+    "account_name": "Hiasan HUT DKI JAKARTA",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Sales dan Marketing"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.13.004",
+    "account_name": "Hiasan 17 Agustus",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Sales dan Marketing"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.13.005",
+    "account_name": "Hiasan Natal \u0026 Tahun Baru",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Sales dan Marketing"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.13.006",
+    "account_name": "Hiasan Imlek",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Sales dan Marketing"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.13.007",
+    "account_name": "Hiasan Idul Fitri 1442 H",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Sales dan Marketing"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.13.008",
+    "account_name": "Hiasan Special Event",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Sales dan Marketing"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.13.009",
+    "account_name": "Program Special",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Sales dan Marketing"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.13.010",
+    "account_name": "Pembentukan PPRS",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Sales dan Marketing"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.13.011",
+    "account_name": "Kartu ucapan, bunga",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Sales dan Marketing"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.13.012",
+    "account_name": "Fun Day Anniversary",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Sales dan Marketing"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.13.013",
+    "account_name": "Biaya Iklan / Promosi",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Sales dan Marketing"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.14.000",
+    "account_name": "Biaya Penyisihan Piutang Tak Tertagih",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.14.001",
+    "account_name": "Penyisihan Piutang Tak Tertagih",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.15.000",
+    "account_name": "Biaya Pajak dan denda Pajak",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.15.001",
+    "account_name": "Denda Keterlambatan",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.16.000",
+    "account_name": "Biaya Lain - Lain",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.16.001",
+    "account_name": "Jasa instruktru senam \u0026 Yoga",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.16.002",
+    "account_name": "Makan\u002Bvitamin\u002BVaksin\u002Bassoris Satwa",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.16.003",
+    "account_name": "Konsumsi Pantry (Popmi\u002BKopi\u002BGula\u002Btissue)",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.16.004",
+    "account_name": "Lain -lain",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.000",
+    "account_name": "Pendapatan dan Biaya Lainnya",
+    "account_cat": "Expenses",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.100",
+    "account_name": "Pendapatan Bunga",
+    "account_cat": "Expenses",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.101",
+    "account_name": "Bunga Deposito",
+    "account_cat": "Expenses",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.102",
+    "account_name": "Bunga Giro",
+    "account_cat": "Expenses",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.103",
+    "account_name": "Bunga Pinjaman Kepada Afiliasi",
+    "account_cat": "Expenses",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.104",
+    "account_name": "Pendapatan Lain-Lain",
+    "account_cat": "Expenses",
+    "group_name": "Pendapatan Lain-Lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.200",
+    "account_name": "Biaya Bunga bank /Pinjaman",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Bunga Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.201",
+    "account_name": "Bunga Pinjaman dari bank",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Bunga Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.202",
+    "account_name": "Pinjaman dari afiliasi",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Bunga Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.203",
+    "account_name": "Pajak Bunga Bank",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Bunga Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.300",
+    "account_name": "Biaya Administrasi Bank",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Administrasi Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.301",
+    "account_name": "Buku Cek \u0026 Giro",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Administrasi Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.302",
+    "account_name": "Biaya kliring",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Administrasi Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.303",
+    "account_name": "fee input gaji \u0026 Virtual Acc",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Administrasi Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.304",
+    "account_name": "Lain-lain",
+    "account_cat": "Expenses",
+    "group_name": "Biaya Administrasi Bank"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.400",
+    "account_name": "Denda Pajak",
+    "account_cat": "Expenses",
+    "group_name": "Denda Pajak"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.401",
+    "account_name": "Biaya PPH Pasal 4 ( 2 )",
+    "account_cat": "Expenses",
+    "group_name": "Denda Pajak"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.402",
+    "account_name": "Lain - Lain",
+    "account_cat": "Expenses",
+    "group_name": "Denda Pajak"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.403",
+    "account_name": "Biaya PPh Pasal 23",
+    "account_cat": "Expenses",
+    "group_name": "Denda Pajak"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.501",
+    "account_name": "Pendapatan Lain-Lain",
+    "account_cat": "Expenses",
+    "group_name": "Pendapatan Lain-lain"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "6.17.502",
+    "account_name": "Pajak Penghasilan",
+    "account_cat": "Expenses",
+    "group_name": "Pajak Penghasilan"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "9.99.999",
+    "account_name": "Suspense Account",
+    "account_cat": "Equity",
+    "group_name": "Laba Ditahan Tahun Lalu"
+  },
+  {
+    "company_id": "ASHMD",
+    "account_no": "Current Earning",
+    "account_name": "Current Earning Last Year",
+    "account_cat": "Equity",
+    "group_name": "Laba Ditahan Tahun Lalu"
+  }
+]

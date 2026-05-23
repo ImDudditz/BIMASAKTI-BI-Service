@@ -1,0 +1,14 @@
+root = true
+
+[*.cs]
+# Disable modern C# code style suggestions to preserve compatibility with the legacy C# 5 compiler (csc.exe)
+dotnet_diagnostic.IDE0090.severity = none # Simplify 'new' expression (C# 9.0+)
+dotnet_diagnostic.IDE0063.severity = none # Simplify 'using' statement (C# 8.0+)
+dotnet_diagnostic.IDE0028.severity = none # Simplify collection initialization
+dotnet_diagnostic.IDE0017.severity = none # Simplify object initialization
+dotnet_diagnostic.IDE0018.severity = none # Inline variable declaration
+dotnet_diagnostic.IDE0041.severity = none # Simplify null check
+dotnet_diagnostic.IDE0150.severity = none # Simplify 'is' check
+dotnet_diagnostic.IDE0056.severity = none # Simplify indexing
+dotnet_diagnostic.IDE0062.severity = none # Mark member as static
+dotnet_diagnostic.IDE0078.severity = none # Use pattern matching
