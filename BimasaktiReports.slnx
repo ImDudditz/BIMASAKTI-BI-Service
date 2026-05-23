@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/backend/">
     <Project Path="backend/BimasaktiReports.csproj" />
+    <Project Path="backend/manager/manager.csproj" />
+    <Project Path="backend/tests/BimasaktiReports.Tests.csproj" />
   </Folder>
-  <Project Path="BimasaktiManager.csproj" />
 </Solution>

@@ -29,7 +29,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
                     backendDir = current;
                     break;
                 }
-                if (File.Exists(Path.Combine(current, "BimasaktiManager.csproj")))
+                if (File.Exists(Path.Combine(current, "BimasaktiReports.slnx")))
                 {
                     backendDir = Path.Combine(current, "backend");
                     break;
@@ -50,7 +50,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
                         backendDir = current;
                         break;
                     }
-                    if (File.Exists(Path.Combine(current, "BimasaktiManager.csproj")))
+                    if (File.Exists(Path.Combine(current, "BimasaktiReports.slnx")))
                     {
                         backendDir = Path.Combine(current, "backend");
                         break;

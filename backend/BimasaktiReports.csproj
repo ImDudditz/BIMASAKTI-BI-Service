@@ -24,8 +24,10 @@
   <ItemGroup>
     <Compile Remove="tests\**" />
     <Compile Remove="BimasaktiReports.Tests\**" />
+    <Compile Remove="manager\**" />
     <None Remove="tests\**" />
     <None Remove="BimasaktiReports.Tests\**" />
+    <None Remove="manager\**" />
   </ItemGroup>
 
 </Project>

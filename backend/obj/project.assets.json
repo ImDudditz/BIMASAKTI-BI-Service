@@ -2133,15 +2133,14 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\Projects\\IDEs\\BIMASAKTI Reports\\Financial Reports\\backend\\BimasaktiReports.csproj",
+      "projectUniqueName": "E:\\Projects\\IDEs\\BIMASAKTI BI Service\\backend\\BimasaktiReports.csproj",
       "projectName": "BimasaktiReports.FinancialReports.Backend",
-      "projectPath": "E:\\Projects\\IDEs\\BIMASAKTI Reports\\Financial Reports\\backend\\BimasaktiReports.csproj",
+      "projectPath": "E:\\Projects\\IDEs\\BIMASAKTI BI Service\\backend\\BimasaktiReports.csproj",
       "packagesPath": "C:\\Users\\Dudditz\\.nuget\\packages\\",
-      "outputPath": "E:\\Projects\\IDEs\\BIMASAKTI Reports\\Financial Reports\\backend\\obj\\",
+      "outputPath": "E:\\Projects\\IDEs\\BIMASAKTI BI Service\\backend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "E:\\Projects\\IDEs\\BIMASAKTI Reports\\Financial Reports\\backend\\NuGet.Config",
-        "E:\\Projects\\IDEs\\BIMASAKTI Reports\\Financial Reports\\NuGet.Config",
+        "E:\\Projects\\IDEs\\BIMASAKTI BI Service\\NuGet.Config",
         "C:\\Users\\Dudditz\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [

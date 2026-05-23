@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "te+gqw4wb5k=",
+  "dgSpecHash": "3DJ+VX1TJfQ=",
   "success": true,
-  "projectFilePath": "E:\\Projects\\IDEs\\BIMASAKTI Reports\\Financial Reports\\backend\\BimasaktiReports.csproj",
+  "projectFilePath": "E:\\Projects\\IDEs\\BIMASAKTI BI Service\\backend\\BimasaktiReports.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Dudditz\\.nuget\\packages\\closedxml\\0.105.0\\closedxml.0.105.0.nupkg.sha512",
     "C:\\Users\\Dudditz\\.nuget\\packages\\closedxml.parser\\2.0.0\\closedxml.parser.2.0.0.nupkg.sha512",
