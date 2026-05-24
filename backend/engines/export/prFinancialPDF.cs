@@ -16,13 +16,13 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
         private static readonly XColor LightBackground = XColor.FromArgb(248, 250, 252);     // Slate 50
         private static readonly XColor BorderColor = XColor.FromArgb(226, 232, 240); // Slate 200
 
-        private static readonly XFont TitleFont = new XFont("Arial", 16, XFontStyle.Bold);
-        private static readonly XFont SubtitleFont = new XFont("Arial", 10, XFontStyle.Regular);
-        private static readonly XFont HeaderFont = new XFont("Arial", 11, XFontStyle.Bold);
-        private static readonly XFont SectionFont = new XFont("Arial", 10, XFontStyle.Bold);
-        private static readonly XFont GroupFont = new XFont("Arial", 9, XFontStyle.Bold);
-        private static readonly XFont BodyFont = new XFont("Arial", 9, XFontStyle.Regular);
-        private static readonly XFont TotalFont = new XFont("Arial", 9, XFontStyle.Bold);
+        private static readonly XFont TitleFont = new("Arial", 16, XFontStyle.Bold);
+        private static readonly XFont SubtitleFont = new("Arial", 10, XFontStyle.Regular);
+        private static readonly XFont HeaderFont = new("Arial", 11, XFontStyle.Bold);
+        private static readonly XFont SectionFont = new("Arial", 10, XFontStyle.Bold);
+        private static readonly XFont GroupFont = new("Arial", 9, XFontStyle.Bold);
+        private static readonly XFont BodyFont = new("Arial", 9, XFontStyle.Regular);
+        private static readonly XFont TotalFont = new("Arial", 9, XFontStyle.Bold);
 
         private class PdfContext
         {
@@ -160,7 +160,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
             int length = text.Length;
             while (length > 0)
             {
-                string substring = text.Substring(0, length) + ellipsis;
+                string substring = string.Concat(text.AsSpan(0, length), ellipsis);
                 if (graphics.MeasureString(substring, font).Width <= maxWidth)
                 {
                     return substring;
@@ -173,7 +173,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
         private static void DrawBalanceSheet(PdfContext context, ExcelReportPayload payload)
         {
             var currentData = payload.CurrData;
-            var structure = currentData?.Structure ?? new Dictionary<string, LedgerSectionData>();
+            Dictionary<string, LedgerSectionData> structure = currentData?.Structure ?? new();
 
             structure.TryGetValue("Assets", out var assetsSection);
             structure.TryGetValue("Liabilities", out var liabilitiesSection);
@@ -208,7 +208,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
         private static void DrawIncomeStatement(PdfContext context, ExcelReportPayload payload)
         {
             var currentData = payload.CurrData;
-            var structure = currentData?.Structure ?? new Dictionary<string, LedgerSectionData>();
+            Dictionary<string, LedgerSectionData> structure = currentData?.Structure ?? new();
 
             structure.TryGetValue("Revenue", out var revenueSection);
             structure.TryGetValue("Expenses", out var expensesSection);
@@ -337,7 +337,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
             {
                 if (dataset != null && dataset.Structure != null && dataset.Structure.TryGetValue(sectionName, out var sectionData) && sectionData.Groups != null)
                 {
-                    foreach (var groupKey in dataset.Structure[sectionName].Groups.Keys)
+                    foreach (var groupKey in sectionData.Groups.Keys)
                     {
                         allGroups.Add(groupKey);
                     }

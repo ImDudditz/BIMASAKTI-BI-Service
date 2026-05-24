@@ -22,19 +22,19 @@ namespace BimasaktiReports.FinancialReports.Backend.Services
     public class LedgerReportGroup
     {
         public decimal Total { get; set; }
-        public List<LedgerReportItem> Items { get; set; } = new List<LedgerReportItem>();
+        public List<LedgerReportItem> Items { get; set; } = new();
     }
 
     public class LedgerReportSection
     {
         public decimal Total { get; set; }
-        public Dictionary<string, LedgerReportGroup> Groups { get; set; } = new Dictionary<string, LedgerReportGroup>();
+        public Dictionary<string, LedgerReportGroup> Groups { get; set; } = new();
     }
 
     public class LedgerReportResponse
     {
         public string Status { get; set; } = "success";
-        public Dictionary<string, LedgerReportSection> Data { get; set; } = new Dictionary<string, LedgerReportSection>();
+        public Dictionary<string, LedgerReportSection> Data { get; set; } = new();
         public decimal NetIncome { get; set; }
         public decimal NetIncomeBudget { get; set; }
         public string? ErrorMessage { get; set; }
@@ -84,10 +84,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Services
                 {
                     string configDirectory = Path.GetDirectoryName(databasePath)!;
                     string normalizedPreset = preset;
-                    if (preset.StartsWith("preset", StringComparison.OrdinalIgnoreCase) && preset.Length > 6)
-                    {
-                        normalizedPreset = "Preset" + preset.Substring(6);
-                    }
+                        normalizedPreset = $"Preset{preset.AsSpan(6)}";
                     string presetJsonPath = Path.Combine(configDirectory, $"{companyId.ToUpperInvariant()}_{normalizedPreset}.json");
 
                     if (System.IO.File.Exists(presetJsonPath))
@@ -119,181 +116,194 @@ namespace BimasaktiReports.FinancialReports.Backend.Services
                     // Fallback to empty mappings (default prefix mapping rules will apply)
                 }
 
-                using (var connection = new SqliteConnection($"Data Source={databasePath};Mode=ReadOnly;"))
+                using var connection = new SqliteConnection($"Data Source={databasePath};Mode=ReadOnly;");
+                await connection.OpenAsync();
+
+                var schema = BimasaktiReports.FinancialReports.Backend.Engines.svcDbUtils.GetGlrxSchema(databasePath);
+                string tableName = schema.TableName;
+                string yearCol = schema.YearColumn;
+                string periodCol = schema.PeriodColumn;
+                string endBsisCol = schema.EndBsisColumn;
+                string endBalanceCol = schema.EndBalanceColumn;
+                string endBudgetCol = schema.EndBudgetColumn;
+
+                string ledgerQuery = $@"
+                     SELECT 
+                         account_no,
+                         account_name,
+                         SUM({endBsisCol}) AS ending_bsis,
+                         SUM({endBalanceCol}) AS ending_balance,
+                         SUM({endBudgetCol}) AS ending_budget
+                     FROM {tableName}";
+
+                var queryFilters = new List<string>();
+                if (!string.IsNullOrEmpty(year))
                 {
-                    await connection.OpenAsync();
+                    queryFilters.Add($"{yearCol} = @year");
+                }
+                if (!string.IsNullOrEmpty(period))
+                {
+                    queryFilters.Add($"{periodCol} = @period");
+                }
 
-                    var schema = BimasaktiReports.FinancialReports.Backend.Engines.svcDbUtils.GetGlrxSchema(databasePath);
-                    string tableName = schema.TableName;
-                    string yearCol = schema.YearColumn;
-                    string periodCol = schema.PeriodColumn;
-                    string endBsisCol = schema.EndBsisColumn;
-                    string endBalanceCol = schema.EndBalanceColumn;
-                    string endBudgetCol = schema.EndBudgetColumn;
+                if (queryFilters.Count > 0)
+                {
+                    ledgerQuery += " WHERE " + string.Join(" AND ", queryFilters);
+                }
 
-                    string ledgerQuery = $@"
-                         SELECT 
-                             account_no,
-                             account_name,
-                             SUM({endBsisCol}) AS ending_bsis,
-                             SUM({endBalanceCol}) AS ending_balance,
-                             SUM({endBudgetCol}) AS ending_budget
-                         FROM {tableName}";
+                ledgerQuery += " GROUP BY account_no, account_name;";
 
-                    var queryFilters = new List<string>();
-                    if (!string.IsNullOrEmpty(year))
+                using var ledgerCommand = new SqliteCommand(ledgerQuery, connection);
+                if (!string.IsNullOrEmpty(year))
+                {
+                    ledgerCommand.Parameters.AddWithValue("@year", year);
+                }
+                if (!string.IsNullOrEmpty(period))
+                {
+                    ledgerCommand.Parameters.AddWithValue("@period", period);
+                }
+
+                using var reader = await ledgerCommand.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    string accountNumber = reader.IsDBNull(0) ? "" : reader.GetString(0).Trim();
+                    if (string.IsNullOrEmpty(accountNumber))
                     {
-                        queryFilters.Add($"{yearCol} = @year");
+                        continue;
                     }
-                    if (!string.IsNullOrEmpty(period))
+
+                    string accountName = reader.IsDBNull(1) ? "" : reader.GetString(1).Trim();
+                    decimal endingBalanceSheetBsis = reader.IsDBNull(2) ? 0 : reader.GetDecimal(2);
+                    decimal endingBalance = reader.IsDBNull(3) ? 0 : reader.GetDecimal(3);
+                    decimal endingBudget = reader.IsDBNull(4) ? 0 : reader.GetDecimal(4);
+
+                    char firstCharacter = accountNumber[0];
+                    bool isCurrentEarningAccount = accountNumber.Contains("current earning", StringComparison.OrdinalIgnoreCase) ||
+                                                    accountName.Contains("current earning", StringComparison.OrdinalIgnoreCase) ||
+                                                    accountName.Contains("Laba Periode Berjalan", StringComparison.OrdinalIgnoreCase) ||
+                                                    accountName.Contains("Laba ditahan tahun Berjalan", StringComparison.OrdinalIgnoreCase);
+
+                    // Layout section mappings
+                    string targetSectionName;
+                    string targetGroupName;
+
+                    if (isCurrentEarningAccount)
                     {
-                        queryFilters.Add($"{periodCol} = @period");
+                        targetSectionName = "Equity";
+                        targetGroupName = "Laba/Rugi Tahun Lalu";
                     }
-
-                    if (queryFilters.Count > 0)
+                    else
                     {
-                        ledgerQuery += " WHERE " + string.Join(" AND ", queryFilters);
-                    }
+                        activeMappings.TryGetValue(accountNumber, out var mappedRuleElement);
+                        targetGroupName = mappedRuleElement?["group"]?.GetValue<string>() ?? "Uncategorized";
+                        string? mappedSectionName = mappedRuleElement?["section"]?.GetValue<string>();
 
-                    ledgerQuery += " GROUP BY account_no, account_name;";
-
-                    using (var ledgerCommand = new SqliteCommand(ledgerQuery, connection))
-                    {
-                        if (!string.IsNullOrEmpty(year))
+                        if (!string.IsNullOrEmpty(mappedSectionName))
                         {
-                            ledgerCommand.Parameters.AddWithValue("@year", year);
+                            targetSectionName = mappedSectionName;
                         }
-                        if (!string.IsNullOrEmpty(period))
+                        else
                         {
-                            ledgerCommand.Parameters.AddWithValue("@period", period);
-                        }
-
-                        using (var reader = await ledgerCommand.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
+                            if (firstCharacter == '1')
                             {
-                                string accountNumber = reader.IsDBNull(0) ? "" : reader.GetString(0).Trim();
-                                if (string.IsNullOrEmpty(accountNumber))
-                                {
-                                    continue;
-                                }
-
-                                string accountName = reader.IsDBNull(1) ? "" : reader.GetString(1).Trim();
-                                decimal endingBalanceSheetBsis = reader.IsDBNull(2) ? 0 : reader.GetDecimal(2);
-                                decimal endingBalance = reader.IsDBNull(3) ? 0 : reader.GetDecimal(3);
-                                decimal endingBudget = reader.IsDBNull(4) ? 0 : reader.GetDecimal(4);
-
-                                char firstCharacter = accountNumber[0];
-                                bool isCurrentEarningAccount = accountNumber.Contains("current earning", StringComparison.OrdinalIgnoreCase) ||
-                                                                accountName.Contains("current earning", StringComparison.OrdinalIgnoreCase) ||
-                                                                accountName.Contains("Laba Periode Berjalan", StringComparison.OrdinalIgnoreCase) ||
-                                                                accountName.Contains("Laba ditahan tahun Berjalan", StringComparison.OrdinalIgnoreCase);
-
-                                // Layout section mappings
-                                string targetSectionName;
-                                string targetGroupName;
-
-                                if (isCurrentEarningAccount)
-                                {
-                                    targetSectionName = "Equity";
-                                    targetGroupName = "Laba/Rugi Tahun Lalu";
-                                }
-                                else
-                                {
-                                    activeMappings.TryGetValue(accountNumber, out var mappedRuleElement);
-                                    targetGroupName = mappedRuleElement?["group"]?.GetValue<string>() ?? "Uncategorized";
-                                    string? mappedSectionName = mappedRuleElement?["section"]?.GetValue<string>();
-
-                                    if (!string.IsNullOrEmpty(mappedSectionName))
-                                    {
-                                        targetSectionName = mappedSectionName;
-                                    }
-                                    else
-                                    {
-                                        if (firstCharacter == '1')
-                                        {
-                                            targetSectionName = "Assets";
-                                        }
-                                        else if (firstCharacter == '2')
-                                        {
-                                            targetSectionName = "Liabilities";
-                                        }
-                                        else if (firstCharacter == '3')
-                                        {
-                                            targetSectionName = "Equity";
-                                        }
-                                        else if (firstCharacter == '4')
-                                        {
-                                            targetSectionName = "Revenue";
-                                        }
-                                        else
-                                        {
-                                            targetSectionName = "Expenses";
-                                        }
-                                    }
-                                }
-
-                                // Balance calculation inverting logic
-                                decimal balance;
-                                if (isCurrentEarningAccount)
-                                {
-                                    balance = endingBalance;
-                                }
-                                else if (targetSectionName == "Equity")
-                                {
-                                    balance = endingBalance; // Use end_balance as Y axis for Equity
-                                }
-                                else if (firstCharacter == '3')
-                                {
-                                    balance = endingBalance * -1; // Use end_balance as Y axis for Equity
-                                }
-                                else if (firstCharacter == '1' || firstCharacter == '5' || firstCharacter == '6' || firstCharacter == '7' || firstCharacter == '8' || firstCharacter == '9')
-                                {
-                                    balance = endingBalanceSheetBsis;
-                                }
-                                else if (firstCharacter == '2' || firstCharacter == '4')
-                                {
-                                    balance = endingBalanceSheetBsis * -1;
-                                }
-                                else
-                                {
-                                    balance = endingBalanceSheetBsis;
-                                }
-
-                                if (!response.Data.ContainsKey(targetSectionName))
-                                {
-                                    response.Data[targetSectionName] = new LedgerReportSection();
-                                }
-
-                                if (!response.Data[targetSectionName].Groups.ContainsKey(targetGroupName))
-                                {
-                                    response.Data[targetSectionName].Groups[targetGroupName] = new LedgerReportGroup();
-                                }
-
-                                response.Data[targetSectionName].Total += balance;
-                                response.Data[targetSectionName].Groups[targetGroupName].Total += balance;
-                                response.Data[targetSectionName].Groups[targetGroupName].Items.Add(new LedgerReportItem
-                                {
-                                    Balance = balance,
-                                    No = accountNumber,
-                                    Name = accountName,
-                                    EndBudget = endingBudget
-                                });
+                                targetSectionName = "Assets";
                             }
+                            else if (firstCharacter == '2')
+                            {
+                                targetSectionName = "Liabilities";
+                            }
+                            else if (firstCharacter == '3')
+                            {
+                                targetSectionName = "Equity";
+                            }
+                            else if (firstCharacter == '4')
+                            {
+                                targetSectionName = "Revenue";
+                            }
+                            else
+                            {
+                                targetSectionName = "Expenses";
+                            }
+                        }
+                    }
+
+                    // Balance calculation inverting logic
+                    decimal balance;
+                    if (isCurrentEarningAccount)
+                    {
+                        balance = endingBalance;
+                    }
+                    else if (targetSectionName == "Equity")
+                    {
+                        balance = endingBalance; // Use end_balance as Y axis for Equity
+                    }
+                    else if (firstCharacter == '3')
+                    {
+                        balance = endingBalance * -1; // Use end_balance as Y axis for Equity
+                    }
+                    else if (firstCharacter == '1' || firstCharacter == '5' || firstCharacter == '6' || firstCharacter == '7' || firstCharacter == '8' || firstCharacter == '9')
+                    {
+                        balance = endingBalanceSheetBsis;
+                    }
+                    else if (firstCharacter == '2' || firstCharacter == '4')
+                    {
+                        balance = endingBalanceSheetBsis * -1;
+                    }
+                    else
+                    {
+                        balance = endingBalanceSheetBsis;
+                    }
+
+                    if (!response.Data.TryGetValue(targetSectionName, out var section))
+                    {
+                        section = new LedgerReportSection();
+                        response.Data[targetSectionName] = section;
+                    }
+
+                    if (!section.Groups.TryGetValue(targetGroupName, out var group))
+                    {
+                        group = new LedgerReportGroup();
+                        section.Groups[targetGroupName] = group;
+                    }
+
+                    section.Total += balance;
+                    group.Total += balance;
+                    group.Items.Add(new LedgerReportItem
+                    {
+                        Balance = balance,
+                        No = accountNumber,
+                        Name = accountName,
+                        EndBudget = endingBudget
+                    });
+                }
+
+                decimal revenueTotal = response.Data.TryGetValue("Revenue", out var revSec) ? revSec.Total : 0;
+                decimal expensesTotal = response.Data.TryGetValue("Expenses", out var expSec) ? expSec.Total : 0;
+                response.NetIncome = revenueTotal - expensesTotal;
+
+                decimal revenueBudgetTotal = 0;
+                if (response.Data.TryGetValue("Revenue", out var revenueSection))
+                {
+                    foreach (var group in revenueSection.Groups.Values)
+                    {
+                        foreach (var item in group.Items)
+                        {
+                            revenueBudgetTotal += item.EndBudget;
                         }
                     }
                 }
 
-                decimal revenueTotal = response.Data.ContainsKey("Revenue") ? response.Data["Revenue"].Total : 0;
-                decimal expensesTotal = response.Data.ContainsKey("Expenses") ? response.Data["Expenses"].Total : 0;
-                response.NetIncome = revenueTotal - expensesTotal;
-
-                decimal revenueBudgetTotal = response.Data.ContainsKey("Revenue")
-                    ? response.Data["Revenue"].Groups.Values.Sum(g => g.Items.Sum(i => i.EndBudget))
-                    : 0;
-                decimal expensesBudgetTotal = response.Data.ContainsKey("Expenses")
-                    ? response.Data["Expenses"].Groups.Values.Sum(g => g.Items.Sum(i => i.EndBudget))
-                    : 0;
+                decimal expensesBudgetTotal = 0;
+                if (response.Data.TryGetValue("Expenses", out var expensesSection))
+                {
+                    foreach (var group in expensesSection.Groups.Values)
+                    {
+                        foreach (var item in group.Items)
+                        {
+                            expensesBudgetTotal += item.EndBudget;
+                        }
+                    }
+                }
                 response.NetIncomeBudget = revenueBudgetTotal - expensesBudgetTotal;
 
                 return response;
