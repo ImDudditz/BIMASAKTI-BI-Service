@@ -1,17 +1,42 @@
 # C# / dotnet build folders
 [Bb]in/
 [Oo]bj/
+out/
+publish/
 
 # Node/Vite frontend folders
 node_modules/
 dist/
 dist-ssr/
 *.local
+.eslintcache
+
+# Environment and Secrets
+.env
+.env.*
+*.env
+*.env.local
+!*_config.json
+
+# Logs and Databases
+*.log
+logs/
+*.db
+
+# Python compilation (in case Python engines are run)
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
 
 # IDEs and OS metadata
 .vs/
 .vscode/
+.idea/
 *.user
 *.suo
 .DS_Store
 Thumbs.db
+
