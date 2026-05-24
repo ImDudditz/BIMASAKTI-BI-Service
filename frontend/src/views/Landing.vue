@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
@@ -21,6 +21,8 @@ const handleActionClick = () => {
 
 // Scroll detection for scroll-triggered slide-up/fade-in animations
 onMounted(() => {
+  document.title = 'BIMASAKTI BI'
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -57,41 +59,31 @@ const scrollToSection = (id) => {
 
     <!-- --- LANDING HEADER --- -->
     <header class="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between relative z-20 border-b border-slate-200/40">
-      <div class="flex items-center gap-3 cursor-pointer" @click="router.push('/')">
-        <img :src="bimasaktiLogo" alt="Bimasakti Logo" class="h-10 w-auto object-contain">
-        <div class="flex flex-col">
-          <span class="text-sm font-black tracking-tight text-slate-900 leading-tight">BIMASAKTI</span>
-          <span class="text-[10px] font-bold text-blue-600 tracking-widest uppercase leading-none">BI SERVICE</span>
-        </div>
-      </div>
+      <!-- Logo removed per request -->
+      <div></div>
 
       <!-- Nav Items -->
       <nav class="hidden md:flex items-center gap-8">
-        <button @click="scrollToSection('about')" class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">About System</button>
-        <button @click="scrollToSection('features')" class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Core Modules</button>
-        <button @click="scrollToSection('azure')" class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Cloud & Security</button>
+        <button @click="scrollToSection('about')" class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">System Overview</button>
+        <button @click="scrollToSection('features')" class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Key Modules</button>
+        <button @click="scrollToSection('azure')" class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Cloud Infrastructure</button>
       </nav>
 
       <button 
         @click="handleActionClick" 
-        class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2.5 rounded-full shadow-md shadow-blue-500/10 active:scale-95 transition-all relative z-10"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-5 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all active:scale-[0.98] relative z-10"
       >
-        {{ authStore.isAuthenticated ? 'GO TO DASHBOARD' : 'ENTER SYSTEM PORTAL' }}
+        {{ authStore.isAuthenticated ? 'Access Dashboard' : 'Sign In to Portal' }}
       </button>
     </header>
 
     <!-- --- HERO SECTION --- -->
     <section class="max-w-6xl mx-auto px-6 pt-16 pb-20 text-center relative z-10 flex flex-col items-center">
-      <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-200/50 rounded-full px-4 py-1.5 mb-6 shadow-sm">
-        <span class="flex h-2 w-2 relative">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-        </span>
-        <span class="text-[10px] font-black text-blue-700 tracking-wider uppercase">BIMASAKTI AS A SERVICE ACTIVE</span>
-      </div>
+      <!-- Centered Hero Logo matching Title Scale -->
+      <img :src="bimasaktiLogo" alt="Bimasakti Logo" class="h-24 sm:h-28 md:h-32 w-auto object-contain mb-8">
 
       <h1 class="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-none max-w-4xl mb-6">
-        Integrated Property & <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">BI Management Service</span>
+        Business <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Dashboard Service</span>
       </h1>
 
       <p class="text-base sm:text-lg text-slate-500 font-medium max-w-2xl leading-relaxed mb-10">
@@ -101,16 +93,15 @@ const scrollToSection = (id) => {
       <div class="flex flex-col sm:flex-row gap-4 mb-16">
         <button 
           @click="handleActionClick" 
-          class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-black text-sm px-8 py-4 rounded-2xl shadow-xl shadow-blue-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-8 py-3.5 rounded-lg shadow-lg shadow-blue-500/10 hover:shadow-xl hover:shadow-blue-500/20 active:scale-[0.98] transition-all flex items-center justify-center"
         >
-          <span>🚀</span>
-          {{ authStore.isAuthenticated ? 'Access Your Dashboard' : 'Secure Portal Sign-In' }}
+          {{ authStore.isAuthenticated ? 'Access Dashboard' : 'Sign In to Portal' }}
         </button>
         <button 
           @click="scrollToSection('about')" 
-          class="bg-white/80 hover:bg-white text-slate-700 border border-slate-200/60 font-black text-sm px-8 py-4 rounded-2xl shadow-md backdrop-blur-md active:scale-95 transition-all"
+          class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-sm px-8 py-3.5 rounded-lg shadow-sm active:scale-[0.98] transition-all"
         >
-          Explore Core Modules
+          System Overview
         </button>
       </div>
 
@@ -286,9 +277,9 @@ $ az webapp show --name BimasaktiService --resource-group RealtaGroup
       </p>
       <button 
         @click="handleActionClick" 
-        class="bg-blue-600 hover:bg-blue-700 text-white font-black text-sm px-8 py-4 rounded-2xl shadow-xl shadow-blue-500/20 active:scale-95 transition-all"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-8 py-3.5 rounded-lg shadow-lg shadow-blue-500/10 hover:shadow-xl hover:shadow-blue-500/20 active:scale-[0.98] transition-all"
       >
-        Access System Portal
+        {{ authStore.isAuthenticated ? 'Access Dashboard' : 'Sign In to Portal' }}
       </button>
     </section>
 
