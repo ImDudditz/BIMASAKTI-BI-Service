@@ -24,15 +24,15 @@ namespace BimasaktiReports.FinancialReports.Backend
                 string companyId = args.Length > 1 ? args[1] : "ASHMD";
                 Console.WriteLine($"Starting standalone database sync for company: {companyId}...");
                 var syncService = new svcDatabaseSyncService();
-                var result = await syncService.SyncCompanyDatabaseAsync(companyId);
-                if (result.Success)
+                var (success, message) = await syncService.SyncCompanyDatabaseAsync(companyId);
+                if (success)
                 {
-                    Console.WriteLine($"Sync Success: {result.Message}");
+                    Console.WriteLine($"Sync Success: {message}");
                     Environment.Exit(0);
                 }
                 else
                 {
-                    Console.Error.WriteLine($"Sync Failed: {result.Message}");
+                    Console.Error.WriteLine($"Sync Failed: {message}");
                     Environment.Exit(1);
                 }
             }

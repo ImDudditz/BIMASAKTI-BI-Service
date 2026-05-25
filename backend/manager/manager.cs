@@ -34,12 +34,17 @@ namespace BimasaktiReports.FinancialReports.Manager
         private static bool _frontendHasError;
         
         // Log buffer for the live terminal log viewer
-        private static readonly ConcurrentQueue<string> _logQueue = new ConcurrentQueue<string>();
+        private static readonly ConcurrentQueue<string> _logQueue = new();
         private const int MaxLogLines = 1000;
 
         private static string _godModePath;
         private static string _localIp;
         private static string _coolAlias;
+
+        // Cached static resources to optimize allocations and resolve analyzer warnings
+        private static readonly char[] UrlSplitSeparators = ['\r', '\n'];
+        private static readonly string[] LineSplitSeparators = ["\r\n", "\n"];
+        private static readonly JsonSerializerOptions IndentedJsonOptions = new() { WriteIndented = true };
 
         public static void Main(string[] args)
         {
@@ -89,12 +94,9 @@ namespace BimasaktiReports.FinancialReports.Manager
         {
             try
             {
-                using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
-                {
-                    socket.Connect("8.8.8.8", 80);
-                    IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
-                    return endPoint != null ? endPoint.Address.ToString() : "127.0.0.1";
-                }
+                using Socket socket = new(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                socket.Connect("8.8.8.8", 80);
+                return socket.LocalEndPoint is IPEndPoint endPoint ? endPoint.Address.ToString() : "127.0.0.1";
             }
             catch
             {
@@ -139,16 +141,18 @@ namespace BimasaktiReports.FinancialReports.Manager
                 bool useDll = File.Exists(dllPath);
                 string executableArguments = useDll ? $"\"{dllPath}\"" : "run";
 
-                _backendProcess = new Process();
-                _backendProcess.StartInfo = new ProcessStartInfo
+                _backendProcess = new Process
                 {
-                    FileName = "dotnet",
-                    Arguments = executableArguments,
-                    WorkingDirectory = backendDir,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "dotnet",
+                        Arguments = executableArguments,
+                        WorkingDirectory = backendDir,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
                 };
 
                 _backendProcess.OutputDataReceived += (s, e) =>
@@ -156,11 +160,11 @@ namespace BimasaktiReports.FinancialReports.Manager
                     if (e.Data != null)
                     {
                         Log("[Backend] " + e.Data, true);
-                        if (e.Data.IndexOf(": error CS", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("Build FAILED", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("Unhandled exception", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("fail:", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("crit:", StringComparison.OrdinalIgnoreCase) >= 0)
+                        if (e.Data.Contains(": error CS", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("Build FAILED", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("Unhandled exception", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("fail:", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("crit:", StringComparison.OrdinalIgnoreCase))
                         {
                             _backendHasError = true;
                         }
@@ -172,10 +176,10 @@ namespace BimasaktiReports.FinancialReports.Manager
                     if (e.Data != null)
                     {
                         Log("[Backend Error] " + e.Data, true);
-                        if (e.Data.IndexOf(": error CS", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("Build FAILED", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("Unhandled exception", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("System.Exception", StringComparison.OrdinalIgnoreCase) >= 0)
+                        if (e.Data.Contains(": error CS", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("Build FAILED", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("Unhandled exception", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("System.Exception", StringComparison.OrdinalIgnoreCase))
                         {
                             _backendHasError = true;
                         }
@@ -226,16 +230,18 @@ namespace BimasaktiReports.FinancialReports.Manager
                 // Ensure port 5173 is completely free to prevent restart collisions
                 KillProcessOnPort(5173);
 
-                _frontendProcess = new Process();
-                _frontendProcess.StartInfo = new ProcessStartInfo
+                _frontendProcess = new Process
                 {
-                    FileName = "cmd.exe",
-                    Arguments = "/c npm run dev",
-                    WorkingDirectory = frontendDir,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = "/c npm run dev",
+                        WorkingDirectory = frontendDir,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
                 };
 
                 _frontendProcess.OutputDataReceived += (s, e) =>
@@ -243,11 +249,11 @@ namespace BimasaktiReports.FinancialReports.Manager
                     if (e.Data != null)
                     {
                         Log("[Vite] " + e.Data, true);
-                        if (e.Data.IndexOf("failed to compile", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("Failed to compile", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("Syntax Error", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("SyntaxError", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("Internal server error", StringComparison.OrdinalIgnoreCase) >= 0)
+                        if (e.Data.Contains("failed to compile", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("Failed to compile", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("Syntax Error", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("SyntaxError", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("Internal server error", StringComparison.OrdinalIgnoreCase))
                         {
                             _frontendHasError = true;
                         }
@@ -259,13 +265,13 @@ namespace BimasaktiReports.FinancialReports.Manager
                     if (e.Data != null)
                     {
                         Log("[Vite Error] " + e.Data, true);
-                        if (e.Data.IndexOf("failed to compile", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("Failed to compile", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("Syntax Error", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("SyntaxError", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("Internal server error", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                            e.Data.IndexOf("ERROR  ", StringComparison.Ordinal) >= 0 ||
-                            e.Data.IndexOf("error: ", StringComparison.OrdinalIgnoreCase) >= 0)
+                        if (e.Data.Contains("failed to compile", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("Failed to compile", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("Syntax Error", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("SyntaxError", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("Internal server error", StringComparison.OrdinalIgnoreCase) ||
+                            e.Data.Contains("ERROR  ", StringComparison.Ordinal) ||
+                            e.Data.Contains("error: ", StringComparison.OrdinalIgnoreCase))
                         {
                             _frontendHasError = true;
                         }
@@ -306,16 +312,14 @@ namespace BimasaktiReports.FinancialReports.Manager
 
             try
             {
-                using (Process killer = Process.Start(new ProcessStartInfo
+                using Process killer = Process.Start(new ProcessStartInfo
                 {
                     FileName = "taskkill",
                     Arguments = "/F /T /PID " + process.Id,
                     CreateNoWindow = true,
                     UseShellExecute = false
-                }))
-                {
-                    if (killer != null) killer.WaitForExit(3000);
-                }
+                });
+                killer?.WaitForExit(3000);
             }
             catch (Exception ex)
             {
@@ -357,7 +361,7 @@ namespace BimasaktiReports.FinancialReports.Manager
         public static string[] LoadCompanySyncUrls(string companyId)
         {
             string configPath = Path.Combine(GetRootDirectory(), "backend", "assets", companyId, companyId + "_config.json");
-            if (!File.Exists(configPath)) return Array.Empty<string>();
+            if (!File.Exists(configPath)) return [];
             
             try
             {
@@ -366,26 +370,23 @@ namespace BimasaktiReports.FinancialReports.Manager
                 {
                     if (doc.RootElement.TryGetProperty("sync_urls", out var syncUrlsProp) && syncUrlsProp.ValueKind == JsonValueKind.Object)
                     {
-                        var list = new List<string>();
-                        foreach (var prop in syncUrlsProp.EnumerateObject())
-                        {
-                            list.Add(prop.Value.GetString());
-                        }
-                        return list.ToArray();
+                        return syncUrlsProp.EnumerateObject()
+                            .Select(prop => prop.Value.GetString())
+                            .ToArray();
                     }
                 }
-                return Array.Empty<string>();
+                return [];
             }
             catch (Exception ex)
             {
                 Log("Error loading sync URLs: " + ex.Message);
-                return Array.Empty<string>();
+                return [];
             }
         }
 
         public static void WriteCompanyConfig(string dir, string companyId, string syncUrlsText)
         {
-            string[] urls = syncUrlsText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] urls = syncUrlsText.Split(UrlSplitSeparators, StringSplitOptions.RemoveEmptyEntries);
             var syncUrlsDict = new Dictionary<string, string>();
             
             foreach (string url in urls)
@@ -405,8 +406,7 @@ namespace BimasaktiReports.FinancialReports.Manager
             }
 
             var configObj = new { sync_urls = syncUrlsDict };
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(configObj, options);
+            string json = JsonSerializer.Serialize(configObj, IndentedJsonOptions);
 
             string configPath = Path.Combine(dir, companyId + "_config.json");
             File.WriteAllText(configPath, json);
@@ -421,48 +421,46 @@ namespace BimasaktiReports.FinancialReports.Manager
                     Log("[Sync] Launching database synchronization for " + companyId + "...");
                     string backendDir = Path.GetFullPath(Path.Combine(GetRootDirectory(), "backend"));
 
-                    using (Process syncProcess = new Process())
+                    using Process syncProcess = new();
+                    syncProcess.StartInfo = new ProcessStartInfo
                     {
-                        syncProcess.StartInfo = new ProcessStartInfo
-                        {
-                            FileName = "dotnet",
-                            Arguments = "run -- --sync " + companyId,
-                            WorkingDirectory = backendDir,
-                            RedirectStandardOutput = true,
-                            RedirectStandardError = true,
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        };
+                        FileName = "dotnet",
+                        Arguments = "run -- --sync " + companyId,
+                        WorkingDirectory = backendDir,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
 
-                        syncProcess.OutputDataReceived += (sender, e) =>
+                    syncProcess.OutputDataReceived += (sender, e) =>
+                    {
+                        if (!string.IsNullOrEmpty(e.Data))
                         {
-                            if (!string.IsNullOrEmpty(e.Data))
-                            {
-                                Log("[Sync] " + e.Data, false);
-                            }
-                        };
-
-                        syncProcess.ErrorDataReceived += (sender, e) =>
-                        {
-                            if (!string.IsNullOrEmpty(e.Data))
-                            {
-                                Log("[Sync Error] " + e.Data, false);
-                            }
-                        };
-
-                        syncProcess.Start();
-                        syncProcess.BeginOutputReadLine();
-                        syncProcess.BeginErrorReadLine();
-                        syncProcess.WaitForExit();
-
-                        if (syncProcess.ExitCode == 0)
-                        {
-                            Log("[Sync] Database sync completed successfully for " + companyId + "!");
+                            Log("[Sync] " + e.Data, false);
                         }
-                        else
+                    };
+
+                    syncProcess.ErrorDataReceived += (sender, e) =>
+                    {
+                        if (!string.IsNullOrEmpty(e.Data))
                         {
-                            Log("[Sync] Database sync failed with exit code: " + syncProcess.ExitCode);
+                            Log("[Sync Error] " + e.Data, false);
                         }
+                    };
+
+                    syncProcess.Start();
+                    syncProcess.BeginOutputReadLine();
+                    syncProcess.BeginErrorReadLine();
+                    syncProcess.WaitForExit();
+
+                    if (syncProcess.ExitCode == 0)
+                    {
+                        Log("[Sync] Database sync completed successfully for " + companyId + "!");
+                    }
+                    else
+                    {
+                        Log("[Sync] Database sync failed with exit code: " + syncProcess.ExitCode);
                     }
                 }
                 catch (Exception ex)
@@ -523,18 +521,16 @@ namespace BimasaktiReports.FinancialReports.Manager
         {
             try
             {
-                using (var client = new TcpClient())
+                using var client = new TcpClient();
+                var connectTask = client.ConnectAsync(host, port);
+                var delayTask = Task.Delay(500); // 500ms timeout provides robust Windows loopback resolution
+                var completedTask = await Task.WhenAny(connectTask, delayTask);
+                if (completedTask == connectTask)
                 {
-                    var connectTask = client.ConnectAsync(host, port);
-                    var delayTask = Task.Delay(500); // 500ms timeout provides robust Windows loopback resolution
-                    var completedTask = await Task.WhenAny(connectTask, delayTask);
-                    if (completedTask == connectTask)
-                    {
-                        await connectTask; // propagate exceptions if any
-                        return true;
-                    }
-                    return false;
+                    await connectTask; // propagate exceptions if any
+                    return true;
                 }
+                return false;
             }
             catch
             {
@@ -547,46 +543,41 @@ namespace BimasaktiReports.FinancialReports.Manager
             try
             {
                 string output;
-                using (Process netstat = new Process())
+                using Process netstat = new();
+                netstat.StartInfo = new ProcessStartInfo
                 {
-                    netstat.StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "cmd.exe",
-                        Arguments = "/c netstat -ano | findstr :" + port,
-                        RedirectStandardOutput = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
-                    netstat.Start();
-                    output = netstat.StandardOutput.ReadToEnd();
-                    netstat.WaitForExit();
-                }
+                    FileName = "cmd.exe",
+                    Arguments = "/c netstat -ano | findstr :" + port,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                netstat.Start();
+                output = netstat.StandardOutput.ReadToEnd();
+                netstat.WaitForExit();
 
                 if (string.IsNullOrEmpty(output)) return;
 
-                string[] lines = output.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                string[] lines = output.Split(LineSplitSeparators, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string line in lines)
                 {
                     if (line.Contains("LISTENING"))
                     {
-                        string[] parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                         if (parts.Length > 0)
                         {
-                            string pidStr = parts[parts.Length - 1].Trim();
-                            int pid;
-                            if (int.TryParse(pidStr, out pid) && pid > 0)
+                            string pidStr = parts[^1].Trim();
+                            if (int.TryParse(pidStr, out int pid) && pid > 0)
                             {
                                 Log($"Found external process ID {pid} on port {port}. Terminating...");
-                                using (Process killer = Process.Start(new ProcessStartInfo
+                                using Process killer = Process.Start(new ProcessStartInfo
                                 {
                                     FileName = "taskkill",
                                     Arguments = "/F /T /PID " + pid,
                                     CreateNoWindow = true,
                                     UseShellExecute = false
-                                }))
-                                {
-                                    if (killer != null) killer.WaitForExit(3000);
-                                }
+                                });
+                                killer?.WaitForExit(3000);
                             }
                         }
                     }
@@ -676,7 +667,7 @@ namespace BimasaktiReports.FinancialReports.Manager
         private static string SanitizeKey(string input)
         {
             if (string.IsNullOrEmpty(input)) return "";
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            System.Text.StringBuilder sb = new();
             foreach (char c in input)
             {
                 if (char.IsLetterOrDigit(c) || c == '_')
@@ -837,25 +828,23 @@ namespace BimasaktiReports.FinancialReports.Manager
             // 8.1 List users for a company (excluding admin role)
             app.MapGet("/api/manager/companies/{companyId}/users", async (string companyId) =>
             {
-                var validation = ManagerServer.ValidateCompanyId(companyId);
-                if (!validation.IsValid)
+                var (isValid, errorMessage) = ManagerServer.ValidateCompanyId(companyId);
+                if (!isValid)
                 {
-                    return Results.BadRequest(new { error = validation.ErrorMessage });
+                    return Results.BadRequest(new { error = errorMessage });
                 }
 
                 string id = companyId.Trim().ToUpperInvariant();
                 string databasePath = svcDbUtils.GetSafeDbPath(id);
                 try
                 {
-                    using (var dbContext = new TenantDbContext(databasePath))
-                    {
-                        await dbContext.Database.EnsureCreatedAsync();
-                        var usersList = await dbContext.Users
-                            .Where(u => u.CompanyId == id && u.Role != "admin")
-                            .ToListAsync();
-                        
-                        return Results.Ok(usersList.Select(u => new { id = u.Id, username = u.Username, role = u.Role }));
-                    }
+                    using var dbContext = new TenantDbContext(databasePath);
+                    await dbContext.Database.EnsureCreatedAsync();
+                    var usersList = await dbContext.Users
+                        .Where(u => u.CompanyId == id && u.Role != "admin")
+                        .ToListAsync();
+                    
+                    return Results.Ok(usersList.Select(u => new { id = u.Id, username = u.Username, role = u.Role }));
                 }
                 catch (Exception ex)
                 {
@@ -867,35 +856,33 @@ namespace BimasaktiReports.FinancialReports.Manager
             // 8.2 Get permissions for a specific user in a company
             app.MapGet("/api/manager/companies/{companyId}/users/{userId:int}/permissions", async (string companyId, int userId) =>
             {
-                var validation = ManagerServer.ValidateCompanyId(companyId);
-                if (!validation.IsValid)
+                var (isValid, errorMessage) = ManagerServer.ValidateCompanyId(companyId);
+                if (!isValid)
                 {
-                    return Results.BadRequest(new { error = validation.ErrorMessage });
+                    return Results.BadRequest(new { error = errorMessage });
                 }
 
                 string id = companyId.Trim().ToUpperInvariant();
                 string databasePath = svcDbUtils.GetSafeDbPath(id);
                 try
                 {
-                    using (var dbContext = new TenantDbContext(databasePath))
+                    using var dbContext = new TenantDbContext(databasePath);
+                    await dbContext.Database.EnsureCreatedAsync();
+                    
+                    var targetUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId && u.CompanyId == id);
+                    if (targetUser == null)
                     {
-                        await dbContext.Database.EnsureCreatedAsync();
-                        
-                        var targetUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId && u.CompanyId == id);
-                        if (targetUser == null)
-                        {
-                            return Results.NotFound(new { error = "User not found." });
-                        }
-
-                        var widgetsList = await dbContext.UserWidgets.Where(w => w.UserId == userId).ToListAsync();
-                        var reportsList = await dbContext.UserReports.Where(r => r.UserId == userId).ToListAsync();
-
-                        return Results.Ok(new
-                        {
-                            widgets = widgetsList.ToDictionary(w => w.WidgetKey, w => w.IsActive),
-                            reports = reportsList.ToDictionary(r => r.ReportKey, r => r.IsActive)
-                        });
+                        return Results.NotFound(new { error = "User not found." });
                     }
+
+                    var widgetsList = await dbContext.UserWidgets.Where(w => w.UserId == userId).ToListAsync();
+                    var reportsList = await dbContext.UserReports.Where(r => r.UserId == userId).ToListAsync();
+
+                    return Results.Ok(new
+                    {
+                        widgets = widgetsList.ToDictionary(w => w.WidgetKey, w => w.IsActive),
+                        reports = reportsList.ToDictionary(r => r.ReportKey, r => r.IsActive)
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -907,10 +894,10 @@ namespace BimasaktiReports.FinancialReports.Manager
             // 8.3 Save permissions for a user in a company
             app.MapPost("/api/manager/companies/{companyId}/users/{userId:int}/permissions", async (string companyId, int userId, PermissionSettingsSpecification permissions) =>
             {
-                var validation = ManagerServer.ValidateCompanyId(companyId);
-                if (!validation.IsValid)
+                var (isValid, errorMessage) = ManagerServer.ValidateCompanyId(companyId);
+                if (!isValid)
                 {
-                    return Results.BadRequest(new { error = validation.ErrorMessage });
+                    return Results.BadRequest(new { error = errorMessage });
                 }
 
                 if (permissions == null)
@@ -922,52 +909,50 @@ namespace BimasaktiReports.FinancialReports.Manager
                 string databasePath = svcDbUtils.GetSafeDbPath(id);
                 try
                 {
-                    using (var dbContext = new TenantDbContext(databasePath))
+                    using var dbContext = new TenantDbContext(databasePath);
+                    await dbContext.Database.EnsureCreatedAsync();
+
+                    var targetUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId && u.CompanyId == id);
+                    if (targetUser == null)
                     {
-                        await dbContext.Database.EnsureCreatedAsync();
-
-                        var targetUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId && u.CompanyId == id);
-                        if (targetUser == null)
-                        {
-                            return Results.NotFound(new { error = "User not found." });
-                        }
-
-                        // Save widgets
-                        var existingWidgets = await dbContext.UserWidgets.Where(w => w.UserId == userId).ToListAsync();
-                        var existingWidgetsMap = existingWidgets.ToDictionary(w => w.WidgetKey);
-
-                        foreach (var kvp in permissions.Widgets)
-                        {
-                            if (existingWidgetsMap.TryGetValue(kvp.Key, out var w))
-                            {
-                                w.IsActive = kvp.Value;
-                            }
-                            else
-                            {
-                                dbContext.UserWidgets.Add(new UserWidget { UserId = userId, WidgetKey = kvp.Key, IsActive = kvp.Value });
-                            }
-                        }
-
-                        // Save reports
-                        var existingReports = await dbContext.UserReports.Where(r => r.UserId == userId).ToListAsync();
-                        var existingReportsMap = existingReports.ToDictionary(r => r.ReportKey);
-
-                        foreach (var kvp in permissions.Reports)
-                        {
-                            if (existingReportsMap.TryGetValue(kvp.Key, out var r))
-                            {
-                                r.IsActive = kvp.Value;
-                            }
-                            else
-                            {
-                                dbContext.UserReports.Add(new UserReport { UserId = userId, ReportKey = kvp.Key, IsActive = kvp.Value });
-                            }
-                        }
-
-                        await dbContext.SaveChangesAsync();
-                        ManagerServer.Log($"Saved permissions successfully for user: {targetUser.Username} in company: {id}");
-                        return Results.Ok(new { message = "Permissions updated successfully." });
+                        return Results.NotFound(new { error = "User not found." });
                     }
+
+                    // Save widgets
+                    var existingWidgets = await dbContext.UserWidgets.Where(w => w.UserId == userId).ToListAsync();
+                    var existingWidgetsMap = existingWidgets.ToDictionary(w => w.WidgetKey);
+
+                    foreach (var kvp in permissions.Widgets)
+                    {
+                        if (existingWidgetsMap.TryGetValue(kvp.Key, out var w))
+                        {
+                            w.IsActive = kvp.Value;
+                        }
+                        else
+                        {
+                            dbContext.UserWidgets.Add(new UserWidget { UserId = userId, WidgetKey = kvp.Key, IsActive = kvp.Value });
+                        }
+                    }
+
+                    // Save reports
+                    var existingReports = await dbContext.UserReports.Where(r => r.UserId == userId).ToListAsync();
+                    var existingReportsMap = existingReports.ToDictionary(r => r.ReportKey);
+
+                    foreach (var kvp in permissions.Reports)
+                    {
+                        if (existingReportsMap.TryGetValue(kvp.Key, out var r))
+                        {
+                            r.IsActive = kvp.Value;
+                        }
+                        else
+                        {
+                            dbContext.UserReports.Add(new UserReport { UserId = userId, ReportKey = kvp.Key, IsActive = kvp.Value });
+                        }
+                    }
+
+                    await dbContext.SaveChangesAsync();
+                    ManagerServer.Log($"Saved permissions successfully for user: {targetUser.Username} in company: {id}");
+                    return Results.Ok(new { message = "Permissions updated successfully." });
                 }
                 catch (Exception ex)
                 {
@@ -979,10 +964,10 @@ namespace BimasaktiReports.FinancialReports.Manager
             // 9. Load company configuration sync URLs
             app.MapGet("/api/companies/{id}", (string id) =>
             {
-                var validation = ManagerServer.ValidateCompanyId(id);
-                if (!validation.IsValid)
+                var (isValid, errorMessage) = ManagerServer.ValidateCompanyId(id);
+                if (!isValid)
                 {
-                    return Results.BadRequest(new { error = validation.ErrorMessage });
+                    return Results.BadRequest(new { error = errorMessage });
                 }
 
                 string companyId = id.Trim().ToUpperInvariant();
@@ -995,10 +980,10 @@ namespace BimasaktiReports.FinancialReports.Manager
             {
                 if (req == null) return Results.BadRequest(new { error = "Request body is empty." });
 
-                var validation = ManagerServer.ValidateCompanyId(req.CompanyId);
-                if (!validation.IsValid)
+                var (isValid, errorMessage) = ManagerServer.ValidateCompanyId(req.CompanyId);
+                if (!isValid)
                 {
-                    return Results.BadRequest(new { error = validation.ErrorMessage });
+                    return Results.BadRequest(new { error = errorMessage });
                 }
 
                 string companyId = req.CompanyId.Trim().ToUpperInvariant();
@@ -1102,10 +1087,10 @@ namespace BimasaktiReports.FinancialReports.Manager
             // 11. Trigger sync explicitly
             app.MapPost("/api/companies/{id}/sync", (string id) =>
             {
-                var validation = ManagerServer.ValidateCompanyId(id);
-                if (!validation.IsValid)
+                var (isValid, errorMessage) = ManagerServer.ValidateCompanyId(id);
+                if (!isValid)
                 {
-                    return Results.BadRequest(new { error = validation.ErrorMessage });
+                    return Results.BadRequest(new { error = errorMessage });
                 }
 
                 string companyId = id.Trim().ToUpperInvariant();

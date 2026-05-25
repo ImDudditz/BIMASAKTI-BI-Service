@@ -19,12 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\\BimasaktiReports.csproj" />
+    <ProjectReference Include="../BimasaktiReports.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="obj\**" />
-    <None Remove="obj\**" />
-  </ItemGroup>
 
 </Project>
