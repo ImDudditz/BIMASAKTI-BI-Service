@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -76,433 +77,10 @@ namespace BimasaktiReports.FinancialReports.Manager
             // Check if backend/frontend are already running externally on ports 8001/5173
             CheckExternalServers();
 
-            // --- API ENDPOINTS ---
+            // --- API ENDPOINTS REGISTRATION ---
+            app.MapManagerEndpoints();
 
-            // 1. Get process and server status
-            app.MapGet("/api/status", () =>
-            {
-                bool backendPortActive = IsPortActive("127.0.0.1", 8001);
-                bool frontendPortActive = IsPortActive("127.0.0.1", 5173);
-
-                bool backendProcessActive = (_backendProcess != null && !_backendProcess.HasExited) || backendPortActive;
-                bool frontendProcessActive = (_frontendProcess != null && !_frontendProcess.HasExited) || frontendPortActive;
-
-                ServerStatus backendStatus = ServerStatus.Stopped;
-                if (_backendHasError)
-                {
-                    backendStatus = ServerStatus.Error;
-                }
-                else if (backendPortActive)
-                {
-                    backendStatus = ServerStatus.Running;
-                }
-                else if (_backendProcess != null && !_backendProcess.HasExited)
-                {
-                    backendStatus = ServerStatus.Loading;
-                }
-                else if (_backendProcess != null && _backendProcess.HasExited)
-                {
-                    backendStatus = ServerStatus.Error;
-                }
-
-                ServerStatus frontendStatus = ServerStatus.Stopped;
-                if (_frontendHasError)
-                {
-                    frontendStatus = ServerStatus.Error;
-                }
-                else if (frontendPortActive)
-                {
-                    frontendStatus = ServerStatus.Running;
-                }
-                else if (_frontendProcess != null && !_frontendProcess.HasExited)
-                {
-                    frontendStatus = ServerStatus.Loading;
-                }
-                else if (_frontendProcess != null && _frontendProcess.HasExited)
-                {
-                    frontendStatus = ServerStatus.Error;
-                }
-
-                return Results.Ok(new
-                {
-                    backendActive = backendProcessActive,
-                    frontendActive = frontendProcessActive,
-                    backendStatus = backendStatus.ToString(),
-                    frontendStatus = frontendStatus.ToString(),
-                    godMode = File.Exists(_godModePath),
-                    localIp = _localIp,
-                    coolAlias = _coolAlias
-                });
-            });
-
-            // 2. Start servers
-            app.MapPost("/api/start", () =>
-            {
-                StartAll();
-                return Results.Ok(new { message = "Server startup sequence triggered." });
-            });
-
-            // 3. Stop servers
-            app.MapPost("/api/stop", () =>
-            {
-                StopAll();
-                return Results.Ok(new { message = "Server shutdown sequence triggered." });
-            });
-
-            // 4. Restart servers
-            app.MapPost("/api/restart", () =>
-            {
-                RestartAll();
-                return Results.Ok(new { message = "Server restart sequence triggered." });
-            });
-
-            // 5. Toggle God Mode
-            app.MapPost("/api/godmode", () =>
-            {
-                ToggleGodMode();
-                return Results.Ok(new { godMode = File.Exists(_godModePath) });
-            });
-
-            // 6. Get consolidated system logs
-            app.MapGet("/api/logs", () =>
-            {
-                return Results.Ok(_logQueue.ToArray());
-            });
-
-            // 7. Clear consolidated system logs
-            app.MapPost("/api/logs/clear", () =>
-            {
-                while (_logQueue.TryDequeue(out _)) { }
-                Log("Terminal log console cleared.");
-                return Results.Ok(new { message = "Logs cleared." });
-            });
-
-            // 8. List registered companies
-            app.MapGet("/api/companies", () =>
-            {
-                var list = new List<string>();
-                try
-                {
-                    string assetsDir = Path.GetFullPath(Path.Combine(GetRootDirectory(), "backend", "assets"));
-                    if (Directory.Exists(assetsDir))
-                    {
-                        string[] dirs = Directory.GetDirectories(assetsDir);
-                        foreach (string dir in dirs)
-                        {
-                            string name = Path.GetFileName(dir);
-                            if (name.Length == 5 && IsValidId(name))
-                            {
-                                list.Add(name);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log("Error listing companies: " + ex.Message);
-                }
-                return Results.Ok(list);
-            });
-
-            // 8.1 List users for a company (excluding admin role)
-            app.MapGet("/api/manager/companies/{companyId}/users", async (string companyId) =>
-            {
-                string id = companyId.Trim().ToUpperInvariant();
-                if (id.Length != 5 || !IsValidId(id))
-                {
-                    return Results.BadRequest(new { error = "Invalid Company ID." });
-                }
-
-                string databasePath = svcDbUtils.GetSafeDbPath(id);
-                try
-                {
-                    using (var dbContext = new TenantDbContext(databasePath))
-                    {
-                        await dbContext.Database.EnsureCreatedAsync();
-                        var usersList = await dbContext.Users
-                            .Where(u => u.CompanyId == id && u.Role != "admin")
-                            .ToListAsync();
-                        
-                        return Results.Ok(usersList.Select(u => new { id = u.Id, username = u.Username, role = u.Role }));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log("Error listing users for company " + id + ": " + ex.Message);
-                    return Results.StatusCode(500);
-                }
-            });
-
-            // 8.2 Get permissions for a specific user in a company
-            app.MapGet("/api/manager/companies/{companyId}/users/{userId:int}/permissions", async (string companyId, int userId) =>
-            {
-                string id = companyId.Trim().ToUpperInvariant();
-                if (id.Length != 5 || !IsValidId(id))
-                {
-                    return Results.BadRequest(new { error = "Invalid Company ID." });
-                }
-
-                string databasePath = svcDbUtils.GetSafeDbPath(id);
-                try
-                {
-                    using (var dbContext = new TenantDbContext(databasePath))
-                    {
-                        await dbContext.Database.EnsureCreatedAsync();
-                        
-                        var targetUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId && u.CompanyId == id);
-                        if (targetUser == null)
-                        {
-                            return Results.NotFound(new { error = "User not found." });
-                        }
-
-                        var widgetsList = await dbContext.UserWidgets.Where(w => w.UserId == userId).ToListAsync();
-                        var reportsList = await dbContext.UserReports.Where(r => r.UserId == userId).ToListAsync();
-
-                        return Results.Ok(new
-                        {
-                            widgets = widgetsList.ToDictionary(w => w.WidgetKey, w => w.IsActive),
-                            reports = reportsList.ToDictionary(r => r.ReportKey, r => r.IsActive)
-                        });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log("Error loading permissions for user " + userId + " in company " + id + ": " + ex.Message);
-                    return Results.StatusCode(500);
-                }
-            });
-
-            // 8.3 Save permissions for a user in a company
-            app.MapPost("/api/manager/companies/{companyId}/users/{userId:int}/permissions", async (string companyId, int userId, PermissionSettingsSpecification permissions) =>
-            {
-                string id = companyId.Trim().ToUpperInvariant();
-                if (id.Length != 5 || !IsValidId(id))
-                {
-                    return Results.BadRequest(new { error = "Invalid Company ID." });
-                }
-
-                if (permissions == null)
-                {
-                    return Results.BadRequest(new { error = "Permissions body cannot be null." });
-                }
-
-                string databasePath = svcDbUtils.GetSafeDbPath(id);
-                try
-                {
-                    using (var dbContext = new TenantDbContext(databasePath))
-                    {
-                        await dbContext.Database.EnsureCreatedAsync();
-
-                        var targetUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId && u.CompanyId == id);
-                        if (targetUser == null)
-                        {
-                            return Results.NotFound(new { error = "User not found." });
-                        }
-
-                        // Save widgets
-                        var existingWidgets = await dbContext.UserWidgets.Where(w => w.UserId == userId).ToListAsync();
-                        var existingWidgetsMap = existingWidgets.ToDictionary(w => w.WidgetKey);
-
-                        foreach (var kvp in permissions.Widgets)
-                        {
-                            if (existingWidgetsMap.TryGetValue(kvp.Key, out var w))
-                            {
-                                w.IsActive = kvp.Value;
-                            }
-                            else
-                            {
-                                dbContext.UserWidgets.Add(new UserWidget { UserId = userId, WidgetKey = kvp.Key, IsActive = kvp.Value });
-                            }
-                        }
-
-                        // Save reports
-                        var existingReports = await dbContext.UserReports.Where(r => r.UserId == userId).ToListAsync();
-                        var existingReportsMap = existingReports.ToDictionary(r => r.ReportKey);
-
-                        foreach (var kvp in permissions.Reports)
-                        {
-                            if (existingReportsMap.TryGetValue(kvp.Key, out var r))
-                            {
-                                r.IsActive = kvp.Value;
-                            }
-                            else
-                            {
-                                dbContext.UserReports.Add(new UserReport { UserId = userId, ReportKey = kvp.Key, IsActive = kvp.Value });
-                            }
-                        }
-
-                        await dbContext.SaveChangesAsync();
-                        Log($"Saved permissions successfully for user: {targetUser.Username} in company: {id}");
-                        return Results.Ok(new { message = "Permissions updated successfully." });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log("Error saving permissions for user " + userId + " in company " + id + ": " + ex.Message);
-                    return Results.StatusCode(500);
-                }
-            });
-
-            // 9. Load company configuration sync URLs
-            app.MapGet("/api/companies/{id}", (string id) =>
-            {
-                string companyId = id.Trim().ToUpperInvariant();
-                if (companyId.Length != 5 || !IsValidId(companyId))
-                {
-                    return Results.BadRequest(new { error = "Invalid Company ID. Must be exactly 5 alphanumeric characters." });
-                }
-
-                string[] urls = LoadCompanySyncUrls(companyId);
-                return Results.Ok(new { companyId, urls });
-            });
-
-            // 10. Register or modify company config
-            app.MapPost("/api/companies", (CompanySaveRequest req) =>
-            {
-                if (req == null) return Results.BadRequest(new { error = "Request body is empty." });
-
-                string companyId = req.CompanyId?.Trim()?.ToUpperInvariant();
-                string mode = req.Mode?.Trim() ?? "New";
-                string syncUrlsText = req.SyncUrls ?? "";
-
-                if (string.IsNullOrEmpty(companyId))
-                {
-                    return Results.BadRequest(new { error = "Company ID must be provided." });
-                }
-
-                if (companyId.Length != 5)
-                {
-                    return Results.BadRequest(new { error = "Company ID must be exactly 5 characters long." });
-                }
-
-                if (!IsValidId(companyId))
-                {
-                    return Results.BadRequest(new { error = "Company ID must contain only alphanumeric characters, dashes, or underscores." });
-                }
-
-                string rootDir = GetRootDirectory();
-                string assetsDir = Path.GetFullPath(Path.Combine(rootDir, "backend", "assets"));
-                string tmplDir = Path.GetFullPath(Path.Combine(assetsDir, "BMS"));
-                string targetDir = Path.GetFullPath(Path.Combine(assetsDir, companyId));
-
-                if (mode == "New")
-                {
-                    if (string.IsNullOrEmpty(syncUrlsText.Trim()))
-                    {
-                        return Results.BadRequest(new { error = "Sync URLs cannot be empty when registering a new company." });
-                    }
-
-                    if (!Directory.Exists(tmplDir))
-                    {
-                        return Results.BadRequest(new { error = "Template directory (BMS) not found under: " + tmplDir });
-                    }
-
-                    if (Directory.Exists(targetDir))
-                    {
-                        return Results.BadRequest(new { error = "Company directory already exists: " + targetDir });
-                    }
-
-                    try
-                    {
-                        Log("Creating new tenant: " + companyId + " from template: BMS");
-                        Directory.CreateDirectory(targetDir);
-                        
-                        foreach (string dirPath in Directory.GetDirectories(tmplDir, "*", SearchOption.AllDirectories))
-                        {
-                            Directory.CreateDirectory(dirPath.Replace(tmplDir, targetDir));
-                        }
-
-                        string tmplSyncPath = Path.Combine(tmplDir, "BMS_sync.py");
-                        if (File.Exists(tmplSyncPath))
-                        {
-                            string targetSyncPath = Path.Combine(targetDir, companyId + "_sync.py");
-                            File.Copy(tmplSyncPath, targetSyncPath, true);
-
-                            string content = File.ReadAllText(targetSyncPath);
-                            if (content.Contains("BMS"))
-                            {
-                                content = content.Replace("BMS", companyId);
-                            }
-                            string lowerTmpl = "bms";
-                            string lowerNewId = companyId.ToLowerInvariant();
-                            if (content.Contains(lowerTmpl))
-                            {
-                                content = content.Replace(lowerTmpl, lowerNewId);
-                            }
-                            File.WriteAllText(targetSyncPath, content);
-                        }
-                        else
-                        {
-                            Log("Warning: Template sync script not found: " + tmplSyncPath);
-                        }
-
-                        WriteCompanyConfig(targetDir, companyId, syncUrlsText);
-                        Log("Success: Company " + companyId + " created and configuration saved!");
-                        TriggerDatabaseSync(companyId);
-
-                        return Results.Ok(new { message = $"Company {companyId} created and registered successfully!" });
-                    }
-                    catch (Exception ex)
-                    {
-                        string errMsg = "Error creating company: " + ex.Message;
-                        Log(errMsg);
-                        return Results.StatusCode(500);
-                    }
-                }
-                else // Modify
-                {
-                    if (!Directory.Exists(targetDir))
-                    {
-                        return Results.BadRequest(new { error = "Target company directory not found: " + targetDir });
-                    }
-
-                    try
-                    {
-                        Log("Modifying configuration for company: " + companyId);
-                        WriteCompanyConfig(targetDir, companyId, syncUrlsText);
-                        Log("Success: Company " + companyId + " configuration updated!");
-                        TriggerDatabaseSync(companyId);
-
-                        return Results.Ok(new { message = $"Company {companyId} configuration updated successfully!" });
-                    }
-                    catch (Exception ex)
-                    {
-                        string errMsg = "Error modifying company: " + ex.Message;
-                        Log(errMsg);
-                        return Results.StatusCode(500);
-                    }
-                }
-            });
-
-            // 11. Trigger sync explicitly
-            app.MapPost("/api/companies/{id}/sync", (string id) =>
-            {
-                string companyId = id.Trim().ToUpperInvariant();
-                if (companyId.Length != 5 || !IsValidId(companyId))
-                {
-                    return Results.BadRequest(new { error = "Invalid Company ID." });
-                }
-
-                TriggerDatabaseSync(companyId);
-                return Results.Ok(new { message = $"Database sync initiated for {companyId}." });
-            });
-
-            // Auto-launch browser to port 5000 once ASP.NET server is ready
-            Task.Run(async () =>
-            {
-                await Task.Delay(1500);
-                try
-                {
-                    Log("Opening Web Manager in default browser...");
-                    Process.Start(new ProcessStartInfo("http://localhost:5000") { UseShellExecute = true });
-                }
-                catch (Exception ex)
-                {
-                    Log("Could not launch web browser automatically: " + ex.Message + ". Please open http://localhost:5000 manually.");
-                }
-            });
-
-            app.Run("http://localhost:5000");
+            app.Run("http://localhost:5050");
         }
 
         // --- CORE PROCESS CONTROL ---
@@ -524,11 +102,14 @@ namespace BimasaktiReports.FinancialReports.Manager
             }
         }
 
-        private static void Log(string message)
+        public static void Log(string message, bool writeToConsole = true)
         {
             string timestamp = DateTime.Now.ToString("HH:mm:ss");
             string line = $"[{timestamp}] {message}";
-            Console.WriteLine(line);
+            if (writeToConsole)
+            {
+                Console.WriteLine(line);
+            }
             
             _logQueue.Enqueue(line);
             while (_logQueue.Count > MaxLogLines)
@@ -537,7 +118,7 @@ namespace BimasaktiReports.FinancialReports.Manager
             }
         }
 
-        private static void StartBackend()
+        public static void StartBackend()
         {
             try
             {
@@ -550,11 +131,19 @@ namespace BimasaktiReports.FinancialReports.Manager
                     return;
                 }
 
+                // Ensure port 8001 is completely free to prevent restart collisions
+                KillProcessOnPort(8001);
+
+                // Use pre-compiled DLL if present for near-instant boot, fallback to dotnet run
+                string dllPath = Path.Combine(backendDir, "bin", "Debug", "net8.0", "BimasaktiReports.FinancialReports.Backend.dll");
+                bool useDll = File.Exists(dllPath);
+                string executableArguments = useDll ? $"\"{dllPath}\"" : "run";
+
                 _backendProcess = new Process();
                 _backendProcess.StartInfo = new ProcessStartInfo
                 {
                     FileName = "dotnet",
-                    Arguments = "run",
+                    Arguments = executableArguments,
                     WorkingDirectory = backendDir,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -566,7 +155,7 @@ namespace BimasaktiReports.FinancialReports.Manager
                 {
                     if (e.Data != null)
                     {
-                        Log("[Backend] " + e.Data);
+                        Log("[Backend] " + e.Data, true);
                         if (e.Data.IndexOf(": error CS", StringComparison.OrdinalIgnoreCase) >= 0 ||
                             e.Data.IndexOf("Build FAILED", StringComparison.OrdinalIgnoreCase) >= 0 ||
                             e.Data.IndexOf("Unhandled exception", StringComparison.OrdinalIgnoreCase) >= 0 ||
@@ -582,7 +171,7 @@ namespace BimasaktiReports.FinancialReports.Manager
                 {
                     if (e.Data != null)
                     {
-                        Log("[Backend Error] " + e.Data);
+                        Log("[Backend Error] " + e.Data, true);
                         if (e.Data.IndexOf(": error CS", StringComparison.OrdinalIgnoreCase) >= 0 ||
                             e.Data.IndexOf("Build FAILED", StringComparison.OrdinalIgnoreCase) >= 0 ||
                             e.Data.IndexOf("Unhandled exception", StringComparison.OrdinalIgnoreCase) >= 0 ||
@@ -605,7 +194,7 @@ namespace BimasaktiReports.FinancialReports.Manager
             }
         }
 
-        private static void StopBackend()
+        public static void StopBackend()
         {
             if (_backendProcess != null)
             {
@@ -621,7 +210,7 @@ namespace BimasaktiReports.FinancialReports.Manager
             }
         }
 
-        private static void StartFrontend()
+        public static void StartFrontend()
         {
             try
             {
@@ -633,6 +222,9 @@ namespace BimasaktiReports.FinancialReports.Manager
                     Log($"Error: Frontend directory not found: {frontendDir}");
                     return;
                 }
+
+                // Ensure port 5173 is completely free to prevent restart collisions
+                KillProcessOnPort(5173);
 
                 _frontendProcess = new Process();
                 _frontendProcess.StartInfo = new ProcessStartInfo
@@ -650,7 +242,7 @@ namespace BimasaktiReports.FinancialReports.Manager
                 {
                     if (e.Data != null)
                     {
-                        Log("[Vite] " + e.Data);
+                        Log("[Vite] " + e.Data, true);
                         if (e.Data.IndexOf("failed to compile", StringComparison.OrdinalIgnoreCase) >= 0 ||
                             e.Data.IndexOf("Failed to compile", StringComparison.OrdinalIgnoreCase) >= 0 ||
                             e.Data.IndexOf("Syntax Error", StringComparison.OrdinalIgnoreCase) >= 0 ||
@@ -666,7 +258,7 @@ namespace BimasaktiReports.FinancialReports.Manager
                 {
                     if (e.Data != null)
                     {
-                        Log("[Vite Error] " + e.Data);
+                        Log("[Vite Error] " + e.Data, true);
                         if (e.Data.IndexOf("failed to compile", StringComparison.OrdinalIgnoreCase) >= 0 ||
                             e.Data.IndexOf("Failed to compile", StringComparison.OrdinalIgnoreCase) >= 0 ||
                             e.Data.IndexOf("Syntax Error", StringComparison.OrdinalIgnoreCase) >= 0 ||
@@ -692,7 +284,7 @@ namespace BimasaktiReports.FinancialReports.Manager
             }
         }
 
-        private static void StopFrontend()
+        public static void StopFrontend()
         {
             if (_frontendProcess != null)
             {
@@ -733,7 +325,7 @@ namespace BimasaktiReports.FinancialReports.Manager
 
         // --- GOD MODE MANAGEMENT ---
 
-        private static void ToggleGodMode()
+        public static void ToggleGodMode()
         {
             try
             {
@@ -762,43 +354,40 @@ namespace BimasaktiReports.FinancialReports.Manager
 
         // --- TENANT HELPERS ---
 
-        private static string[] LoadCompanySyncUrls(string companyId)
+        public static string[] LoadCompanySyncUrls(string companyId)
         {
             string configPath = Path.Combine(GetRootDirectory(), "backend", "assets", companyId, companyId + "_config.json");
-            if (!File.Exists(configPath)) return new string[0];
+            if (!File.Exists(configPath)) return Array.Empty<string>();
             
             try
             {
                 string content = File.ReadAllText(configPath);
-                var matches = System.Text.RegularExpressions.Regex.Matches(content, @"""[^""]+""\s*:\s*""([^""]+)""");
-                var list = new List<string>();
-                foreach (System.Text.RegularExpressions.Match match in matches)
+                using (JsonDocument doc = JsonDocument.Parse(content))
                 {
-                    if (match.Groups.Count > 1)
+                    if (doc.RootElement.TryGetProperty("sync_urls", out var syncUrlsProp) && syncUrlsProp.ValueKind == JsonValueKind.Object)
                     {
-                        string url = match.Groups[1].Value;
-                        url = url.Replace("\\\"", "\"").Replace("\\\\", "\\");
-                        list.Add(url);
+                        var list = new List<string>();
+                        foreach (var prop in syncUrlsProp.EnumerateObject())
+                        {
+                            list.Add(prop.Value.GetString());
+                        }
+                        return list.ToArray();
                     }
                 }
-                return list.ToArray();
+                return Array.Empty<string>();
             }
             catch (Exception ex)
             {
                 Log("Error loading sync URLs: " + ex.Message);
-                return new string[0];
+                return Array.Empty<string>();
             }
         }
 
-        private static void WriteCompanyConfig(string dir, string companyId, string syncUrlsText)
+        public static void WriteCompanyConfig(string dir, string companyId, string syncUrlsText)
         {
             string[] urls = syncUrlsText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var syncUrlsDict = new Dictionary<string, string>();
             
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            sb.AppendLine("{");
-            sb.AppendLine("    \"sync_urls\": {");
-
-            bool first = true;
             foreach (string url in urls)
             {
                 string trimmedUrl = url.Trim();
@@ -812,21 +401,18 @@ namespace BimasaktiReports.FinancialReports.Manager
                     continue;
                 }
 
-                string escapedUrl = trimmedUrl.Replace("\\", "\\\\").Replace("\"", "\\\"");
-
-                if (!first) sb.AppendLine(",");
-                sb.Append("        \"" + key + "\": \"" + escapedUrl + "\"");
-                first = false;
+                syncUrlsDict[key] = trimmedUrl;
             }
-            if (!first) sb.AppendLine();
-            sb.AppendLine("    }");
-            sb.AppendLine("}");
+
+            var configObj = new { sync_urls = syncUrlsDict };
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(configObj, options);
 
             string configPath = Path.Combine(dir, companyId + "_config.json");
-            File.WriteAllText(configPath, sb.ToString());
+            File.WriteAllText(configPath, json);
         }
 
-        private static void TriggerDatabaseSync(string companyId)
+        public static void TriggerDatabaseSync(string companyId)
         {
             Task.Run(() =>
             {
@@ -852,7 +438,7 @@ namespace BimasaktiReports.FinancialReports.Manager
                         {
                             if (!string.IsNullOrEmpty(e.Data))
                             {
-                                Log("[Sync] " + e.Data);
+                                Log("[Sync] " + e.Data, false);
                             }
                         };
 
@@ -860,7 +446,7 @@ namespace BimasaktiReports.FinancialReports.Manager
                         {
                             if (!string.IsNullOrEmpty(e.Data))
                             {
-                                Log("[Sync Error] " + e.Data);
+                                Log("[Sync Error] " + e.Data, false);
                             }
                         };
 
@@ -888,8 +474,8 @@ namespace BimasaktiReports.FinancialReports.Manager
 
         private static void CheckExternalServers()
         {
-            bool backRunning = IsPortActive("127.0.0.1", 8001);
-            bool frontRunning = IsPortActive("127.0.0.1", 5173);
+            bool backRunning = IsPortActiveAsync("127.0.0.1", 8001).GetAwaiter().GetResult();
+            bool frontRunning = IsPortActiveAsync("127.0.0.1", 5173).GetAwaiter().GetResult();
 
             if (backRunning)
             {
@@ -901,19 +487,19 @@ namespace BimasaktiReports.FinancialReports.Manager
             }
         }
 
-        private static void StartAll()
+        public static void StartAll()
         {
             StartBackend();
             StartFrontend();
         }
 
-        private static void StopAll()
+        public static void StopAll()
         {
             StopBackend();
             StopFrontend();
         }
 
-        private static void RestartAll()
+        public static void RestartAll()
         {
             Log("Restarting all servers...");
             StopAll();
@@ -926,17 +512,25 @@ namespace BimasaktiReports.FinancialReports.Manager
 
         // --- UTILITIES ---
 
-        private static bool IsPortActive(string host, int port)
+        public static async Task<bool> IsPortActiveAsync(string host, int port)
+        {
+            if (await TryConnectAsync(host, port)) return true;
+            if (host == "127.0.0.1" && await TryConnectAsync("localhost", port)) return true;
+            return false;
+        }
+
+        private static async Task<bool> TryConnectAsync(string host, int port)
         {
             try
             {
                 using (var client = new TcpClient())
                 {
-                    var result = client.BeginConnect(host, port, null, null);
-                    bool success = result.AsyncWaitHandle.WaitOne(150, false); // 150ms timeout
-                    if (success)
+                    var connectTask = client.ConnectAsync(host, port);
+                    var delayTask = Task.Delay(500); // 500ms timeout provides robust Windows loopback resolution
+                    var completedTask = await Task.WhenAny(connectTask, delayTask);
+                    if (completedTask == connectTask)
                     {
-                        client.EndConnect(result);
+                        await connectTask; // propagate exceptions if any
                         return true;
                     }
                     return false;
@@ -1004,24 +598,71 @@ namespace BimasaktiReports.FinancialReports.Manager
             }
         }
 
-        private static string GetRootDirectory()
+        public static string GetRootDirectory()
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string current = baseDir;
+            
+            // 1. Walk up from BaseDirectory to find "backend" or its parent containing it
             while (!string.IsNullOrEmpty(current))
             {
-                if (Directory.Exists(Path.Combine(current, "backend")) && Directory.Exists(Path.Combine(current, "frontend")))
+                string dirName = Path.GetFileName(current);
+                if (dirName.Equals("backend", StringComparison.OrdinalIgnoreCase))
+                {
+                    string parent = Path.GetDirectoryName(current);
+                    if (!string.IsNullOrEmpty(parent))
+                    {
+                        return parent;
+                    }
+                    break;
+                }
+                if (Directory.Exists(Path.Combine(current, "backend")))
                 {
                     return current;
                 }
-                string parent = Path.GetDirectoryName(current);
-                if (parent == current || string.IsNullOrEmpty(parent)) break;
-                current = parent;
+                string parentDir = Path.GetDirectoryName(current);
+                if (parentDir == current || string.IsNullOrEmpty(parentDir)) break;
+                current = parentDir;
             }
+
+            // 2. Fallback: Walk up from Current Working Directory
+            current = Directory.GetCurrentDirectory();
+            while (!string.IsNullOrEmpty(current))
+            {
+                string dirName = Path.GetFileName(current);
+                if (dirName.Equals("backend", StringComparison.OrdinalIgnoreCase))
+                {
+                    string parent = Path.GetDirectoryName(current);
+                    if (!string.IsNullOrEmpty(parent))
+                    {
+                        return parent;
+                    }
+                    break;
+                }
+                if (Directory.Exists(Path.Combine(current, "backend")))
+                {
+                    return current;
+                }
+                string parentDir = Path.GetDirectoryName(current);
+                if (parentDir == current || string.IsNullOrEmpty(parentDir)) break;
+                current = parentDir;
+            }
+
+            // 3. Last resort fallback: Go up 4 levels from baseDir
+            try
+            {
+                string relativeFallback = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", ".."));
+                if (Directory.Exists(Path.Combine(relativeFallback, "backend")))
+                {
+                    return relativeFallback;
+                }
+            }
+            catch { }
+
             return baseDir;
         }
 
-        private static bool IsValidId(string input)
+        public static bool IsValidId(string input)
         {
             if (string.IsNullOrEmpty(input)) return false;
             foreach (char c in input)
@@ -1049,6 +690,428 @@ namespace BimasaktiReports.FinancialReports.Manager
                 return "";
             }
             return result;
+        }
+
+        // Global Helper for Company ID & Request Body Validations
+        public static (bool IsValid, string ErrorMessage) ValidateCompanyId(string rawId)
+        {
+            string cleanId = rawId?.Trim()?.ToUpperInvariant();
+            if (string.IsNullOrEmpty(cleanId))
+            {
+                return (false, "Company ID must be provided.");
+            }
+            if (cleanId.Length != 5)
+            {
+                return (false, "Company ID must be exactly 5 characters long.");
+            }
+            if (!IsValidId(cleanId))
+            {
+                return (false, "Company ID must contain only alphanumeric characters, dashes, or underscores.");
+            }
+            return (true, null);
+        }
+
+        // Global properties/getters for API routing
+        public static string GodModePath => _godModePath;
+        public static string LocalIp => _localIp;
+        public static string CoolAlias => _coolAlias;
+        public static bool BackendHasError => _backendHasError;
+        public static bool FrontendHasError => _frontendHasError;
+        public static ConcurrentQueue<string> LogQueue => _logQueue;
+    }
+
+    public static class ManagerEndpointExtensions
+    {
+        public static void MapManagerEndpoints(this WebApplication app)
+        {
+            // 1. Get process and server status (Refactored to be Async & Non-blocking)
+            app.MapGet("/api/status", async () =>
+            {
+                bool backendPortActive = await ManagerServer.IsPortActiveAsync("127.0.0.1", 8001);
+                bool frontendPortActive = await ManagerServer.IsPortActiveAsync("127.0.0.1", 5173);
+
+                bool backendProcessActive = backendPortActive; // simplified as port active indicates running status
+                bool frontendProcessActive = frontendPortActive;
+
+                ServerStatus backendStatus = ServerStatus.Stopped;
+                if (ManagerServer.BackendHasError)
+                {
+                    backendStatus = ServerStatus.Error;
+                }
+                else if (backendPortActive)
+                {
+                    backendStatus = ServerStatus.Running;
+                }
+
+                ServerStatus frontendStatus = ServerStatus.Stopped;
+                if (ManagerServer.FrontendHasError)
+                {
+                    frontendStatus = ServerStatus.Error;
+                }
+                else if (frontendPortActive)
+                {
+                    frontendStatus = ServerStatus.Running;
+                }
+
+                return Results.Ok(new
+                {
+                    backendActive = backendProcessActive,
+                    frontendActive = frontendProcessActive,
+                    backendStatus = backendStatus.ToString(),
+                    frontendStatus = frontendStatus.ToString(),
+                    godMode = File.Exists(ManagerServer.GodModePath),
+                    localIp = ManagerServer.LocalIp,
+                    coolAlias = ManagerServer.CoolAlias
+                });
+            });
+
+            // 2. Start servers
+            app.MapPost("/api/start", () =>
+            {
+                ManagerServer.StartAll();
+                return Results.Ok(new { message = "Server startup sequence triggered." });
+            });
+
+            // 3. Stop servers
+            app.MapPost("/api/stop", () =>
+            {
+                ManagerServer.StopAll();
+                return Results.Ok(new { message = "Server shutdown sequence triggered." });
+            });
+
+            // 4. Restart servers
+            app.MapPost("/api/restart", () =>
+            {
+                ManagerServer.RestartAll();
+                return Results.Ok(new { message = "Server restart sequence triggered." });
+            });
+
+            // 5. Toggle God Mode
+            app.MapPost("/api/godmode", () =>
+            {
+                ManagerServer.ToggleGodMode();
+                return Results.Ok(new { godMode = File.Exists(ManagerServer.GodModePath) });
+            });
+
+            // 6. Get consolidated system logs
+            app.MapGet("/api/logs", () =>
+            {
+                return Results.Ok(ManagerServer.LogQueue.ToArray());
+            });
+
+            // 7. Clear consolidated system logs
+            app.MapPost("/api/logs/clear", () =>
+            {
+                while (ManagerServer.LogQueue.TryDequeue(out _)) { }
+                ManagerServer.Log("Terminal log console cleared.");
+                return Results.Ok(new { message = "Logs cleared." });
+            });
+
+            // 8. List registered companies
+            app.MapGet("/api/companies", () =>
+            {
+                var list = new List<string>();
+                try
+                {
+                    string assetsDir = Path.GetFullPath(Path.Combine(ManagerServer.GetRootDirectory(), "backend", "assets"));
+                    if (Directory.Exists(assetsDir))
+                    {
+                        string[] dirs = Directory.GetDirectories(assetsDir);
+                        foreach (string dir in dirs)
+                        {
+                            string name = Path.GetFileName(dir);
+                            if (name.Length == 5 && ManagerServer.IsValidId(name))
+                            {
+                                list.Add(name);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ManagerServer.Log("Error listing companies: " + ex.Message);
+                }
+                return Results.Ok(list);
+            });
+
+            // 8.1 List users for a company (excluding admin role)
+            app.MapGet("/api/manager/companies/{companyId}/users", async (string companyId) =>
+            {
+                var validation = ManagerServer.ValidateCompanyId(companyId);
+                if (!validation.IsValid)
+                {
+                    return Results.BadRequest(new { error = validation.ErrorMessage });
+                }
+
+                string id = companyId.Trim().ToUpperInvariant();
+                string databasePath = svcDbUtils.GetSafeDbPath(id);
+                try
+                {
+                    using (var dbContext = new TenantDbContext(databasePath))
+                    {
+                        await dbContext.Database.EnsureCreatedAsync();
+                        var usersList = await dbContext.Users
+                            .Where(u => u.CompanyId == id && u.Role != "admin")
+                            .ToListAsync();
+                        
+                        return Results.Ok(usersList.Select(u => new { id = u.Id, username = u.Username, role = u.Role }));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ManagerServer.Log("Error listing users for company " + id + ": " + ex.Message);
+                    return Results.StatusCode(500);
+                }
+            });
+
+            // 8.2 Get permissions for a specific user in a company
+            app.MapGet("/api/manager/companies/{companyId}/users/{userId:int}/permissions", async (string companyId, int userId) =>
+            {
+                var validation = ManagerServer.ValidateCompanyId(companyId);
+                if (!validation.IsValid)
+                {
+                    return Results.BadRequest(new { error = validation.ErrorMessage });
+                }
+
+                string id = companyId.Trim().ToUpperInvariant();
+                string databasePath = svcDbUtils.GetSafeDbPath(id);
+                try
+                {
+                    using (var dbContext = new TenantDbContext(databasePath))
+                    {
+                        await dbContext.Database.EnsureCreatedAsync();
+                        
+                        var targetUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId && u.CompanyId == id);
+                        if (targetUser == null)
+                        {
+                            return Results.NotFound(new { error = "User not found." });
+                        }
+
+                        var widgetsList = await dbContext.UserWidgets.Where(w => w.UserId == userId).ToListAsync();
+                        var reportsList = await dbContext.UserReports.Where(r => r.UserId == userId).ToListAsync();
+
+                        return Results.Ok(new
+                        {
+                            widgets = widgetsList.ToDictionary(w => w.WidgetKey, w => w.IsActive),
+                            reports = reportsList.ToDictionary(r => r.ReportKey, r => r.IsActive)
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ManagerServer.Log("Error loading permissions for user " + userId + " in company " + id + ": " + ex.Message);
+                    return Results.StatusCode(500);
+                }
+            });
+
+            // 8.3 Save permissions for a user in a company
+            app.MapPost("/api/manager/companies/{companyId}/users/{userId:int}/permissions", async (string companyId, int userId, PermissionSettingsSpecification permissions) =>
+            {
+                var validation = ManagerServer.ValidateCompanyId(companyId);
+                if (!validation.IsValid)
+                {
+                    return Results.BadRequest(new { error = validation.ErrorMessage });
+                }
+
+                if (permissions == null)
+                {
+                    return Results.BadRequest(new { error = "Permissions body cannot be null." });
+                }
+
+                string id = companyId.Trim().ToUpperInvariant();
+                string databasePath = svcDbUtils.GetSafeDbPath(id);
+                try
+                {
+                    using (var dbContext = new TenantDbContext(databasePath))
+                    {
+                        await dbContext.Database.EnsureCreatedAsync();
+
+                        var targetUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId && u.CompanyId == id);
+                        if (targetUser == null)
+                        {
+                            return Results.NotFound(new { error = "User not found." });
+                        }
+
+                        // Save widgets
+                        var existingWidgets = await dbContext.UserWidgets.Where(w => w.UserId == userId).ToListAsync();
+                        var existingWidgetsMap = existingWidgets.ToDictionary(w => w.WidgetKey);
+
+                        foreach (var kvp in permissions.Widgets)
+                        {
+                            if (existingWidgetsMap.TryGetValue(kvp.Key, out var w))
+                            {
+                                w.IsActive = kvp.Value;
+                            }
+                            else
+                            {
+                                dbContext.UserWidgets.Add(new UserWidget { UserId = userId, WidgetKey = kvp.Key, IsActive = kvp.Value });
+                            }
+                        }
+
+                        // Save reports
+                        var existingReports = await dbContext.UserReports.Where(r => r.UserId == userId).ToListAsync();
+                        var existingReportsMap = existingReports.ToDictionary(r => r.ReportKey);
+
+                        foreach (var kvp in permissions.Reports)
+                        {
+                            if (existingReportsMap.TryGetValue(kvp.Key, out var r))
+                            {
+                                r.IsActive = kvp.Value;
+                            }
+                            else
+                            {
+                                dbContext.UserReports.Add(new UserReport { UserId = userId, ReportKey = kvp.Key, IsActive = kvp.Value });
+                            }
+                        }
+
+                        await dbContext.SaveChangesAsync();
+                        ManagerServer.Log($"Saved permissions successfully for user: {targetUser.Username} in company: {id}");
+                        return Results.Ok(new { message = "Permissions updated successfully." });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ManagerServer.Log("Error saving permissions for user " + userId + " in company " + id + ": " + ex.Message);
+                    return Results.StatusCode(500);
+                }
+            });
+
+            // 9. Load company configuration sync URLs
+            app.MapGet("/api/companies/{id}", (string id) =>
+            {
+                var validation = ManagerServer.ValidateCompanyId(id);
+                if (!validation.IsValid)
+                {
+                    return Results.BadRequest(new { error = validation.ErrorMessage });
+                }
+
+                string companyId = id.Trim().ToUpperInvariant();
+                string[] urls = ManagerServer.LoadCompanySyncUrls(companyId);
+                return Results.Ok(new { companyId, urls });
+            });
+
+            // 10. Register or modify company config
+            app.MapPost("/api/companies", (CompanySaveRequest req) =>
+            {
+                if (req == null) return Results.BadRequest(new { error = "Request body is empty." });
+
+                var validation = ManagerServer.ValidateCompanyId(req.CompanyId);
+                if (!validation.IsValid)
+                {
+                    return Results.BadRequest(new { error = validation.ErrorMessage });
+                }
+
+                string companyId = req.CompanyId.Trim().ToUpperInvariant();
+                string mode = req.Mode?.Trim() ?? "New";
+                string syncUrlsText = req.SyncUrls ?? "";
+
+                string rootDir = ManagerServer.GetRootDirectory();
+                string assetsDir = Path.GetFullPath(Path.Combine(rootDir, "backend", "assets"));
+                string tmplDir = Path.GetFullPath(Path.Combine(assetsDir, "BMS"));
+                string targetDir = Path.GetFullPath(Path.Combine(assetsDir, companyId));
+
+                if (mode == "New")
+                {
+                    if (string.IsNullOrEmpty(syncUrlsText.Trim()))
+                    {
+                        return Results.BadRequest(new { error = "Sync URLs cannot be empty when registering a new company." });
+                    }
+
+                    if (!Directory.Exists(tmplDir))
+                    {
+                        return Results.BadRequest(new { error = "Template directory (BMS) not found under: " + tmplDir });
+                    }
+
+                    if (Directory.Exists(targetDir))
+                    {
+                        return Results.BadRequest(new { error = "Company directory already exists: " + targetDir });
+                    }
+
+                    try
+                    {
+                        ManagerServer.Log("Creating new tenant: " + companyId + " from template: BMS");
+                        Directory.CreateDirectory(targetDir);
+                        
+                        foreach (string dirPath in Directory.GetDirectories(tmplDir, "*", SearchOption.AllDirectories))
+                        {
+                            Directory.CreateDirectory(dirPath.Replace(tmplDir, targetDir));
+                        }
+
+                        string tmplSyncPath = Path.Combine(tmplDir, "BMS_sync.py");
+                        if (File.Exists(tmplSyncPath))
+                        {
+                            string targetSyncPath = Path.Combine(targetDir, companyId + "_sync.py");
+                            File.Copy(tmplSyncPath, targetSyncPath, true);
+
+                            string content = File.ReadAllText(targetSyncPath);
+                            if (content.Contains("BMS"))
+                            {
+                                content = content.Replace("BMS", companyId);
+                            }
+                            string lowerTmpl = "bms";
+                            string lowerNewId = companyId.ToLowerInvariant();
+                            if (content.Contains(lowerTmpl))
+                            {
+                                content = content.Replace(lowerTmpl, lowerNewId);
+                            }
+                            File.WriteAllText(targetSyncPath, content);
+                        }
+                        else
+                        {
+                            ManagerServer.Log("Warning: Template sync script not found: " + tmplSyncPath);
+                        }
+
+                        ManagerServer.WriteCompanyConfig(targetDir, companyId, syncUrlsText);
+                        ManagerServer.Log("Success: Company " + companyId + " created and configuration saved!");
+                        ManagerServer.TriggerDatabaseSync(companyId);
+
+                        return Results.Ok(new { message = $"Company {companyId} created and registered successfully!" });
+                    }
+                    catch (Exception ex)
+                    {
+                        string errMsg = "Error creating company: " + ex.Message;
+                        ManagerServer.Log(errMsg);
+                        return Results.StatusCode(500);
+                    }
+                }
+                else // Modify
+                {
+                    if (!Directory.Exists(targetDir))
+                    {
+                        return Results.BadRequest(new { error = "Target company directory not found: " + targetDir });
+                    }
+
+                    try
+                    {
+                        ManagerServer.Log("Modifying configuration for company: " + companyId);
+                        ManagerServer.WriteCompanyConfig(targetDir, companyId, syncUrlsText);
+                        ManagerServer.Log("Success: Company " + companyId + " configuration updated!");
+                        ManagerServer.TriggerDatabaseSync(companyId);
+
+                        return Results.Ok(new { message = $"Company {companyId} configuration updated successfully!" });
+                    }
+                    catch (Exception ex)
+                    {
+                        string errMsg = "Error modifying company: " + ex.Message;
+                        ManagerServer.Log(errMsg);
+                        return Results.StatusCode(500);
+                    }
+                }
+            });
+
+            // 11. Trigger sync explicitly
+            app.MapPost("/api/companies/{id}/sync", (string id) =>
+            {
+                var validation = ManagerServer.ValidateCompanyId(id);
+                if (!validation.IsValid)
+                {
+                    return Results.BadRequest(new { error = validation.ErrorMessage });
+                }
+
+                string companyId = id.Trim().ToUpperInvariant();
+                ManagerServer.TriggerDatabaseSync(companyId);
+                return Results.Ok(new { message = $"Database sync initiated for {companyId}." });
+            });
         }
     }
 

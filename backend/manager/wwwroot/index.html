@@ -1530,9 +1530,15 @@
         async function fetchAccessCompanies() {
             try {
                 const res = await fetch('/api/companies');
-                if (!res.ok) return;
+                if (!res.ok) {
+                    showToast("Failed to fetch companies: Server returned " + res.status, 'error');
+                    return;
+                }
                 const companies = await res.json();
                 const select = document.getElementById('access-company-select');
+                if (!select) {
+                    throw new Error("Element 'access-company-select' not found in DOM");
+                }
                 select.innerHTML = '<option value="">-- Select Company --</option>';
                 companies.forEach(company => {
                     const opt = document.createElement('option');
@@ -1541,7 +1547,8 @@
                     select.appendChild(opt);
                 });
             } catch (err) {
-                showToast("Failed to fetch companies for access control", 'error');
+                console.error("Access Control fetch error:", err);
+                showToast("Failed to fetch companies for access control: " + err.message, 'error');
             }
         }
 

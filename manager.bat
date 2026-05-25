@@ -25,8 +25,8 @@ echo.
 echo  [SYSTEM LIVE STATUS MONITOR]
 echo  -------------------------------------------------------------
 
-:: 1. Check if Web Manager (Port 5000) is active
-netstat -ano | findstr LISTENING | findstr :5000 >nul
+:: 1. Check if Web Manager (Port 5050) is active
+netstat -ano | findstr LISTENING | findstr :5050 >nul
 if errorlevel 1 (
     set "MGR_STATUS=OFFLINE"
 ) else (
@@ -67,18 +67,18 @@ if "%LOCAL_IP%"=="" set "LOCAL_IP=127.0.0.1"
 :: 6. Get local network hostname alias
 set "COOL_ALIAS=%COMPUTERNAME%.local"
 
-echo   » Web Manager (Port 5000) : [!MGR_STATUS!]
+echo   » Web Manager (Port 5050) : [!MGR_STATUS!]
 echo   » Backend API (Port 8001) : [!BACK_STATUS!]
 echo   » Frontend App (Port 5173): [!FRONT_STATUS!]
 echo   » Developer God Mode      : [!GOD_STATUS!]
-echo   » Local Network Endpoint  : http://!LOCAL_IP!:5000  (Alias: http://!COOL_ALIAS!:5000)
+echo   » Local Network Endpoint  : http://!LOCAL_IP!:5050  (Alias: http://!COOL_ALIAS!:5050)
 echo  -------------------------------------------------------------
 echo.
 echo  [DASHBOARD LAUNCH CONTROLS]
 echo   ┌──────────────────────────────────────────────────────────┐
-echo   │ [1] Start Web Manager (Runs & Launches Web Interface)    │
+echo   │ [1] Start Web Manager (Runs ^& Launches Web Interface)    │
 echo   │ [2] Start Dev Services Directly (Separate Windows)       │
-echo   │ [3] Deep Clean & Optimize Cache (Fix compile/run issues) │
+echo   │ [3] Deep Clean ^& Optimize Cache (Fix compile/run issues) │
 echo   │ [4] Force Free Port Locks (Kill stuck Node/Dotnet tasks) │
 echo   │ [5] Toggle Developer God Mode                            │
 echo   │ [6] Run Environment Diagnostics                           │
@@ -104,23 +104,22 @@ echo ====================================================================
 echo   [OPTION 1] Launching Bimasakti BI Web Manager...
 echo ====================================================================
 echo.
-echo  Step 1: Freeing port 5000 if occupied to prevent launch errors...
-netstat -ano | findstr LISTENING | findstr :5000 >nul
+echo  Step 1: Freeing port 5050 if occupied to prevent launch errors...
+netstat -ano | findstr LISTENING | findstr :5050 >nul
 if not errorlevel 1 (
-    echo  Port 5000 is occupied! Terminating the blocking process...
-    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :5000') do (
+    echo  Port 5050 is occupied! Terminating the blocking process...
+    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :5050') do (
         taskkill /F /T /PID %%a >nul 2>&1
     )
 )
 
 echo  Step 2: Restoring and running Manager via Dotnet CLI...
-echo  (The manager will open the browser at http://localhost:5000 automatically)
+echo  (The manager will open the browser at http://localhost:5050 automatically)
 echo.
-dotnet run --project "%BACKEND_DIR%\manager\manager.csproj"
-echo.
-echo Web Manager process has ended.
-pause
-goto MENU
+    start "Bimasakti Manager" /D "%BACKEND_DIR%\manager" cmd /k "dotnet run > manager_startup.log 2>&1"
+    timeout /t 3 >nul
+    start "" "http://localhost:5050"
+    goto MENU
 
 
 :START_DEV_SERVICES
@@ -222,24 +221,24 @@ echo   [OPTION 4] Port Liberator - Forcefully Terminate Port Locks
 echo ====================================================================
 echo.
 echo  This tool terminates any background process locking the dev ports:
-echo  - Port 5000 (BI Web Manager)
+echo  - Port 5050 (BI Web Manager)
 echo  - Port 8001 (C# Web API Backend)
 echo  - Port 5173 (Vue Frontend)
 echo.
 
 set "KILLED_ANY=0"
 
-:: 5000
-netstat -ano | findstr LISTENING | findstr :5000 >nul
+:: 5050
+netstat -ano | findstr LISTENING | findstr :5050 >nul
 if not errorlevel 1 (
-    echo  [+] Port 5000: Found active process! Terminating...
-    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :5000') do (
+    echo  [+] Port 5050: Found active process! Terminating...
+    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :5050') do (
         taskkill /F /T /PID %%a >nul 2>&1
         echo      ✔ PID %%a successfully terminated.
     )
     set "KILLED_ANY=1"
 ) else (
-    echo  [-] Port 5000: Clean (No active process)
+    echo  [-] Port 5050: Clean (No active process)
 )
 
 :: 8001
