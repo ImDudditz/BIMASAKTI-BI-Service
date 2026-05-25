@@ -7,6 +7,8 @@ import { useReportFilterStore } from './stores/reportFilters'
 import { useGlobalModalStore } from '@/stores/globalModal'
 import { useAuthStore } from '@/stores/auth'
 
+const highriseBg = new URL('./assets/highrise_bg.svg', import.meta.url).href
+
 const router = useRouter()
 const authStore = useAuthStore()
 
@@ -14,6 +16,13 @@ const filterStore = useReportFilterStore()
 const { companyName, companyId, selectedYear, selectedPeriod, activePreset } = storeToRefs(filterStore)
 
 onMounted(async () => {
+  if (!document.getElementById('google-font-royale')) {
+    const link = document.createElement('link')
+    link.id = 'google-font-royale'
+    link.rel = 'stylesheet'
+    link.href = 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap'
+    document.head.appendChild(link)
+  }
   if (authStore.isAuthenticated) {
     await authStore.fetchPermissions()
   }
@@ -284,220 +293,273 @@ const triggerPdfExport = async () => {
 </script>
 
 <template>
-  <!-- Main layout container with global styles -->
-  <div class="h-screen w-screen flex flex-col font-sans text-slate-800 overflow-hidden relative bg-[#f0f4f9] select-none">
-    
-    <!-- BACKGROUND PASTEL BLUR CIRLCES - Only shown on authenticated dashboard shell -->
-    <template v-if="isAuthPage">
-      <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-300/30 blur-[130px] pointer-events-none z-0"></div>
-      <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-200/30 blur-[130px] pointer-events-none z-0"></div>
-      <div class="absolute top-[30%] right-[20%] w-[35%] h-[35%] rounded-full bg-[#3c56d6]/12 blur-[110px] pointer-events-none z-0"></div>
-    </template>
+  <!-- Decorative Royale Light Blue Metallic Ribbon at Top -->
+  <div class="w-full h-1.5 bg-gradient-to-r from-sky-400 via-blue-500 to-sky-300 relative z-30 shrink-0"></div>
 
-    <!-- AUTHENTICATED PREMIUM GLASSMORPHIC DASHBOARD SHELL -->
+  <!-- Main layout container with global styles -->
+  <div class="h-screen w-screen flex flex-col font-['Plus_Jakarta_Sans',sans-serif] text-[#1c2e4a] overflow-hidden relative bg-[#f1f6fa] select-none selection:bg-sky-500/30">
+    
+    <!-- Beautiful Architectural Skyscraper Grayscale Background with 75% Transparency (opacity-20) -->
+    <div v-if="isAuthPage" class="absolute inset-x-0 top-0 h-[750px] lg:h-[900px] pointer-events-none opacity-20 overflow-hidden z-0 flex items-end justify-center select-none">
+      <img :src="highriseBg" alt="Skyscraper Background" class="w-full h-full object-cover">
+    </div>
+
+    <!-- AUTHENTICATED PREMIUM WINDOWS XP ROYALE DASHBOARD SHELL -->
     <div v-if="isAuthPage" class="flex-1 flex gap-6 p-6 overflow-hidden h-full w-full relative z-10">
       
-      <!-- LEFT-HAND GLASS SIDEBAR -->
-      <aside class="w-[260px] bg-white/45 backdrop-blur-xl border border-white/60 shadow-2xl rounded-[32px] flex flex-col p-6 shrink-0 z-40 transition-all duration-500 hover:shadow-indigo-100/40">
+      <!-- LEFT-HAND WINDOWS XP ROYALE SIDEBAR (Explorer Task Pane style) -->
+      <aside class="w-[260px] bg-gradient-to-b from-[#d6e5f8] to-[#a2c6ec] border border-[#95bfe9] shadow-xl rounded-2xl flex flex-col p-4 shrink-0 z-40 transition-all duration-500 hover:shadow-sky-100/40 relative select-none">
         
-        <!-- Brand section with Company Logo & Name -->
-        <div class="flex flex-col items-center justify-center text-center pb-6 border-b border-slate-200/40 shrink-0 gap-3">
-          <div v-if="activeLogoUrl" class="flex items-center justify-center w-full max-h-16 px-4">
-            <img :src="activeLogoUrl" @error="handleLogoError" alt="Company Logo" class="max-w-full max-h-14 object-contain">
+        <!-- Brand section with Company Logo & Name inside an XP Group Box panel -->
+        <div class="bg-white/80 rounded-xl border border-[#95bfe9] p-3 flex flex-col items-center justify-center text-center shadow-sm shrink-0 gap-2 mb-4">
+          <div v-if="activeLogoUrl" class="flex items-center justify-center w-full max-h-16 px-2">
+            <img :src="activeLogoUrl" @error="handleLogoError" alt="Company Logo" class="max-w-full max-h-12 object-contain">
           </div>
           <div class="flex flex-col items-center min-w-0 max-w-full">
-            <h1 class="text-xs font-black text-slate-900 tracking-wide uppercase leading-snug break-words whitespace-normal px-2 max-w-full" :title="companyName">
+            <h1 class="text-[10px] font-black text-[#0c3c8c] tracking-widest uppercase leading-snug break-words whitespace-normal px-1 font-['Outfit']" :title="companyName">
               {{ companyName }}
             </h1>
           </div>
         </div>
 
         <!-- Sidebar Navigation List -->
-        <nav class="flex-grow overflow-y-auto mt-6 pr-1 space-y-2 custom-scrollbar">
+        <nav class="flex-grow overflow-y-auto pr-1 space-y-3 custom-scrollbar">
           
-          <!-- 1. OVERVIEW -->
-          <RouterLink 
-            to="/overview" 
-            class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[13px] font-bold border transition-all duration-300 group"
-            :class="router.currentRoute.value.path === '/overview' 
-              ? 'bg-[#3c56d6]/10 text-[#3c56d6] border-[#3c56d6]/20 shadow-sm' 
-              : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/40'"
-          >
-            <span class="text-base group-hover:scale-110 transition-transform">🏠</span>
-            <span>Overview</span>
-          </RouterLink>
+          <!-- Panel 1: System Console -->
+          <div class="bg-white/70 rounded-xl overflow-hidden border border-[#95bfe9] shadow-sm">
+            <div class="px-3.5 py-2 flex items-center justify-between bg-gradient-to-r from-[#215dc6] to-[#6da3f6] text-white text-[10px] font-black uppercase tracking-wider font-['Outfit']">
+              <span>System Console</span>
+            </div>
+            <div class="p-1.5 flex flex-col gap-1">
+              <RouterLink 
+                to="/overview" 
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 outline-none border"
+                :class="router.currentRoute.value.path === '/overview' 
+                  ? 'bg-[#3b82f6]/15 text-[#0c3c8c] border-[#3b82f6]/30' 
+                  : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
+              >
+                <span class="text-sm">🏠</span>
+                <span>Overview Node</span>
+              </RouterLink>
+              
+              <RouterLink 
+                to="/settings" 
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 outline-none border"
+                :class="router.currentRoute.value.path === '/settings' 
+                  ? 'bg-[#3b82f6]/15 text-[#0c3c8c] border-[#3b82f6]/30' 
+                  : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
+              >
+                <span class="text-sm">⚙️</span>
+                <span>Settings Wizard</span>
+              </RouterLink>
+            </div>
+          </div>
 
-          <!-- 2. FINANCIALS (Accordion) -->
-          <div class="space-y-1">
+          <!-- Panel 2: Financial Systems -->
+          <div class="bg-white/70 rounded-xl overflow-hidden border border-[#95bfe9] shadow-sm">
             <button 
               @click="toggleMenu('financials')"
-              class="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-[13px] font-bold text-slate-500 hover:text-slate-900 hover:bg-white/40 border border-transparent transition-all duration-300 group"
+              class="w-full px-3.5 py-2 flex items-center justify-between bg-gradient-to-r from-[#215dc6] to-[#6da3f6] text-white text-[10px] font-black uppercase tracking-wider font-['Outfit'] outline-none"
             >
-              <div class="flex items-center gap-3">
-                <span class="text-base group-hover:scale-110 transition-transform">💳</span>
+              <div class="flex items-center gap-1.5">
+                <span>💳</span>
                 <span>Financials</span>
               </div>
-              <!-- Rotating Chevron -->
-              <span class="text-[10px] transition-transform duration-300" :class="{ 'rotate-180': expandedMenus.financials }">▼</span>
+              <span class="text-[9px] transition-transform duration-300" :class="{ 'rotate-180': expandedMenus.financials }">▼</span>
             </button>
             
-            <!-- Financials Submenus -->
             <div 
               v-show="expandedMenus.financials" 
-              class="pl-6 pr-2 space-y-1 overflow-hidden transition-all duration-300"
+              class="p-1.5 flex flex-col gap-1 transition-all duration-300"
             >
-              <!-- Dashboard -->
               <RouterLink 
                 to="/dashboard" 
-                class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all duration-200 outline-none"
                 :class="router.currentRoute.value.path === '/dashboard'
-                  ? 'bg-[#3c56d6]/8 text-[#3c56d6] border-[#3c56d6]/15 shadow-sm'
-                  : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/30'"
+                  ? 'bg-[#3b82f6]/15 text-[#0c3c8c] border-[#3b82f6]/30'
+                  : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
-                <span>•</span>
-                <span>Dashboard</span>
+                <span class="text-[10px]">•</span>
+                <span>Dashboard Node</span>
               </RouterLink>
               
-              <!-- Report -->
               <RouterLink 
                 to="/balance-sheet" 
-                class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all duration-200 outline-none"
                 :class="['/balance-sheet', '/income-statement'].includes(router.currentRoute.value.path)
-                  ? 'bg-[#3c56d6]/8 text-[#3c56d6] border-[#3c56d6]/15 shadow-sm'
-                  : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/30'"
+                  ? 'bg-[#3b82f6]/15 text-[#0c3c8c] border-[#3b82f6]/30'
+                  : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
-                <span>•</span>
-                <span>Report</span>
+                <span class="text-[10px]">•</span>
+                <span>Ledger Reports</span>
               </RouterLink>
               
-              <!-- Print -->
               <RouterLink 
                 to="/print" 
-                class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all duration-200 outline-none"
                 :class="router.currentRoute.value.path === '/print'
-                  ? 'bg-[#3c56d6]/8 text-[#3c56d6] border-[#3c56d6]/15 shadow-sm'
-                  : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/30'"
+                  ? 'bg-[#3b82f6]/15 text-[#0c3c8c] border-[#3b82f6]/30'
+                  : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
-                <span>•</span>
-                <span>Print</span>
+                <span class="text-[10px]">•</span>
+                <span>Print Core</span>
               </RouterLink>
             </div>
           </div>
 
-          <!-- 3. TENANCY (Accordion) -->
-          <div class="space-y-1">
+          <!-- Panel 3: Tenancy Stacks -->
+          <div class="bg-white/70 rounded-xl overflow-hidden border border-[#95bfe9] shadow-sm">
             <button 
               @click="toggleMenu('tenancy')"
-              class="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-[13px] font-bold text-slate-500 hover:text-slate-900 hover:bg-white/40 border border-transparent transition-all duration-300 group"
+              class="w-full px-3.5 py-2 flex items-center justify-between bg-gradient-to-r from-[#215dc6] to-[#6da3f6] text-white text-[10px] font-black uppercase tracking-wider font-['Outfit'] outline-none"
             >
-              <div class="flex items-center gap-3">
-                <span class="text-base group-hover:scale-110 transition-transform">🏢</span>
+              <div class="flex items-center gap-1.5">
+                <span>🏢</span>
                 <span>Tenancy</span>
               </div>
-              <span class="text-[10px] transition-transform duration-300" :class="{ 'rotate-180': expandedMenus.tenancy }">▼</span>
+              <span class="text-[9px] transition-transform duration-300" :class="{ 'rotate-180': expandedMenus.tenancy }">▼</span>
             </button>
             
-            <!-- Tenancy Submenus -->
             <div 
               v-show="expandedMenus.tenancy" 
-              class="pl-6 pr-2 space-y-1 overflow-hidden transition-all duration-300"
+              class="p-1.5 flex flex-col gap-1 transition-all duration-300"
             >
-              <!-- Dashboard -->
               <RouterLink 
                 to="/dashboard/operation" 
-                class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all duration-200 outline-none"
                 :class="router.currentRoute.value.path === '/dashboard/operation'
-                  ? 'bg-[#3c56d6]/8 text-[#3c56d6] border-[#3c56d6]/15 shadow-sm'
-                  : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/30'"
+                  ? 'bg-[#3b82f6]/15 text-[#0c3c8c] border-[#3b82f6]/30'
+                  : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
-                <span>•</span>
-                <span>Dashboard</span>
+                <span class="text-[10px]">•</span>
+                <span>Ops Dashboard</span>
               </RouterLink>
               
-              <!-- Report -->
               <RouterLink 
                 to="/tenancy-report" 
-                class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all duration-200 outline-none"
                 :class="router.currentRoute.value.path === '/tenancy-report'
-                  ? 'bg-[#3c56d6]/8 text-[#3c56d6] border-[#3c56d6]/15 shadow-sm'
-                  : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/30'"
+                  ? 'bg-[#3b82f6]/15 text-[#0c3c8c] border-[#3b82f6]/30'
+                  : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
-                <span>•</span>
-                <span>Report</span>
+                <span class="text-[10px]">•</span>
+                <span>Tenancy Report</span>
               </RouterLink>
             </div>
           </div>
 
-          <!-- 4. SERVICES (Accordion) -->
-          <div class="space-y-1">
+          <!-- Panel 4: Service & Maintenance -->
+          <div class="bg-white/70 rounded-xl overflow-hidden border border-[#95bfe9] shadow-sm">
             <button 
               @click="toggleMenu('services')"
-              class="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-[13px] font-bold text-slate-500 hover:text-slate-900 hover:bg-white/40 border border-transparent transition-all duration-300 group"
+              class="w-full px-3.5 py-2 flex items-center justify-between bg-gradient-to-r from-[#215dc6] to-[#6da3f6] text-white text-[10px] font-black uppercase tracking-wider font-['Outfit'] outline-none"
             >
-              <div class="flex items-center gap-3">
-                <span class="text-base group-hover:scale-110 transition-transform">🔧</span>
+              <div class="flex items-center gap-1.5">
+                <span>🔧</span>
                 <span>Services</span>
               </div>
-              <span class="text-[10px] transition-transform duration-300" :class="{ 'rotate-180': expandedMenus.services }">▼</span>
+              <span class="text-[9px] transition-transform duration-300" :class="{ 'rotate-180': expandedMenus.services }">▼</span>
             </button>
             
-            <!-- Services Submenus -->
             <div 
               v-show="expandedMenus.services" 
-              class="pl-6 pr-2 space-y-1 overflow-hidden transition-all duration-300"
+              class="p-1.5 flex flex-col gap-1 transition-all duration-300"
             >
-              <!-- Dashboard -->
               <RouterLink 
                 to="/dashboard/maintenance" 
-                class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all duration-200 outline-none"
                 :class="router.currentRoute.value.path === '/dashboard/maintenance'
-                  ? 'bg-[#3c56d6]/8 text-[#3c56d6] border-[#3c56d6]/15 shadow-sm'
-                  : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/30'"
+                  ? 'bg-[#3b82f6]/15 text-[#0c3c8c] border-[#3b82f6]/30'
+                  : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
-                <span>•</span>
-                <span>Dashboard</span>
+                <span class="text-[10px]">•</span>
+                <span>Maintenance Desk</span>
               </RouterLink>
               
-              <!-- Report -->
               <RouterLink 
                 to="/services-report" 
-                class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold border transition-all duration-200"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all duration-200 outline-none"
                 :class="router.currentRoute.value.path === '/services-report'
-                  ? 'bg-[#3c56d6]/8 text-[#3c56d6] border-[#3c56d6]/15 shadow-sm'
-                  : 'text-slate-500 border-transparent hover:text-slate-900 hover:bg-white/30'"
+                  ? 'bg-[#3b82f6]/15 text-[#0c3c8c] border-[#3b82f6]/30'
+                  : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
-                <span>•</span>
-                <span>Report</span>
+                <span class="text-[10px]">•</span>
+                <span>Service Report</span>
               </RouterLink>
             </div>
           </div>
 
-          <!-- Divider -->
-          <div class="border-t border-slate-200/40 my-2"></div>
-
-          <!-- SETTINGS (Utility Link) -->
-          <RouterLink 
-            to="/settings" 
-            class="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-[11px] font-bold border transition-all duration-200 group"
-            :class="router.currentRoute.value.path === '/settings' 
-              ? 'bg-[#3c56d6]/6 text-[#3c56d6] border-[#3c56d6]/12 shadow-sm' 
-              : 'text-slate-400 border-transparent hover:text-slate-600 hover:bg-white/30'"
-          >
-            <span class="text-xs group-hover:scale-110 transition-transform">⚙️</span>
-            <span>Settings</span>
-          </RouterLink>
 
 
         </nav>
+
+        <div class="flex items-center justify-center gap-1.5 border-t border-[#95bfe9]/50 pt-2 mt-auto">
+          <div class="w-5 h-5 rounded bg-[#3b82f6]/10 border border-[#3b82f6]/20 flex items-center justify-center text-[9px] font-black text-[#0c3c8c]">B</div>
+          <span class="text-[7.5px] text-[#475569] font-black tracking-widest font-mono">BIMASAKTI BI</span>
+        </div>
 
       </aside>
 
       <!-- RIGHT-HAND MAIN CONTAINER AREA -->
       <div class="flex-1 flex flex-col overflow-hidden h-full min-w-0">
         
-        <!-- SUB-PAGE OUTER CONTAINER (Frosted RouterView Wrapper) -->
-        <main class="flex-1 bg-white/45 backdrop-blur-xl border border-white/60 shadow-2xl rounded-[32px] overflow-hidden relative flex flex-col min-h-0">
-          <RouterView class="grow overflow-hidden flex flex-col w-full relative z-10" />
+        <!-- Outer window frame representing Windows XP Royale (Energy Blue) window -->
+        <main class="flex-1 bg-[#f3f7fd] rounded-2xl border border-[#1f62d4] shadow-[0_20px_50px_-12px_rgba(31,98,212,0.35)] overflow-hidden relative flex flex-col min-h-0">
+          
+          <!-- Authentic Windows XP Royale Energy Blue Title Bar -->
+          <div class="flex items-center justify-between px-4 py-2 border-t border-white/40 bg-gradient-to-b from-[#629ef7] via-[#357ae5] to-[#1b56ca] text-white relative z-20 shrink-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.4)] select-none">
+            <div class="flex items-center gap-2">
+              <!-- Computer system icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-sky-100 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+              </svg>
+              <!-- Dynamic Title Text -->
+              <span class="text-xs font-black tracking-wide text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] font-['Outfit'] uppercase">
+                Bimasakti BI - {{ activePageTitle }}
+              </span>
+            </div>
+            
+            <!-- Top Right Action Area (In place of Minimize, Maximize, Close buttons) -->
+            <div class="flex items-center gap-4">
+              
+              <!-- Notification Bell -->
+              <button class="w-8 h-8 rounded-full bg-white/60 border border-slate-200/40 hover:bg-white hover:border-slate-200 flex items-center justify-center shadow-sm relative transition-all active:scale-95 group">
+                <span class="text-sm group-hover:rotate-12 transition-transform">🔔</span>
+                <span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#3c56d6] ring-1 ring-white"></span>
+              </button>
+
+              <!-- Divider -->
+              <div class="w-px h-5 bg-slate-200/50"></div>
+
+              <!-- Profile Info -->
+              <div class="flex items-center gap-2.5 pl-1" v-if="authStore.user">
+                <!-- Avatar Circle -->
+                <div class="w-7 h-7 rounded-full bg-[#3c56d6]/20 border border-[#3c56d6]/30 text-white flex items-center justify-center text-[11px] font-black uppercase shadow-inner">
+                  {{ authStore.user.username.charAt(0) }}
+                </div>
+                <div class="flex flex-col text-left hidden sm:flex leading-none">
+                  <span class="text-[11px] font-black text-white leading-none">{{ authStore.user.username }}</span>
+                  <span class="text-[8px] font-bold text-sky-200 leading-none mt-0.5 uppercase tracking-wider">
+                    {{ authStore.isAdmin ? 'Admin' : 'User' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Logout Button -->
+              <button @click="handleLogout" class="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50/50 border border-transparent hover:border-rose-200/50 px-2.5 py-1.5 rounded-xl transition-all duration-200 active:scale-95 group shrink-0 bg-white/60 shadow-sm">
+                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-rose-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                <span>Logout</span>
+              </button>
+
+            </div>
+          </div>
+
+
+
+          <!-- Main Content Workspace Wrapper -->
+          <div class="flex-1 flex flex-col overflow-hidden relative min-h-0 bg-[#f3f7fd]">
+            <RouterView class="grow overflow-hidden flex flex-col w-full relative z-10" />
+          </div>
         </main>
 
       </div>
@@ -505,7 +567,7 @@ const triggerPdfExport = async () => {
     </div>
 
     <!-- NON-AUTHENTICATED / DIRECT RENDER LAYOUT (Landing & Login Pages) -->
-    <div v-else class="flex-1 w-full h-full flex flex-col overflow-hidden relative z-10">
+    <div v-else class="flex-1 w-full h-full flex flex-col overflow-hidden relative z-10 bg-[#f1f6fa]">
       <RouterView class="grow overflow-hidden flex flex-col w-full relative z-10" />
     </div>
 
@@ -514,21 +576,51 @@ const triggerPdfExport = async () => {
       <div v-if="isOpen" class="fixed inset-0 z-[999] flex items-center justify-center p-4">
         <!-- Backdrop -->
         <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" @click="modalStore.closeModal"></div>
-        <!-- Modal Card -->
-        <div class="relative bg-white/95 backdrop-blur-xl rounded-[24px] shadow-2xl max-w-md w-full overflow-hidden animate-slide-up border border-white/80">
-          <div class="p-6">
-            <div class="flex items-start gap-4">
-              <div class="text-3xl bg-slate-50 p-3 rounded-xl border border-slate-100 shadow-sm shrink-0">{{ icon }}</div>
-              <div class="pt-1 w-full">
-                <h3 class="text-lg font-black text-sky-950 tracking-tight leading-tight">{{ title }}</h3>
-                <p class="text-sm text-slate-500 font-bold mt-1 leading-relaxed">{{ message }}</p>
-                <input v-if="type === 'prompt'" v-model="modalStore.inputValue" type="text" class="mt-4 w-full border border-slate-200 bg-white/50 rounded-xl p-2.5 text-sm font-bold text-slate-800 focus:ring-2 ring-cyan-500 focus:border-cyan-500 focus:bg-white outline-none transition-all" @keyup.enter="modalStore.confirmModal" autofocus>
-              </div>
+        <!-- Themed XP Program Window Dialog Card -->
+        <div class="relative bg-[#f3f7fd] rounded-xl shadow-2xl max-w-md w-full overflow-hidden border border-[#1f62d4] animate-slide-up flex flex-col font-['Plus_Jakarta_Sans',sans-serif]">
+          <!-- Dialog Title Bar -->
+          <div class="flex items-center justify-between px-3 py-1.5 bg-gradient-to-b from-[#629ef7] via-[#357ae5] to-[#1b56ca] text-white select-none">
+            <span class="text-[10px] font-black uppercase tracking-wider font-['Outfit']">{{ title || 'Bimasakti BI System Message' }}</span>
+            <button @click="modalStore.closeModal" class="w-4 h-4 rounded-full flex items-center justify-center border border-[#9b1708] bg-gradient-to-b from-[#fbae97] via-[#f3664d] to-[#bf2613] hover:from-[#ffbfad] hover:to-[#df301b] transition-all">
+              <span class="text-[8px] font-bold text-white">✕</span>
+            </button>
+          </div>
+          
+          <!-- Dialog Body -->
+          <div class="p-5 flex gap-4">
+            <div class="text-3xl bg-white border border-[#95bfe9] p-3 rounded-lg shadow-sm shrink-0 flex items-center justify-center">{{ icon }}</div>
+            <div class="w-full flex flex-col text-left">
+              <h3 class="text-sm font-black text-[#0f2240] tracking-tight leading-tight font-['Outfit']">{{ title }}</h3>
+              <p class="text-xs text-slate-600 font-bold mt-1 leading-relaxed">{{ message }}</p>
+              <input 
+                v-if="type === 'prompt'" 
+                v-model="modalStore.inputValue" 
+                type="text" 
+                class="mt-3 w-full border border-[#95bfe9] bg-white rounded-lg p-2 text-xs font-bold text-slate-800 focus:border-[#3b82f6] outline-none transition-all" 
+                @keyup.enter="modalStore.confirmModal" 
+                autofocus
+              >
             </div>
           </div>
-          <div class="bg-slate-50/80 px-6 py-4 flex items-center justify-end gap-3 border-t border-slate-100">
-            <button v-if="type !== 'alert'" @click="modalStore.closeModal" class="px-5 py-2.5 text-xs font-black text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 rounded-xl transition-all active:scale-95">{{ cancelText }}</button>
-            <button @click="modalStore.confirmModal" class="px-6 py-2.5 text-xs font-black text-white rounded-xl shadow-md shadow-cyan-900/10 transition-all active:scale-95" :class="confirmColor">{{ confirmText }}</button>
+          
+          <!-- Dialog Actions Bar -->
+          <div class="bg-[#ebf3fd] px-4 py-2.5 flex items-center justify-end gap-2 border-t border-[#a8cbf3]">
+            <button 
+              v-if="type !== 'alert'" 
+              @click="modalStore.closeModal" 
+              class="px-4 py-1.5 text-[10px] font-black text-[#40567a] hover:text-slate-900 border border-[#95bfe9] hover:bg-slate-50 bg-white rounded-md shadow-sm active:scale-95 transition-all"
+            >
+              {{ cancelText }}
+            </button>
+            <!-- XP Start-style confirm button (Green) -->
+            <button 
+              @click="modalStore.confirmModal" 
+              class="px-5 py-1.5 text-[10px] font-black text-white bg-gradient-to-b from-[#8fd878] via-[#5cae46] to-[#257317] hover:brightness-110 border border-[#1b5011] rounded-md shadow-md active:scale-95 transition-all relative overflow-hidden"
+            >
+              <!-- Green glare -->
+              <div class="absolute inset-x-0 top-0 h-[40%] bg-white/20"></div>
+              <span class="relative z-10">{{ confirmText }}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -544,19 +636,33 @@ const triggerPdfExport = async () => {
   to { opacity: 1; transform: translateY(0) scale(1); } 
 }
 
-/* Custom premium slim scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Custom premium slim scrollbar matching Royale mockup */
+.custom-scrollbar::-webkit-scrollbar,
+.custom-scroll::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
 }
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+.custom-scrollbar::-webkit-scrollbar-track,
+.custom-scroll::-webkit-scrollbar-track {
+  background: rgba(56, 189, 248, 0.02);
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.08);
-  border-radius: 99px;
+.custom-scrollbar::-webkit-scrollbar-thumb,
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.25);
+  border-radius: 4px;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.16);
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.45);
+}
+
+/* Shine effect utility for Royale premium buttons */
+@keyframes shine {
+  100% {
+    left: 125%;
+  }
+}
+.animate-shine {
+  animation: shine 0.85s ease-in-out;
 }
 </style>
