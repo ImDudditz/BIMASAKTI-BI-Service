@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" fill="none" opacity="0.6">
+  <!-- Gradients -->
+  <linearGradient id="skyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#f8fafc" />
+    <stop offset="100%" stop-color="#e2e8f0" />
+  </linearGradient>
+  <linearGradient id="towerGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#475569" stop-opacity="0.4" />
+    <stop offset="100%" stop-color="#1e293b" stop-opacity="0.05" />
+  </linearGradient>
+  <linearGradient id="towerGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#64748b" stop-opacity="0.45" />
+    <stop offset="100%" stop-color="#334155" stop-opacity="0.05" />
+  </linearGradient>
+  <linearGradient id="towerGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#94a3b8" stop-opacity="0.5" />
+    <stop offset="100%" stop-color="#475569" stop-opacity="0.05" />
+  </linearGradient>
+  <linearGradient id="towerGrad4" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#cbd5e1" stop-opacity="0.4" />
+    <stop offset="100%" stop-color="#64748b" stop-opacity="0.05" />
+  </linearGradient>
+  
+  <!-- Background Grid -->
+  <path d="M0 100 H1440 M0 200 H1440 M0 300 H1440 M0 400 H1440 M0 500 H1440 M0 600 H1440 M0 700 H1440 M0 800 H1440" stroke="#cbd5e1" stroke-width="0.5" opacity="0.3" />
+  <path d="M100 0 V900 M200 0 V900 M300 0 V900 M400 0 V900 M500 0 V900 M600 0 V900 M700 0 V900 M800 0 V900 M900 0 V900 M1000 0 V900 M1100 0 V900 M1200 0 V900 M1300 0 V900" stroke="#cbd5e1" stroke-width="0.5" opacity="0.3" />
+
+  <!-- Skyscraper 1 (Far Left) -->
+  <rect x="60" y="280" width="150" height="620" rx="3" fill="url(#towerGrad1)" />
+  <path d="M85 320 H185 M85 350 H185 M85 380 H185 M85 410 H185 M85 440 H185 M85 470 H185 M85 500 H185 M85 530 H185 M85 560 H185 M85 590 H185 M85 620 H185 M85 650 H185 M85 680 H185 M85 710 H185 M85 740 H185 M85 770 H185 M85 800 H185" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="4 6" opacity="0.25" />
+  
+  <!-- Skyscraper 2 (Left, Slanted Roof) -->
+  <path d="M260 160 L400 230 V900 H260 Z" fill="url(#towerGrad2)" />
+  <path d="M280 210 L380 260 M280 240 L380 290 M280 270 L380 320 M280 300 L380 350 M280 330 L380 380 M280 360 L380 410 M280 390 L380 440 M280 420 L380 470 M280 450 L380 500 M280 480 L380 530" stroke="#ffffff" stroke-width="2" stroke-dasharray="8 8" opacity="0.3" />
+  
+  <!-- Skyscraper 3 (Right, Glass Spire Tower) -->
+  <path d="M1020 80 L1150 180 V900 H1020 Z" fill="url(#towerGrad3)" />
+  <line x1="1085" y1="10" x2="1085" y2="80" stroke="#94a3b8" stroke-width="3" opacity="0.5" />
+  <path d="M1040 220 L1130 286 M1040 250 L1130 316 M1040 280 L1130 346 M1040 310 L1130 376 M1040 340 L1130 406 M1040 370 L1130 436 M1040 400 L1130 466 M1040 430 L1130 496 M1040 460 L1130 526" stroke="#ffffff" stroke-width="1.8" stroke-dasharray="6 4" opacity="0.35" />
+  
+  <!-- Skyscraper 4 (Far Right, Block Skyscraper) -->
+  <rect x="1200" y="340" width="180" height="560" rx="5" fill="url(#towerGrad4)" />
+  <path d="M1230 380 V860 M1260 380 V860 M1290 380 V860 M1320 380 V860 M1350 380 V860" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="10 10" opacity="0.25" />
+
+  <!-- Elegant perspective lines for a clean technical watermark -->
+  <path d="M-100 900 L540 520 L1600 900" stroke="#cbd5e1" stroke-width="1" opacity="0.4" />
+  <path d="M-100 900 L540 560 L1600 900" stroke="#cbd5e1" stroke-width="1" opacity="0.25" />
+</svg>
