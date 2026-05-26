@@ -10,11 +10,11 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 {
     public static class prFinancialPDF
     {
-        private static readonly XColor PrimaryColor = XColor.FromArgb(15, 23, 42);   // Slate 900
-        private static readonly XColor SecondaryColor = XColor.FromArgb(14, 165, 233); // Sky 500
-        private static readonly XColor AccentColor = XColor.FromArgb(13, 110, 253);  // Blue 600
-        private static readonly XColor LightBackground = XColor.FromArgb(248, 250, 252);     // Slate 50
-        private static readonly XColor BorderColor = XColor.FromArgb(226, 232, 240); // Slate 200
+        private static readonly XColor PrimaryColor = XColor.FromArgb(0, 0, 0);         // Black
+        private static readonly XColor SecondaryColor = XColor.FromArgb(227, 239, 255); // Soft Sky Blue (#e3efff)
+        private static readonly XColor AccentColor = XColor.FromArgb(0, 0, 0);          // Black
+        private static readonly XColor LightBackground = XColor.FromArgb(235, 243, 253); // Soft XP Pastel Blue (#ebf3fd)
+        private static readonly XColor BorderColor = XColor.FromArgb(149, 191, 233);     // XP Border Blue (#95bfe9)
 
         private static readonly XFont TitleFont = new("Arial", 16, XFontStyle.Bold);
         private static readonly XFont SubtitleFont = new("Arial", 10, XFontStyle.Regular);
@@ -90,12 +90,43 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
             context.PageNumber++;
             context.CurrentY = context.Margin;
 
-            // Draw header background strip
-            context.Graphics.DrawRectangle(new XSolidBrush(PrimaryColor), 0, 0, context.PageWidth, 60);
+            // Draw header background strip with neutral background
+            context.Graphics.DrawRectangle(XBrushes.White, 0, 0, context.PageWidth, 60);
+            context.Graphics.DrawLine(new XPen(BorderColor, 1), 0, 60, context.PageWidth, 60);
 
-            // Draw header text
-            context.Graphics.DrawString(context.Company.ToUpper(), TitleFont, XBrushes.White, new XPoint(context.Margin, 15), XStringFormats.TopLeft);
-            context.Graphics.DrawString($"{reportTitle} - {context.PeriodInfo}", SubtitleFont, new XSolidBrush(SecondaryColor), new XPoint(context.Margin, 38), XStringFormats.TopLeft);
+            string logoPath = GetLogoPath(context.Company);
+            bool hasLogo = File.Exists(logoPath);
+            double textStartX = context.Margin + (hasLogo ? 50 : 0);
+
+            if (hasLogo)
+            {
+                try
+                {
+                    // Draw a rounded card with a soft neutral background and border for padding the logo
+                    context.Graphics.DrawRoundedRectangle(
+                        new XPen(BorderColor, 1),
+                        new XSolidBrush(LightBackground),
+                        context.Margin - 5,
+                        5,
+                        50,
+                        50,
+                        8,
+                        8
+                    );
+                    using (var image = XImage.FromFile(logoPath))
+                    {
+                        context.Graphics.DrawImage(image, context.Margin, 10, 40, 40);
+                    }
+                }
+                catch
+                {
+                    textStartX = context.Margin;
+                }
+            }
+
+            // Draw header text in black / dark slate
+            context.Graphics.DrawString(context.Company.ToUpper(), TitleFont, XBrushes.Black, new XPoint(textStartX, 15), XStringFormats.TopLeft);
+            context.Graphics.DrawString($"{reportTitle} - {context.PeriodInfo}", SubtitleFont, new XSolidBrush(XColor.FromArgb(100, 116, 139)), new XPoint(textStartX, 38), XStringFormats.TopLeft);
 
             // Draw footer strip
             context.Graphics.DrawLine(new XPen(BorderColor, 1), context.Margin, context.PageHeight - 35, context.PageWidth - context.Margin, context.PageHeight - 35);
@@ -517,6 +548,71 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
             }
 
             context.IsDetailComparison = false;
+        }
+
+        private static string GetCompanyId(string companyName)
+        {
+            if (string.IsNullOrEmpty(companyName)) return "BMS";
+            string lower = companyName.ToLowerInvariant();
+            if (lower.Contains("agung") || lower.Contains("sedayu") || lower.Contains("residences") || lower.Contains("ashmd"))
+                return "ASHMD";
+            if (lower.Contains("grand") || lower.Contains("leasing") || lower.Contains("mall") || lower.Contains("pcgr1"))
+                return "PCGR1";
+            return "BMS";
+        }
+
+        private static string GetLogoPath(string companyName)
+        {
+            string safeId = GetCompanyId(companyName);
+            string baseDir = AppContext.BaseDirectory;
+            string? backendDir = null;
+            string current = baseDir;
+            while (!string.IsNullOrEmpty(current))
+            {
+                string dirName = Path.GetFileName(current);
+                if (dirName.Equals("backend", StringComparison.OrdinalIgnoreCase))
+                {
+                    backendDir = current;
+                    break;
+                }
+                if (File.Exists(Path.Combine(current, "BimasaktiReports.slnx")))
+                {
+                    backendDir = Path.Combine(current, "backend");
+                    break;
+                }
+                string? parent = Path.GetDirectoryName(current);
+                if (parent == current || string.IsNullOrEmpty(parent)) break;
+                current = parent;
+            }
+
+            if (backendDir == null)
+            {
+                current = Directory.GetCurrentDirectory();
+                while (!string.IsNullOrEmpty(current))
+                {
+                    string dirName = Path.GetFileName(current);
+                    if (dirName.Equals("backend", StringComparison.OrdinalIgnoreCase))
+                    {
+                        backendDir = current;
+                        break;
+                    }
+                    if (File.Exists(Path.Combine(current, "BimasaktiReports.slnx")))
+                    {
+                        backendDir = Path.Combine(current, "backend");
+                        break;
+                    }
+                    string? parent = Path.GetDirectoryName(current);
+                    if (parent == current || string.IsNullOrEmpty(parent)) break;
+                    current = parent;
+                }
+            }
+
+            if (backendDir == null)
+            {
+                backendDir = baseDir;
+            }
+
+            return Path.Combine(backendDir, "assets", safeId, "img", $"{safeId}_logo.png");
         }
     }
 }

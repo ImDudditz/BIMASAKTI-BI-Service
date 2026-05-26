@@ -173,7 +173,7 @@ const scrollToSection = (id) => {
   <div class="min-h-screen w-full bg-[#f1f6fa] text-[#1c2e4a] font-['Plus_Jakarta_Sans',sans-serif] overflow-y-auto overflow-x-hidden scroll-smooth relative custom-scroll selection:bg-sky-500/30">
     
     <!-- Beautiful Architectural Skyscraper Grayscale Background with 75% Transparency (opacity-25) -->
-    <div class="absolute inset-x-0 top-0 h-[750px] lg:h-[900px] pointer-events-none opacity-25 overflow-hidden z-0 flex items-end justify-center select-none">
+    <div class="absolute inset-x-0 top-0 h-[60vh] lg:h-[80vh] min-h-[600px] max-h-[1000px] pointer-events-none opacity-25 overflow-hidden z-0 flex items-end justify-center select-none">
       <img :src="highriseBg" alt="Skyscraper Background" class="w-full h-full object-cover">
     </div>
 
@@ -182,7 +182,7 @@ const scrollToSection = (id) => {
 
     <!-- --- PREVENT BLUR NAVBAR --- -->
     <header class="w-full sticky top-0 z-50 bg-[#f1f6fa]/85 backdrop-blur-md border-b border-sky-100 shadow-[0_2px_15px_-3px_rgba(56,189,248,0.1)]">
-      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="max-w-7xl 2xl:max-w-[1440px] mx-auto px-6 py-4 flex items-center justify-between">
         <!-- Brand/Logo with Windows XP Royale gloss effect -->
         <div class="flex items-center gap-3 group cursor-pointer" @click="scrollToSection('hero')">
           <div class="relative w-8 h-8 rounded-lg bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center shadow-[0_2px_8px_rgba(56,189,248,0.4)] overflow-hidden">
@@ -230,8 +230,8 @@ const scrollToSection = (id) => {
     </header>
 
     <!-- --- HERO SECTION (Riot Layout Grid) --- -->
-    <section id="hero" class="relative max-w-7xl mx-auto px-6 pt-6 lg:pt-8 pb-20 z-10">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+    <section id="hero" class="relative max-w-7xl 2xl:max-w-[1440px] mx-auto px-6 pt-6 lg:pt-8 pb-12 sm:pb-16 md:pb-20 lg:pb-24 z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-center">
         
         <!-- Left Side: Copy and Actions (Riot scale display headers) -->
         <div class="lg:col-span-5 flex flex-col items-start text-left scroll-animate slide-up">
@@ -239,12 +239,12 @@ const scrollToSection = (id) => {
           <img :src="bimasaktiLogo" alt="Bimasakti Logo" class="h-12 sm:h-14 w-auto object-contain mb-6 opacity-95 select-none">
 
 
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-['Outfit'] font-black text-[#0f2240] tracking-tight leading-[1.08] mb-6">
+          <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-['Outfit'] font-black text-[#0f2240] tracking-tight leading-[1.08] mb-6">
             <span class="bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">Business Intelligence</span> <br/>
             For Properties
           </h1>
 
-          <p class="text-sm sm:text-base text-[#40567a]/90 font-medium leading-relaxed max-w-lg mb-8">
+          <p class="text-xs sm:text-sm md:text-base text-[#40567a]/90 font-medium leading-relaxed max-w-lg mb-8">
             Engineered by PT Realta Chakradarma, Bimasakti unifies operational property data, automated tax systems, and real-time tenant communications on a premium cloud dashboard.
           </p>
 
@@ -270,7 +270,7 @@ const scrollToSection = (id) => {
           </div>
 
           <!-- Quick Statistics Bar in Royale Light Blue style -->
-          <div class="grid grid-cols-3 gap-6 border-t border-sky-200/60 pt-4 mt-6 w-full max-w-md">
+          <div class="grid grid-cols-3 gap-4 sm:gap-6 border-t border-sky-200/60 pt-4 mt-6 w-full max-w-md">
             <div>
               <span class="block text-2xl font-black text-[#0f2240] font-['Outfit']">99.98%</span>
               <span class="text-[9px] uppercase tracking-wider font-extrabold text-[#7487a3]">Azure Uptime</span>
@@ -289,7 +289,7 @@ const scrollToSection = (id) => {
         <!-- Right Side: The Professional High-Fidelity Mockup Dashboard (The Star piece) -->
         <div id="dashboard-demo" class="lg:col-span-7 scroll-animate fade-in">
           <!-- Outer window frame representing Windows XP Royale (Energy Blue) window -->
-          <div class="w-full bg-[#f3f7fd] rounded-t-xl border-t border-x border-b border-[#1f62d4] shadow-[0_20px_50px_-12px_rgba(31,98,212,0.35)] overflow-hidden relative flex flex-col lg:h-[480px]">
+          <div class="w-full bg-[#f3f7fd] rounded-t-xl border-t border-x border-b border-[#1f62d4] shadow-[0_20px_50px_-12px_rgba(31,98,212,0.35)] overflow-hidden relative flex flex-col h-[480px] sm:h-[500px] md:h-[520px] lg:h-[480px] xl:h-[540px] 2xl:h-[600px]">
             
             <!-- Authentic Windows XP Royale Energy Blue Title Bar -->
             <div class="flex items-center justify-between px-3 py-1.5 border-t border-white/40 bg-gradient-to-b from-[#629ef7] via-[#357ae5] to-[#1b56ca] text-white relative z-20 shrink-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.4)] select-none">
@@ -341,7 +341,7 @@ const scrollToSection = (id) => {
             <div class="flex-1 flex min-h-0 relative">
               
               <!-- --- COLLAPSIBLE LEFT EXPLORER PANE (XP Task Pane) --- -->
-              <div class="w-44 border-r border-[#95bfe9] bg-gradient-to-b from-[#d6e5f8] to-[#a2c6ec] p-2 flex flex-col justify-between shrink-0 overflow-y-auto custom-scroll relative z-10 select-none">
+              <div class="hidden md:flex w-40 lg:w-44 border-r border-[#95bfe9] bg-gradient-to-b from-[#d6e5f8] to-[#a2c6ec] p-2 flex flex-col justify-between shrink-0 overflow-y-auto custom-scroll relative z-10 select-none">
                 <div class="space-y-3">
                   
                   <!-- Panel 1: System Tasks -->
@@ -434,6 +434,22 @@ const scrollToSection = (id) => {
                 
                 <!-- Sheen top watermark -->
                 <div class="absolute top-0 right-0 w-32 h-32 bg-sky-200/10 rounded-full blur-2xl pointer-events-none"></div>
+                
+                <!-- Mobile Tab Switcher inside workspace (only visible on mobile/tablet) -->
+                <div class="flex md:hidden gap-1.5 mb-3 shrink-0 select-none">
+                  <button 
+                    @click="activeTab = 'accounting'"
+                    :class="['flex-1 py-1 px-2 text-center text-[10px] font-bold rounded border transition-all shadow-sm outline-none', activeTab === 'accounting' ? 'bg-[#3b82f6] text-white border-[#1f62d4]' : 'bg-white text-[#475569] border-[#95bfe9]/50']"
+                  >
+                    Accounting & VAT
+                  </button>
+                  <button 
+                    @click="activeTab = 'tenant'"
+                    :class="['flex-1 py-1 px-2 text-center text-[10px] font-bold rounded border transition-all shadow-sm outline-none', activeTab === 'tenant' ? 'bg-[#3b82f6] text-white border-[#1f62d4]' : 'bg-white text-[#475569] border-[#95bfe9]/50']"
+                  >
+                    Tenant API Stacks
+                  </button>
+                </div>
                 
                 <!-- Tab 1: Accounting Node -->
                 <div v-if="activeTab === 'accounting'" class="flex-1 flex flex-col justify-between min-h-0 space-y-3">
@@ -694,7 +710,7 @@ const scrollToSection = (id) => {
                   </div>
                   
                   <!-- Scrollable logs box -->
-                  <div ref="terminalRef" class="h-14 overflow-y-auto space-y-0.5 leading-normal custom-scroll pr-1 select-text">
+                  <div ref="terminalRef" class="h-12 sm:h-14 md:h-16 lg:h-20 xl:h-24 2xl:h-28 overflow-y-auto space-y-0.5 leading-normal custom-scroll pr-1 select-text">
                     <div v-for="(log, i) in terminalLogs" :key="i" class="flex gap-1.5 items-start font-mono text-[8.5px]">
                       <span class="text-[#0c3c8c] font-black select-none">&gt;</span>
                       <span :class="[
@@ -728,10 +744,10 @@ const scrollToSection = (id) => {
     </section>
 
     <!-- --- MODULE OVERVIEW (Asymmetric Riot Card Grid) --- -->
-    <section id="about" class="py-24 bg-[#f8fbfe] border-y border-sky-100 relative z-10">
-      <div class="max-w-7xl mx-auto px-6">
+    <section id="about" class="py-12 sm:py-16 md:py-20 lg:py-24 bg-[#f8fbfe] border-y border-sky-100 relative z-10">
+      <div class="max-w-7xl 2xl:max-w-[1440px] mx-auto px-6">
         
-        <div class="text-center max-w-2xl mx-auto mb-20 scroll-animate fade-in">
+        <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16 lg:mb-20 scroll-animate fade-in">
           <span class="text-xs font-black text-sky-500 uppercase tracking-widest block mb-3 font-mono">Enterprise Operations</span>
           <h2 class="text-3xl sm:text-4xl font-['Outfit'] font-black text-[#0f2240] tracking-tight leading-none">
             Total Operational Control
@@ -741,7 +757,7 @@ const scrollToSection = (id) => {
           </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           
           <!-- Riot Card 1 -->
           <div class="bg-white rounded-xl border border-sky-100 hover:border-sky-300 p-8 shadow-[0_4px_25px_-5px_rgba(56,189,248,0.06)] hover:shadow-[0_8px_30px_rgba(56,189,248,0.12)] transition-all duration-300 flex flex-col justify-between group scroll-animate slide-up relative overflow-hidden">
@@ -804,10 +820,10 @@ const scrollToSection = (id) => {
     </section>
 
     <!-- --- FEATURE SEGMENTS (Double Column Asymmetrical Columns) --- -->
-    <section id="features" class="py-24 max-w-7xl mx-auto px-6 space-y-32">
+    <section id="features" class="py-12 sm:py-16 md:py-20 lg:py-24 max-w-7xl 2xl:max-w-[1440px] mx-auto px-6 space-y-20 sm:space-y-24 lg:space-y-32">
       
       <!-- Segment 1: Financial & Invoicing Automated Core -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-center">
         
         <div class="lg:col-span-5 scroll-animate slide-up">
           <span class="text-xs font-mono font-black text-sky-500 uppercase tracking-widest block mb-3">Module 01 / Financial Integration</span>
@@ -855,7 +871,7 @@ const scrollToSection = (id) => {
       </div>
 
       <!-- Segment 2: Tenant Mobile Desk Portal -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-center">
         
         <div class="lg:col-span-7 scroll-animate slide-up bg-white p-3 border border-sky-100 rounded-xl shadow-[0_4px_30px_rgba(56,189,248,0.06)]">
           <div class="border border-sky-50 rounded-lg overflow-hidden relative">
@@ -907,7 +923,7 @@ const scrollToSection = (id) => {
 
 
     <!-- --- CALL TO ACTION --- -->
-    <section class="max-w-4xl mx-auto px-6 py-24 text-center scroll-animate slide-up relative z-10 flex flex-col items-center">
+    <section class="max-w-4xl mx-auto px-6 py-12 sm:py-16 md:py-20 lg:py-24 text-center scroll-animate slide-up relative z-10 flex flex-col items-center">
       <div class="w-12 h-1.5 bg-gradient-to-r from-sky-400 to-blue-500 rounded-full mb-8"></div>
       <h2 class="text-3xl sm:text-4xl font-['Outfit'] font-black text-[#0f2240] tracking-tight leading-none mb-6">
         Unlock Your Operational Power
@@ -928,8 +944,8 @@ const scrollToSection = (id) => {
     </section>
 
     <!-- --- FOOTER --- -->
-    <footer class="w-full bg-[#040811] border-t border-sky-950 text-[#7487a3] py-16 relative z-10">
-      <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+    <footer class="w-full bg-[#040811] border-t border-sky-950 text-[#7487a3] py-12 sm:py-16 relative z-10">
+      <div class="max-w-7xl 2xl:max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-sky-950 border border-sky-850 flex items-center justify-center">
             <span class="text-sky-400 font-['Outfit'] font-black text-sm">B</span>

@@ -66,6 +66,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
             // --- SHEET 1: BS Summary ---
             var wsBs = workbook.Worksheets.Add("BS Summary");
+            AddLogoIfCallback(wsBs, company);
             SetupSheet(wsBs);
             MergeRange(wsBs, "A1:E1", company, TitleFmt);
             MergeRange(wsBs, "A2:E2", "Balance Sheet Summary", SubtitleFmt);
@@ -104,6 +105,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
             // --- SHEET 2: IS Summary ---
             var wsIs = workbook.Worksheets.Add("IS Summary");
+            AddLogoIfCallback(wsIs, company);
             SetupSheet(wsIs);
             MergeRange(wsIs, "A1:E1", company, TitleFmt);
             MergeRange(wsIs, "A2:E2", "Income Statement Summary", SubtitleFmt);
@@ -137,6 +139,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
             // BS Details
             var wsBsc = workbook.Worksheets.Add("BS Detail Comparison");
+            AddLogoIfCallback(wsBsc, company);
             SetupSheet(wsBsc);
             MergeRange(wsBsc, "A1:D1", company, TitleFmt);
             MergeRange(wsBsc, "A2:D2", "Balance Sheet - Detailed Comparison", SubtitleFmt);
@@ -161,6 +164,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
             // IS Details
             var wsIsc = workbook.Worksheets.Add("IS Detail Comparison");
+            AddLogoIfCallback(wsIsc, company);
             SetupSheet(wsIsc);
             MergeRange(wsIsc, "A1:D1", company, TitleFmt);
             MergeRange(wsIsc, "A2:D2", "Income Statement - Detailed Comparison", SubtitleFmt);
@@ -191,6 +195,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
                 // BS Quarterly
                 var wsQbs = workbook.Worksheets.Add("BS Quarterly");
+                AddLogoIfCallback(wsQbs, company);
                 SetupSheet(wsQbs);
                 MergeRange(wsQbs, "A1:E1", company, TitleFmt);
                 MergeRange(wsQbs, "A2:E2", $"Balance Sheet - Quarterly Details ({year})", SubtitleFmt);
@@ -215,6 +220,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
                 // IS Quarterly
                 var wsQis = workbook.Worksheets.Add("IS Quarterly");
+                AddLogoIfCallback(wsQis, company);
                 SetupSheet(wsQis);
                 MergeRange(wsQis, "A1:E1", company, TitleFmt);
                 MergeRange(wsQis, "A2:E2", $"Income Statement - Quarterly Details ({year})", SubtitleFmt);
@@ -250,6 +256,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
                 // BS Yearly
                 var wsYbs = workbook.Worksheets.Add("BS Yearly");
+                AddLogoIfCallback(wsYbs, company);
                 SetupSheet(wsYbs);
                 MergeRange(wsYbs, "A1:M1", company, TitleFmt);
                 MergeRange(wsYbs, "A2:M2", $"Balance Sheet - Yearly Details ({year})", SubtitleFmt);
@@ -274,6 +281,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
                 // IS Yearly
                 var wsYis = workbook.Worksheets.Add("IS Yearly");
+                AddLogoIfCallback(wsYis, company);
                 SetupSheet(wsYis);
                 MergeRange(wsYis, "A1:M1", company, TitleFmt);
                 MergeRange(wsYis, "A2:M2", $"Income Statement - Yearly Details ({year})", SubtitleFmt);
@@ -392,7 +400,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
             foreach (var gName in sortedGroupNames)
             {
                 var grp = groups[gName];
-                Write(ws, r, startCol, gName, GroupFmt);
+                Write(ws, r, startCol, gName, GroupFmtBlack);
                 Write(ws, r, startCol + 1, grp.Total, GroupNumFmt);
                 r++;
             }
@@ -587,6 +595,12 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
             style.Font.FontColor = XLColor.FromHtml("#0d6efd");
         }
 
+        private static void GroupFmtBlack(IXLStyle style)
+        {
+            style.Font.Bold = true;
+            style.Font.FontColor = XLColor.Black;
+        }
+
         private static void GroupNumFmt(IXLStyle style)
         {
             style.Font.Bold = true;
@@ -631,6 +645,89 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
             style.Border.TopBorder = XLBorderStyleValues.Double;
             style.Fill.BackgroundColor = XLColor.FromHtml("#f8f9fa");
             style.NumberFormat.Format = "#,##0.00;(#,##0.00)";
+        }
+
+        private static string GetCompanyId(string companyName)
+        {
+            if (string.IsNullOrEmpty(companyName)) return "BMS";
+            string lower = companyName.ToLowerInvariant();
+            if (lower.Contains("agung") || lower.Contains("sedayu") || lower.Contains("residences") || lower.Contains("ashmd"))
+                return "ASHMD";
+            if (lower.Contains("grand") || lower.Contains("leasing") || lower.Contains("mall") || lower.Contains("pcgr1"))
+                return "PCGR1";
+            return "BMS";
+        }
+
+        private static string GetLogoPath(string companyName)
+        {
+            string safeId = GetCompanyId(companyName);
+            string baseDir = AppContext.BaseDirectory;
+            string? backendDir = null;
+            string current = baseDir;
+            while (!string.IsNullOrEmpty(current))
+            {
+                string dirName = Path.GetFileName(current);
+                if (dirName.Equals("backend", StringComparison.OrdinalIgnoreCase))
+                {
+                    backendDir = current;
+                    break;
+                }
+                if (File.Exists(Path.Combine(current, "BimasaktiReports.slnx")))
+                {
+                    backendDir = Path.Combine(current, "backend");
+                    break;
+                }
+                string? parent = Path.GetDirectoryName(current);
+                if (parent == current || string.IsNullOrEmpty(parent)) break;
+                current = parent;
+            }
+
+            if (backendDir == null)
+            {
+                current = Directory.GetCurrentDirectory();
+                while (!string.IsNullOrEmpty(current))
+                {
+                    string dirName = Path.GetFileName(current);
+                    if (dirName.Equals("backend", StringComparison.OrdinalIgnoreCase))
+                    {
+                        backendDir = current;
+                        break;
+                    }
+                    if (File.Exists(Path.Combine(current, "BimasaktiReports.slnx")))
+                    {
+                        backendDir = Path.Combine(current, "backend");
+                        break;
+                    }
+                    string? parent = Path.GetDirectoryName(current);
+                    if (parent == current || string.IsNullOrEmpty(parent)) break;
+                    current = parent;
+                }
+            }
+
+            if (backendDir == null)
+            {
+                backendDir = baseDir;
+            }
+
+            return Path.Combine(backendDir, "assets", safeId, "img", $"{safeId}_logo.png");
+        }
+
+        private static void AddLogoIfCallback(IXLWorksheet ws, string company)
+        {
+            string logoPath = GetLogoPath(company);
+            if (File.Exists(logoPath))
+            {
+                try
+                {
+                    ws.AddPicture(logoPath)
+                      .MoveTo(ws.Cell(1, 1), 10, 5)
+                      .WithSize(48, 48);
+                }
+                catch
+                {
+                    // Fail-safe
+                }
+            }
         }
     }
 }
