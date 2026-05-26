@@ -101,6 +101,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
                     string companyName = "Unknown Company";
                     try
                     {
+                        await dbContext.Database.OpenConnectionAsync();
                         using (var nameCommand = dbContext.Database.GetDbConnection().CreateCommand())
                         {
                             string tableName = svcDbUtils.GetGlrxTableName(databasePath);
@@ -120,6 +121,14 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
                     catch
                     {
                         // Safe fallback on reflective tables exceptions
+                    }
+                    finally
+                    {
+                        try
+                        {
+                            await dbContext.Database.CloseConnectionAsync();
+                        }
+                        catch {}
                     }
 
                     var claimMap = new Dictionary<string, string>

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="BimasaktiReports.csproj" />
+  <Project Path="manager/manager.csproj" />
+</Solution>

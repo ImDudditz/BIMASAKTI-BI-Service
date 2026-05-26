@@ -28,6 +28,9 @@
     <None Remove="tests\**" />
     <None Remove="BimasaktiReports.Tests\**" />
     <None Remove="manager\**" />
+    <Content Remove="tests\**" />
+    <Content Remove="BimasaktiReports.Tests\**" />
+    <Content Remove="manager\**" />
   </ItemGroup>
 
 </Project>

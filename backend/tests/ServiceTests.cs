@@ -14,12 +14,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Tests
 
     public class AuthenticationServiceTests
     {
-        private readonly IsvcAuthenticationService _authenticationService;
-
-        public AuthenticationServiceTests()
-        {
-            _authenticationService = new svcAuthenticationService();
-        }
+        private readonly IsvcAuthenticationService _authenticationService = new svcAuthenticationService();
 
         [Fact]
         public void GetPasswordHash_ShouldReturnValidSha256HexString()
@@ -68,7 +63,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Tests
         public void CreateAccessToken_ShouldGenerateNonEmptyJwtToken()
         {
             // Arrange
-            var claimMap = new Dictionary<string, string>
+            Dictionary<string, string> claimMap = new()
             {
                 { "sub", "admin" },
                 { "company_id", "ASHMD" }
@@ -89,12 +84,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Tests
 
     public class svcGLRX0310Tests
     {
-        private readonly IsvcGLRX0310 _ledgerService;
-
-        public svcGLRX0310Tests()
-        {
-            _ledgerService = new svcGLRX0310();
-        }
+        private readonly IsvcGLRX0310 _ledgerService = new svcGLRX0310();
 
         [Fact]
         public async Task GenerateLedgerReportAsync_ShouldReturnErrorResponse_WhenDatabaseFileDoesNotExist()
@@ -121,44 +111,38 @@ namespace BimasaktiReports.FinancialReports.Backend.Tests
             try
             {
                 // Create empty schema in temp DB to test parsing
-                using (var connection = new SqliteConnection($"Data Source={temporaryDbPath}"))
-                {
-                    await connection.OpenAsync();
-                    
-                    // Create GLRX0310 table schema
-                    string createTableQuery = @"
-                        CREATE TABLE GLRX0310 (
-                            company_id TEXT,
-                            account_no TEXT,
-                            account_name TEXT,
-                            year TEXT,
-                            period TEXT,
-                            end_bsis REAL,
-                            end_balance REAL,
-                            end_budget REAL
-                        );
-                        CREATE TABLE coa_mappings (
-                            company_id TEXT,
-                            preset_name TEXT,
-                            mapping_data TEXT
-                        );";
-                    
-                    using (var command = new SqliteCommand(createTableQuery, connection))
-                    {
-                        await command.ExecuteNonQueryAsync();
-                    }
+                using var connection = new SqliteConnection($"Data Source={temporaryDbPath}");
+                await connection.OpenAsync();
+                
+                // Create GLRX0310 table schema
+                string createTableQuery = @"
+                    CREATE TABLE GLRX0310 (
+                        company_id TEXT,
+                        account_no TEXT,
+                        account_name TEXT,
+                        year TEXT,
+                        period TEXT,
+                        end_bsis REAL,
+                        end_balance REAL,
+                        end_budget REAL
+                    );
+                    CREATE TABLE coa_mappings (
+                        company_id TEXT,
+                        preset_name TEXT,
+                        mapping_data TEXT
+                    );";
+                
+                using var command = new SqliteCommand(createTableQuery, connection);
+                await command.ExecuteNonQueryAsync();
 
-                    // Insert sample ledger data for Assets (account starting with '1') and Equity (starting with '3')
-                    string insertQuery = @"
-                        INSERT INTO GLRX0310 (company_id, account_no, account_name, year, period, end_bsis, end_balance)
-                        VALUES ('ASHMD', '10101', 'Cash in Bank', '2026', '05', 15000.0, 15000.0),
-                               ('ASHMD', '30101', 'Capital Stock', '2026', '05', -10000.0, 10000.0);";
-                    
-                    using (var command = new SqliteCommand(insertQuery, connection))
-                    {
-                        await command.ExecuteNonQueryAsync();
-                    }
-                }
+                // Insert sample ledger data for Assets (account starting with '1') and Equity (starting with '3')
+                string insertQuery = @"
+                    INSERT INTO GLRX0310 (company_id, account_no, account_name, year, period, end_bsis, end_balance)
+                    VALUES ('ASHMD', '10101', 'Cash in Bank', '2026', '05', 15000.0, 15000.0),
+                           ('ASHMD', '30101', 'Capital Stock', '2026', '05', -10000.0, 10000.0);";
+                
+                using var insertCmd = new SqliteCommand(insertQuery, connection);
+                await insertCmd.ExecuteNonQueryAsync();
 
                 // Act
                 var report = await _ledgerService.GenerateLedgerReportAsync(temporaryDbPath, "2026", "05", "preset1", "ASHMD");
@@ -192,39 +176,33 @@ namespace BimasaktiReports.FinancialReports.Backend.Tests
             
             try
             {
-                using (var connection = new SqliteConnection($"Data Source={temporaryDbPath}"))
-                {
-                    await connection.OpenAsync();
-                    
-                    // Create GLRX0300 table schema (alternate names like ending_balance, year_period, month_period)
-                    string createTableQuery = @"
-                        CREATE TABLE GLRX0300 (
-                            company_id TEXT,
-                            account_no TEXT,
-                            account_name TEXT,
-                            year_period TEXT,
-                            month_period TEXT,
-                            ending_bsis REAL,
-                            ending_balance REAL,
-                            ending_budget REAL
-                        );";
-                    
-                    using (var command = new SqliteCommand(createTableQuery, connection))
-                    {
-                        await command.ExecuteNonQueryAsync();
-                    }
+                using var connection = new SqliteConnection($"Data Source={temporaryDbPath}");
+                await connection.OpenAsync();
+                
+                // Create GLRX0300 table schema (alternate names like ending_balance, year_period, month_period)
+                string createTableQuery = @"
+                    CREATE TABLE GLRX0300 (
+                        company_id TEXT,
+                        account_no TEXT,
+                        account_name TEXT,
+                        year_period TEXT,
+                        month_period TEXT,
+                        ending_bsis REAL,
+                        ending_balance REAL,
+                        ending_budget REAL
+                    );";
+                
+                using var command = new SqliteCommand(createTableQuery, connection);
+                await command.ExecuteNonQueryAsync();
 
-                    // Insert sample ledger data using GLRX0300 column names
-                    string insertQuery = @"
-                        INSERT INTO GLRX0300 (company_id, account_no, account_name, year_period, month_period, ending_bsis, ending_balance, ending_budget)
-                        VALUES ('PCGR1', '10101', 'Cash in Bank', '2026', '05', 15000.0, 15000.0, 1000.0),
-                               ('PCGR1', '30101', 'Capital Stock', '2026', '05', -10000.0, 10000.0, 0.0);";
-                    
-                    using (var command = new SqliteCommand(insertQuery, connection))
-                    {
-                        await command.ExecuteNonQueryAsync();
-                    }
-                }
+                // Insert sample ledger data using GLRX0300 column names
+                string insertQuery = @"
+                    INSERT INTO GLRX0300 (company_id, account_no, account_name, year_period, month_period, ending_bsis, ending_balance, ending_budget)
+                    VALUES ('PCGR1', '10101', 'Cash in Bank', '2026', '05', 15000.0, 15000.0, 1000.0),
+                           ('PCGR1', '30101', 'Capital Stock', '2026', '05', -10000.0, 10000.0, 0.0);";
+                
+                using var insertCommand = new SqliteCommand(insertQuery, connection);
+                await insertCommand.ExecuteNonQueryAsync();
 
                 // Act
                 var report = await _ledgerService.GenerateLedgerReportAsync(temporaryDbPath, "2026", "05", "preset1", "PCGR1");
@@ -264,32 +242,30 @@ namespace BimasaktiReports.FinancialReports.Backend.Tests
 
             // Act
             // Determine years and periods dynamically from the database
-            var yearsList = new List<string>();
-            var periodsList = new List<string>();
-            using (var connection = new SqliteConnection($"Data Source={dbPath};Mode=ReadOnly;"))
+            List<string> yearsList = new();
+            List<string> periodsList = new();
+            using var connection = new SqliteConnection($"Data Source={dbPath};Mode=ReadOnly;");
+            await connection.OpenAsync();
+            
+            // Assert the GLRX0310 table actually has data rows
+            using (var countCmd = new SqliteCommand("SELECT COUNT(*) FROM GLRX0310;", connection))
             {
-                await connection.OpenAsync();
-                
-                // Assert the GLRX0310 table actually has data rows
-                using (var countCmd = new SqliteCommand("SELECT COUNT(*) FROM GLRX0310;", connection))
-                {
-                    long rowCount = (long)(await countCmd.ExecuteScalarAsync() ?? 0L);
-                    Assert.True(rowCount > 0, $"GLRX0310 table in {dbPath} is empty!");
-                }
+                long rowCount = (long)(await countCmd.ExecuteScalarAsync() ?? 0L);
+                Assert.True(rowCount > 0, $"GLRX0310 table in {dbPath} is empty!");
+            }
 
-                // Query distinct years
-                using (var command = new SqliteCommand("SELECT DISTINCT year FROM GLRX0310 WHERE year IS NOT NULL AND year != '';", connection))
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync()) yearsList.Add(reader.GetString(0));
-                }
+            // Query distinct years
+            using (var command = new SqliteCommand("SELECT DISTINCT year FROM GLRX0310 WHERE year IS NOT NULL AND year != '';", connection))
+            using (var reader = await command.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync()) yearsList.Add(reader.GetString(0));
+            }
 
-                // Query distinct periods
-                using (var command = new SqliteCommand("SELECT DISTINCT period FROM GLRX0310 WHERE period IS NOT NULL AND period != '';", connection))
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync()) periodsList.Add(reader.GetString(0));
-                }
+            // Query distinct periods
+            using (var command = new SqliteCommand("SELECT DISTINCT period FROM GLRX0310 WHERE period IS NOT NULL AND period != '';", connection))
+            using (var reader = await command.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync()) periodsList.Add(reader.GetString(0));
             }
 
             Assert.NotEmpty(yearsList);
@@ -319,12 +295,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Tests
 
     public class DashboardAnalyticsServiceTests
     {
-        private readonly IsvcDashboardAnalyticsService _dashboardAnalyticsService;
-
-        public DashboardAnalyticsServiceTests()
-        {
-            _dashboardAnalyticsService = new svcDashboardAnalyticsService();
-        }
+        private readonly IsvcDashboardAnalyticsService _dashboardAnalyticsService = new svcDashboardAnalyticsService();
 
         [Fact]
         public async Task GetOperationsMetricsAsync_ShouldReturnDefaultKPIs_WhenDatabaseDoesNotExist()

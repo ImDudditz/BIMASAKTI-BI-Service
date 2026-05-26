@@ -215,10 +215,10 @@ const matrixState = computed(() => {
     keys = ['curr', 'prevMo', 'prevYr'];
   } else if (displayFormat.value === '3') {
     const getQSub = (q, cp) => {
-      if (q === 1) return cp >= 3 ? 'FINAL' : (cp === 1 ? 'JAN' : 'JAN-FEB');
-      if (q === 2) return cp >= 6 ? 'FINAL' : (cp === 4 ? 'APR' : (cp === 5 ? 'APR-MAY' : '—'));
-      if (q === 3) return cp >= 9 ? 'FINAL' : (cp === 7 ? 'JUL' : (cp === 8 ? 'JUL-AUG' : '—'));
-      if (q === 4) return cp >= 12 ? 'FINAL' : (cp === 10 ? 'OCT' : (cp === 11 ? 'OCT-NOV' : '—'));
+      if (q === 1) return cp >= 3 ? 'JAN-MAR' : (cp === 1 ? 'JAN' : 'JAN-FEB');
+      if (q === 2) return cp >= 6 ? 'APR-JUN' : (cp === 4 ? 'APR' : (cp === 5 ? 'APR-MAY' : '—'));
+      if (q === 3) return cp >= 9 ? 'JUL-SEP' : (cp === 7 ? 'JUL' : (cp === 8 ? 'JUL-AUG' : '—'));
+      if (q === 4) return cp >= 12 ? 'OCT-DEC' : (cp === 10 ? 'OCT' : (cp === 11 ? 'OCT-NOV' : '—'));
     };
     baseHeaders = [
       { label: 'Q1', sub: getQSub(1, p) }, { label: 'Q2', sub: getQSub(2, p) },
@@ -424,13 +424,13 @@ onMounted(async () => { await filterStore.fetchFilters(); loadData(); });
         <div :class="['flex flex-col min-w-max min-h-full', matrixState.wrapperClass]">
           
           <!-- STICKY TOP HEADER -->
-          <div class="sticky top-0 z-[40] bg-white/95 backdrop-blur-md border-b-2 border-slate-300 grid gap-4 text-sky-900 font-bold text-xs uppercase tracking-wider pr-6 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] items-stretch" :style="matrixState.gridStyle">
-            <div class="sticky left-0 z-[50] bg-white/95 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.1)] pl-6 py-3 flex items-center h-full">Account</div>
+          <div class="grid gap-4 text-sky-900 font-bold text-xs uppercase tracking-wider pr-6 items-stretch" :style="matrixState.gridStyle">
+            <div class="sticky top-0 left-0 z-[50] bg-white/95 backdrop-blur-md border-b-2 border-slate-300 shadow-[4px_4px_8px_-4px_rgba(0,0,0,0.1)] pl-6 py-3 flex items-center h-full">Account</div>
             <template v-for="(hd, i) in matrixState.headers" :key="i">
-              <div v-if="!showBudget" class="flex flex-col justify-center text-right whitespace-nowrap py-3">{{ hd.label }} <span class="text-slate-500 block text-[10px] mt-0.5">{{ hd.sub }}</span></div>
+              <div v-if="!showBudget" class="sticky top-0 z-[40] bg-white/95 backdrop-blur-md border-b-2 border-slate-300 flex flex-col justify-center text-center whitespace-nowrap py-3 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)]">{{ hd.label }} <span class="text-slate-500 block text-[10px] mt-0.5">{{ hd.sub }}</span></div>
               <template v-else>
-                <div class="flex flex-col justify-center text-right whitespace-nowrap py-3">{{ hd.label }} <span class="text-slate-500 block text-[10px] mt-0.5">{{ hd.sub }} (ACT)</span></div>
-                <div class="flex flex-col justify-center text-right whitespace-nowrap py-3">{{ hd.label }} <span class="text-sky-600 block text-[10px] mt-0.5">{{ hd.sub }} (BGT)</span></div>
+                <div class="sticky top-0 z-[40] bg-white/95 backdrop-blur-md border-b-2 border-slate-300 flex flex-col justify-center text-center whitespace-nowrap py-3 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)]">{{ hd.label }} <span class="text-slate-500 block text-[10px] mt-0.5">{{ hd.sub }} (ACT)</span></div>
+                <div class="sticky top-0 z-[40] bg-white/95 backdrop-blur-md border-b-2 border-slate-300 flex flex-col justify-center text-center whitespace-nowrap py-3 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)]">{{ hd.label }} <span class="text-sky-600 block text-[10px] mt-0.5">{{ hd.sub }} (BGT)</span></div>
               </template>
             </template>
           </div>
@@ -439,8 +439,10 @@ onMounted(async () => { await filterStore.fetchFilters(); loadData(); });
           <div class="flex flex-col grow p-0">
             <div v-for="(sectionData, secName) in matrixState.data" :key="secName">
               
-              <div class="bg-slate-100/90 sticky left-0 w-full px-6 py-3 border-b border-slate-200 z-[10] shadow-[4px_0_8px_-4px_rgba(0,0,0,0.05)]">
-                <h4 class="text-[18px] font-black text-sky-950 uppercase tracking-tight">{{ secName }}</h4>
+              <div class="bg-slate-100/90 grid gap-4 pr-6 border-b border-slate-200 z-[10] shadow-[4px_0_8px_-4px_rgba(0,0,0,0.05)] items-stretch" :style="matrixState.gridStyle">
+                <div class="font-black text-[18px] text-sky-950 uppercase tracking-tight pl-6 py-3 sticky left-0 z-20 bg-slate-100 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.1)] h-full flex items-center">
+                  {{ secName }}
+                </div>
               </div>
               
               <div class="flex flex-col">
@@ -498,17 +500,17 @@ onMounted(async () => { await filterStore.fetchFilters(); loadData(); });
           </div>
 
           <!-- STICKY BOTTOM FOOTER -->
-          <div class="sticky bottom-0 z-[40] bg-sky-50/95 backdrop-blur-md pr-6 grid gap-4 items-stretch border-t-[3px] border-double border-sky-400 mt-auto shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]" :style="matrixState.gridStyle">
-            <div class="font-black text-[15px] uppercase text-sky-950 tracking-wider pr-4 pl-6 sticky left-0 z-[50] bg-sky-50/95 backdrop-blur-md shadow-[4px_0_8px_-4px_rgba(0,0,0,0.1)] py-4 flex items-center whitespace-normal break-words h-full">
+          <div class="grid gap-4 items-stretch pr-6 mt-auto" :style="matrixState.gridStyle">
+            <div class="sticky bottom-0 left-0 z-[50] bg-sky-50/95 backdrop-blur-md shadow-[4px_-4px_8px_-4px_rgba(0,0,0,0.1)] border-t-[3px] border-double border-sky-400 font-black text-[15px] uppercase text-sky-950 tracking-wider pr-4 pl-6 py-4 flex items-center whitespace-normal break-words h-full">
               Net Income
             </div>
             <template v-for="(ni, i) in matrixState.netIncomes" :key="i">
-              <div class="flex justify-end items-center w-full py-4 px-1">
+              <div class="sticky bottom-0 z-[40] bg-sky-50/95 backdrop-blur-md border-t-[3px] border-double border-sky-400 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] flex justify-end items-center w-full py-4 px-1">
                 <span :class="['text-xl font-black tracking-tight whitespace-nowrap text-right w-full', isNeg(ni) ? 'text-red-600' : 'text-sky-950']">
                   {{ formatMoney(ni) }}
                 </span>
               </div>
-              <div v-if="showBudget" class="flex justify-end items-center w-full bg-white/60 px-2 py-4 border border-sky-200 rounded">
+              <div v-if="showBudget" class="sticky bottom-0 z-[40] bg-sky-50/95 backdrop-blur-md border-t-[3px] border-double border-sky-400 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] flex justify-end items-center w-full px-2 py-4 border-r border-sky-200">
                 <span :class="['text-xl font-black tracking-tight whitespace-nowrap text-right w-full', isNeg(matrixState.netIncomeBudgets[i]) ? 'text-red-600' : 'text-sky-800']">
                   {{ formatMoney(matrixState.netIncomeBudgets[i]) }}
                 </span>

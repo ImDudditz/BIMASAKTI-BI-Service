@@ -339,7 +339,7 @@ const triggerPdfExport = async () => {
                   : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
                 <span class="text-sm">🏠</span>
-                <span>Overview Node</span>
+                <span>Executive Overview</span>
               </RouterLink>
               
               <RouterLink 
@@ -380,7 +380,7 @@ const triggerPdfExport = async () => {
                   : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
                 <span class="text-[10px]">•</span>
-                <span>Dashboard Node</span>
+                <span>Dashboard</span>
               </RouterLink>
               
               <RouterLink 
@@ -391,7 +391,7 @@ const triggerPdfExport = async () => {
                   : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
                 <span class="text-[10px]">•</span>
-                <span>Ledger Reports</span>
+                <span>Reports</span>
               </RouterLink>
               
               <RouterLink 
@@ -402,7 +402,7 @@ const triggerPdfExport = async () => {
                   : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
                 <span class="text-[10px]">•</span>
-                <span>Print Core</span>
+                <span>Print</span>
               </RouterLink>
             </div>
           </div>
@@ -432,7 +432,7 @@ const triggerPdfExport = async () => {
                   : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
                 <span class="text-[10px]">•</span>
-                <span>Ops Dashboard</span>
+                <span>Dashboard</span>
               </RouterLink>
               
               <RouterLink 
@@ -443,7 +443,7 @@ const triggerPdfExport = async () => {
                   : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
                 <span class="text-[10px]">•</span>
-                <span>Tenancy Report</span>
+                <span>Reports</span>
               </RouterLink>
             </div>
           </div>
@@ -473,7 +473,7 @@ const triggerPdfExport = async () => {
                   : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
                 <span class="text-[10px]">•</span>
-                <span>Maintenance Desk</span>
+                <span>Dashboard</span>
               </RouterLink>
               
               <RouterLink 
@@ -484,7 +484,7 @@ const triggerPdfExport = async () => {
                   : 'text-slate-600 border-transparent hover:bg-[#3b82f6]/5 hover:text-[#0c3c8c]'"
               >
                 <span class="text-[10px]">•</span>
-                <span>Service Report</span>
+                <span>ReportS</span>
               </RouterLink>
             </div>
           </div>

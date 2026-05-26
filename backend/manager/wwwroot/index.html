@@ -360,6 +360,17 @@
             box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
         }
 
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border: none;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+
         .btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
@@ -794,8 +805,8 @@
                     </div>
                     
                     <div class="btn-group">
-                        <button class="btn" id="btn-restart" onclick="triggerServerAction('restart')">
-                            🔄 Restart Servers
+                        <button class="btn btn-warning" id="btn-scalar" onclick="launchScalar()">
+                            🔥 Scalar API Docs
                         </button>
                         <button class="btn btn-accent" id="btn-portal" onclick="launchPortal()">
                             🌐 Launch Portal
@@ -1231,7 +1242,7 @@
                 
                 document.getElementById('btn-start').disabled = runningBoth;
                 document.getElementById('btn-stop').disabled = !activeEither;
-                document.getElementById('btn-restart').disabled = !activeEither;
+                document.getElementById('btn-scalar').disabled = (status.backendStatus !== 'Running');
                 document.getElementById('btn-portal').disabled = (status.frontendStatus !== 'Running');
 
             } catch (err) {
@@ -1305,6 +1316,11 @@
         // Launch vue frontend portal
         function launchPortal() {
             window.open(`https://${localIp}:5173`, '_blank');
+        }
+
+        // Launch scalar backend api documentation
+        function launchScalar() {
+            window.open(`http://${localIp}:8001/docs`, '_blank');
         }
 
         // Fetch logs for the Live Terminal Log Console
