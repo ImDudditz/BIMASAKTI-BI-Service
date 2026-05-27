@@ -70,40 +70,43 @@
           </button>
         </div>
 
-        <!-- Dashboard Layout Grid -->
-        <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8 w-full">
+        <!-- Dashboard Dynamic Columns Layout (Like fsDashboard Split Grid) -->
+        <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-5 pb-8 w-full items-start">
           
-          <!-- Tickets KPI Strip -->
-          <div class="lg:col-span-2 mb-2">
-            <TicketsKPI :companyId="companyId" :selectedYear="selectedYear" :selectedPeriod="selectedPeriod" />
+          <!-- Left Column: KPIs & Tickets By Category Breakdown -->
+          <div class="flex flex-col gap-5 w-full">
+            <template v-for="widget in leftColumnWidgets" :key="widget.widget_key">
+              <component 
+                :is="widgetRegistry[widget.widget_key]" 
+                v-bind="getWidgetProps(widget)" 
+              />
+            </template>
           </div>
 
-          <!-- Primary Status Card + Uptime doughnut -->
-          <div class="lg:col-span-2">
-            <MaintenanceStatusWidget />
-          </div>
-
-          <!-- Secondary Categories Chart -->
-          <div class="lg:col-span-2">
-            <TicketsByCategoryWidget :categoriesData="ticketsByCategory" />
+          <!-- Right Column: Status summary & Top Complaints/Requests charts -->
+          <div class="flex flex-col gap-5 w-full">
+            <template v-for="widget in rightColumnWidgets" :key="widget.widget_key">
+              <component 
+                :is="widgetRegistry[widget.widget_key]" 
+                v-bind="getWidgetProps(widget)" 
+              />
+            </template>
           </div>
 
         </div>
+
       </div>
     </div>
   </ReportLayout>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, watch, computed, defineAsyncComponent } from 'vue'
 import { storeToRefs } from 'pinia'
 import api from '@/services/api'
 import { useReportFilterStore } from '@/stores/reportFilters'
 import { useAuthStore } from '@/stores/auth'
 import ReportLayout from '@/components/ReportLayout.vue'
-import MaintenanceStatusWidget from '@/components/widgets/ServiceAndMaintenance/MaintenanceStatusWidget.vue'
-import TicketsByCategoryWidget from '@/components/widgets/ServiceAndMaintenance/TicketsByCategoryWidget.vue'
-import TicketsKPI from '@/components/widgets/ServiceAndMaintenance/TicketsKPI.vue'
 
 const filterStore = useReportFilterStore()
 const { selectedYear, selectedPeriod, availableYears, availablePeriods } = storeToRefs(filterStore)
@@ -124,13 +127,110 @@ const monthNames = {
   "09": "September", "10": "October", "11": "November", "12": "December"
 }
 
+// Widget Registry (Dynamic Async Components like fsDashboard)
+const widgetRegistry = {
+  'tickets_kpi': defineAsyncComponent(() => import('@/components/widgets/ServiceAndMaintenance/TicketsKPI.vue')),
+  'maintenance_status': defineAsyncComponent(() => import('@/components/widgets/ServiceAndMaintenance/MaintenanceStatusWidget.vue')),
+  'top_area_complaints': defineAsyncComponent(() => import('@/components/widgets/ServiceAndMaintenance/TopComplaintsByAreaWidget.vue')),
+  'top_tenant_requests': defineAsyncComponent(() => import('@/components/widgets/ServiceAndMaintenance/TopRequestsByTenantWidget.vue')),
+  'tickets_by_category': defineAsyncComponent(() => import('@/components/widgets/ServiceAndMaintenance/TicketsByCategoryWidget.vue'))
+}
+
 // Maintenance bound structures
 const statusPayload = ref(null)
 const ticketsByCategory = ref([])
+const topAreaComplaints = ref([])
+const topTenantRequests = ref([])
+const activeWidgets = ref([])
+
+const leftColumnWidgets = computed(() => {
+  const leftKeys = ['tickets_kpi', 'tickets_by_category', 'top_tenant_requests']
+  // Keep the order: tickets_kpi -> tickets_by_category -> top_tenant_requests
+  const order = { 'tickets_kpi': 0, 'tickets_by_category': 1, 'top_tenant_requests': 2 }
+  return activeWidgets.value
+    .filter(w => leftKeys.includes(w.widget_key))
+    .sort((a, b) => (order[a.widget_key] ?? 0) - (order[b.widget_key] ?? 0))
+})
+
+const rightColumnWidgets = computed(() => {
+  const rightKeys = ['maintenance_status', 'top_area_complaints']
+  // Keep the order: maintenance_status -> top_area_complaints
+  const order = { 'maintenance_status': 0, 'top_area_complaints': 1 }
+  return activeWidgets.value
+    .filter(w => rightKeys.includes(w.widget_key))
+    .sort((a, b) => (order[a.widget_key] ?? 0) - (order[b.widget_key] ?? 0))
+})
 
 const isAuthorized = computed(() => {
-  return authStore.isAdmin || authStore.userWidgets.includes('tickets_kpi') || authStore.userWidgets.includes('maintenance_status') || authStore.userWidgets.includes('tickets_by_category')
+  return authStore.isAdmin || 
+         authStore.userWidgets.includes('tickets_kpi') || 
+         authStore.userWidgets.includes('maintenance_status') || 
+         authStore.userWidgets.includes('tickets_by_category') ||
+         authStore.userWidgets.includes('top_area_complaints') ||
+         authStore.userWidgets.includes('top_tenant_requests')
 })
+
+const getWidgetProps = (widget) => {
+  const baseProps = { config: widget.config }
+  switch (widget.widget_key) {
+    case 'tickets_kpi':
+      return { 
+        ...baseProps, 
+        companyId: companyId.value, 
+        selectedYear: selectedYear.value, 
+        selectedPeriod: selectedPeriod.value 
+      }
+    case 'top_area_complaints':
+      return { 
+        ...baseProps, 
+        complaintsData: topAreaComplaints.value 
+      }
+    case 'top_tenant_requests':
+      return { 
+        ...baseProps, 
+        requestsData: topTenantRequests.value 
+      }
+    case 'tickets_by_category':
+      return { 
+        ...baseProps, 
+        categoriesData: ticketsByCategory.value 
+      }
+    default:
+      return baseProps
+  }
+}
+
+const fetchUserWidgets = async () => {
+  const defaultMaintWidgets = [
+    { widget_key: 'tickets_kpi' },
+    { widget_key: 'maintenance_status' },
+    { widget_key: 'top_area_complaints' },
+    { widget_key: 'top_tenant_requests' },
+    { widget_key: 'tickets_by_category' }
+  ]
+  
+  try {
+    const company_id = authStore.user?.company_id
+    const username = authStore.user?.username
+    if (!company_id || !username) {
+      activeWidgets.value = defaultMaintWidgets
+      return
+    }
+    
+    const res = await api.get('/dashboard/my-widgets', { params: { company_id, username } })
+    const maintenanceKeys = ['tickets_kpi', 'maintenance_status', 'top_area_complaints', 'top_tenant_requests', 'tickets_by_category']
+    
+    const userMaintWidgets = res.data.filter(w => maintenanceKeys.includes(w.widget_key))
+    
+    if (userMaintWidgets.length > 0) {
+      activeWidgets.value = userMaintWidgets
+    } else {
+      activeWidgets.value = defaultMaintWidgets
+    }
+  } catch {
+    activeWidgets.value = defaultMaintWidgets
+  }
+}
 
 const loadDashboardData = async () => {
   if (!isAuthorized.value) {
@@ -161,8 +261,10 @@ const loadDashboardData = async () => {
     })
     statusPayload.value = res.data
     
-    // Store localized category distributions
+    // Store localized structures
     ticketsByCategory.value = res.data.ticketsByCategory || []
+    topAreaComplaints.value = res.data.topAreaComplaints || []
+    topTenantRequests.value = res.data.topTenantRequests || []
   } catch (err) {
     console.error('Maintenance Dashboard connection failure:', err)
     error.value = err.response?.data?.message || 'Maintenance service connection timeout. Please verify network routing or backend session authorization.'
@@ -171,7 +273,8 @@ const loadDashboardData = async () => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await fetchUserWidgets()
   filterStore.fetchFilters().then(() => loadDashboardData())
 })
 

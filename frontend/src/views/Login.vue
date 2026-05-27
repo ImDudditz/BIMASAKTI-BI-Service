@@ -26,7 +26,7 @@ const handleLogin = async () => {
   const result = await authStore.login(username.value, password.value, companyId.value)
 
   if (result.success) {
-    router.push('/dashboard')
+    router.push('/overview')
   } else {
     errorMsg.value = result.message
     isLoading.value = false

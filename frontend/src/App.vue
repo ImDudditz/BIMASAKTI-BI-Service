@@ -25,8 +25,21 @@ onMounted(async () => {
   }
   if (authStore.isAuthenticated) {
     await authStore.fetchPermissions()
+    if (router.currentRoute.value.path === '/' || router.currentRoute.value.path === '/login') {
+      router.push('/overview')
+    }
   }
 })
+
+// Navigate to /overview when the user logs in and becomes authenticated
+watch(
+  () => authStore.isAuthenticated,
+  (isAuth) => {
+    if (isAuth && (router.currentRoute.value.path === '/' || router.currentRoute.value.path === '/login')) {
+      router.push('/overview')
+    }
+  }
+)
 
 
 
@@ -67,7 +80,7 @@ const { isOpen, type, title, message, confirmText, cancelText, icon } = storeToR
 
 // --- SIDEBAR ACCORDION CONTROLS ---
 const expandedMenus = ref({
-  financials: true,
+  financials: false,
   tenancy: false,
   services: false
 })

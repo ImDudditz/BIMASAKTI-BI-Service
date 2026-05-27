@@ -100,12 +100,12 @@ router.beforeEach((to, _from) => {
   
   if (to.meta.requiresAdmin && !authStore.isAdmin) {
     // Redirect non-admins away from admin pages
-    return { name: 'Dashboard' }
+    return { name: 'Overview' }
   }
   
   if (to.name === 'Login' && authStore.isAuthenticated) {
     // Prevent logged-in users from seeing the login page
-    return { name: 'Dashboard' }
+    return { name: 'Overview' }
   }
 })
 

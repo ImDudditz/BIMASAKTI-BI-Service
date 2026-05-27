@@ -175,15 +175,5 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Dashboard
             var analyticsResult = await _dashboardAnalyticsService.GetOperationsMetricsAsync(databasePath, companyId);
             return Ok(analyticsResult);
         }
-
-        // --- 3. Property Maintenance Desk Status ---
-        [HttpGet("v1/dashboard/maintenance/status")]
-        public async Task<IActionResult> GetMaintenanceStatus([FromQuery(Name = "company_id")] string companyId = "ASHMD")
-        {
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
-
-            var analyticsResult = await _dashboardAnalyticsService.GetMaintenanceStatusAsync(databasePath, companyId);
-            return Ok(analyticsResult);
-        }
     }
 }

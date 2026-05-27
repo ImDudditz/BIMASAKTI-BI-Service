@@ -39,18 +39,33 @@ namespace BimasaktiReports.FinancialReports.Backend.Services
         public int Value { get; set; }
     }
 
+    public class TopAreaComplaintItem
+    {
+        public string Area { get; set; } = "";
+        public int ComplaintCount { get; set; }
+    }
+
+    public class TopTenantRequestItem
+    {
+        public string Tenant { get; set; } = "";
+        public string TopRequestType { get; set; } = "";
+        public int RequestCount { get; set; }
+    }
+
     public class MaintenanceStatusResponse
     {
         public int OpenTickets { get; set; }
         public int CriticalAlerts { get; set; }
         public List<EquipmentUptimeItem> EquipmentUptimePercent { get; set; } = new List<EquipmentUptimeItem>();
         public List<TicketCategoryItem> TicketsByCategory { get; set; } = new List<TicketCategoryItem>();
+        public List<TopAreaComplaintItem> TopAreaComplaints { get; set; } = new List<TopAreaComplaintItem>();
+        public List<TopTenantRequestItem> TopTenantRequests { get; set; } = new List<TopTenantRequestItem>();
     }
 
     public interface IsvcDashboardAnalyticsService
     {
         Task<OperationsMetricsResponse> GetOperationsMetricsAsync(string databasePath, string companyId);
-        Task<MaintenanceStatusResponse> GetMaintenanceStatusAsync(string databasePath, string companyId);
+        Task<MaintenanceStatusResponse> GetMaintenanceStatusAsync(string databasePath, string companyId, string? year = null, string? period = null);
     }
 
     public class svcDashboardAnalyticsService : IsvcDashboardAnalyticsService
@@ -176,7 +191,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Services
             }
         }
 
-        public async Task<MaintenanceStatusResponse> GetMaintenanceStatusAsync(string databasePath, string companyId)
+        public async Task<MaintenanceStatusResponse> GetMaintenanceStatusAsync(string databasePath, string companyId, string? year = null, string? period = null)
         {
             var defaultResponse = GetDefaultMaintenanceStatus();
 
@@ -223,11 +238,20 @@ namespace BimasaktiReports.FinancialReports.Backend.Services
                     string categoriesQuery = @"
                         SELECT sla_category_1, COUNT(*) 
                         FROM LMRX0800 
-                        WHERE sla_category_1 IS NOT NULL AND sla_category_1 != ''
-                        GROUP BY sla_category_1;";
+                        WHERE sla_category_1 IS NOT NULL AND sla_category_1 != ''";
+                    if (!string.IsNullOrEmpty(year) && !string.IsNullOrEmpty(period))
+                    {
+                        categoriesQuery += " AND strftime('%Y', call_date) = @year AND strftime('%m', call_date) = @period";
+                    }
+                    categoriesQuery += " GROUP BY sla_category_1;";
 
                     using (var command = new SqliteCommand(categoriesQuery, connection))
                     {
+                        if (!string.IsNullOrEmpty(year) && !string.IsNullOrEmpty(period))
+                        {
+                            command.Parameters.AddWithValue("@year", year);
+                            command.Parameters.AddWithValue("@period", period.PadLeft(2, '0'));
+                        }
                         using (var reader = await command.ExecuteReaderAsync())
                         {
                             while (await reader.ReadAsync())
@@ -252,12 +276,124 @@ namespace BimasaktiReports.FinancialReports.Backend.Services
                         ticketsByCategoryList = defaultResponse.TicketsByCategory;
                     }
 
+                    // 4. Fetch Top 5 Complaints by Area (building)
+                    var topAreaComplaintsList = new List<TopAreaComplaintItem>();
+                    string areaComplaintsQuery = @"
+                        SELECT 
+                            COALESCE(NULLIF(TRIM(building_name), ''), TRIM(building_id), 'Unknown') AS area, 
+                            COUNT(DISTINCT call_no) AS count 
+                        FROM LMRX0800 
+                        WHERE LOWER(category) = 'complaint'";
+                    if (!string.IsNullOrEmpty(year) && !string.IsNullOrEmpty(period))
+                    {
+                        areaComplaintsQuery += " AND strftime('%Y', call_date) = @year AND strftime('%m', call_date) = @period";
+                    }
+                    areaComplaintsQuery += @"
+                        GROUP BY building_id, building_name 
+                        ORDER BY count DESC 
+                        LIMIT 5;";
+
+                    using (var command = new SqliteCommand(areaComplaintsQuery, connection))
+                    {
+                        if (!string.IsNullOrEmpty(year) && !string.IsNullOrEmpty(period))
+                        {
+                            command.Parameters.AddWithValue("@year", year);
+                            command.Parameters.AddWithValue("@period", period.PadLeft(2, '0'));
+                        }
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                topAreaComplaintsList.Add(new TopAreaComplaintItem
+                                {
+                                    Area = reader.GetString(0).Trim(),
+                                    ComplaintCount = reader.GetInt32(1)
+                                });
+                            }
+                        }
+                    }
+
+                    if (topAreaComplaintsList.Count == 0)
+                    {
+                        topAreaComplaintsList = defaultResponse.TopAreaComplaints;
+                    }
+
+                    // 5. Fetch Top 5 Requests by Tenant
+                    var topTenantRequestsList = new List<TopTenantRequestItem>();
+                    string tenantRequestsQuery = @"
+                        SELECT 
+                            tenant_name, 
+                            COUNT(DISTINCT call_no) AS count 
+                        FROM LMRX0800 
+                        WHERE LOWER(category) = 'request' AND tenant_name IS NOT NULL AND TRIM(tenant_name) != '' AND tenant_name != 'Unknown'";
+                    if (!string.IsNullOrEmpty(year) && !string.IsNullOrEmpty(period))
+                    {
+                        tenantRequestsQuery += " AND strftime('%Y', call_date) = @year AND strftime('%m', call_date) = @period";
+                    }
+                    tenantRequestsQuery += @"
+                        GROUP BY tenant_name 
+                        ORDER BY count DESC 
+                        LIMIT 5;";
+
+                    using (var command = new SqliteCommand(tenantRequestsQuery, connection))
+                    {
+                        if (!string.IsNullOrEmpty(year) && !string.IsNullOrEmpty(period))
+                        {
+                            command.Parameters.AddWithValue("@year", year);
+                            command.Parameters.AddWithValue("@period", period.PadLeft(2, '0'));
+                        }
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                topTenantRequestsList.Add(new TopTenantRequestItem
+                                {
+                                    Tenant = reader.GetString(0).Trim(),
+                                    RequestCount = reader.GetInt32(1)
+                                });
+                            }
+                        }
+                    }
+
+                    // For each of the top tenants, fetch their primary request type
+                    foreach (var item in topTenantRequestsList)
+                    {
+                        string topTypeQuery = @"
+                            SELECT call_type_name 
+                            FROM LMRX0800 
+                            WHERE LOWER(category) = 'request' AND tenant_name = @tenantName";
+                        if (!string.IsNullOrEmpty(year) && !string.IsNullOrEmpty(period))
+                        {
+                            topTypeQuery += " AND strftime('%Y', call_date) = @year AND strftime('%m', call_date) = @period";
+                        }
+                        topTypeQuery += " GROUP BY call_type_name ORDER BY COUNT(DISTINCT call_no) DESC LIMIT 1;";
+
+                        using (var command = new SqliteCommand(topTypeQuery, connection))
+                        {
+                            command.Parameters.AddWithValue("@tenantName", item.Tenant);
+                            if (!string.IsNullOrEmpty(year) && !string.IsNullOrEmpty(period))
+                            {
+                                command.Parameters.AddWithValue("@year", year);
+                                command.Parameters.AddWithValue("@period", period.PadLeft(2, '0'));
+                            }
+                            var result = await command.ExecuteScalarAsync();
+                            item.TopRequestType = result != null && result != DBNull.Value ? result.ToString()!.Trim() : "General";
+                        }
+                    }
+
+                    if (topTenantRequestsList.Count == 0)
+                    {
+                        topTenantRequestsList = defaultResponse.TopTenantRequests;
+                    }
+
                     return new MaintenanceStatusResponse
                     {
                         OpenTickets = openTicketsCount,
                         CriticalAlerts = criticalAlertsCount,
                         EquipmentUptimePercent = defaultResponse.EquipmentUptimePercent,
-                        TicketsByCategory = ticketsByCategoryList
+                        TicketsByCategory = ticketsByCategoryList,
+                        TopAreaComplaints = topAreaComplaintsList,
+                        TopTenantRequests = topTenantRequestsList
                     };
                 }
             }
@@ -315,6 +451,22 @@ namespace BimasaktiReports.FinancialReports.Backend.Services
                     new TicketCategoryItem { Name = "Preventive Maint.", Value = 1853 },
                     new TicketCategoryItem { Name = "Civil / Structure", Value = 995 },
                     new TicketCategoryItem { Name = "Air Conditioning", Value = 206 }
+                },
+                TopAreaComplaints = new List<TopAreaComplaintItem>
+                {
+                    new TopAreaComplaintItem { Area = "North Wing", ComplaintCount = 14 },
+                    new TopAreaComplaintItem { Area = "South Tower", ComplaintCount = 12 },
+                    new TopAreaComplaintItem { Area = "East Wing", ComplaintCount = 8 },
+                    new TopAreaComplaintItem { Area = "West Annex", ComplaintCount = 6 },
+                    new TopAreaComplaintItem { Area = "Central Plaza", ComplaintCount = 4 }
+                },
+                TopTenantRequests = new List<TopTenantRequestItem>
+                {
+                    new TopTenantRequestItem { Tenant = "Starbucks Corp", TopRequestType = "Electrical", RequestCount = 18 },
+                    new TopTenantRequestItem { Tenant = "Zara Retail", TopRequestType = "Air Conditioning", RequestCount = 15 },
+                    new TopTenantRequestItem { Tenant = "Decathlon Store", TopRequestType = "Civil / Structure", RequestCount = 11 },
+                    new TopTenantRequestItem { Tenant = "Nike Store", TopRequestType = "Lighting Array", RequestCount = 9 },
+                    new TopTenantRequestItem { Tenant = "Apple Inc", TopRequestType = "General Service", RequestCount = 7 }
                 }
             };
         }

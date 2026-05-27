@@ -1,6 +1,5 @@
 # 🛠️ CleanStack Architect (Vibe Coding Edition)
 
-**Project:** BIMASAKTI Reports
 **Stack:** C# .NET Core (Backend) | React / Vue 3 / Plain HTML + CSS (Frontend) | Java (Side Framework) | SQLite (per-tenant)
 
 ## 🏛️ Architecture, Vibe & Standards

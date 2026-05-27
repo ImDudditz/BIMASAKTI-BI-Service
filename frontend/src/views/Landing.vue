@@ -101,7 +101,7 @@ const runSimulatedSync = () => {
 
 const handleActionClick = () => {
   if (authStore.isAuthenticated) {
-    router.push('/dashboard')
+    router.push('/overview')
   } else {
     router.push('/login')
   }
