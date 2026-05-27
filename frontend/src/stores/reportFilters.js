@@ -13,7 +13,7 @@ export const useReportFilterStore = defineStore('reportFilters', () => {
   const selectedYear = ref(sessionStorage.getItem('reportYear') || '')
   const selectedPeriod = ref(sessionStorage.getItem('reportPeriod') || '')
   const displayFormat = ref(sessionStorage.getItem('reportFormat') || '1')
-  const showBudget = ref(sessionStorage.getItem('reportShowBudget') === 'true')
+  const showBudget = ref(sessionStorage.getItem('reportShowBudget') !== 'false')
 
   const activePreset = ref(sessionStorage.getItem('reportActivePreset') || 'preset1')
   

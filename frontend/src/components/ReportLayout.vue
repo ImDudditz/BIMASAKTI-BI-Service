@@ -31,8 +31,8 @@ const router = useRouter()
               @change="event => router.push(event.target.value)"
               class="bg-white border border-[#95bfe9] rounded-lg px-3 py-1.5 text-xs font-black text-[#0c3c8c] focus:border-[#3b82f6] outline-none cursor-pointer shadow-sm transition-all"
             >
-              <option value="/balance-sheet">📑 Balance Sheet</option>
-              <option value="/income-statement">📊 Income Statement</option>
+              <option value="/balance-sheet">Balance Sheet</option>
+              <option value="/income-statement">Income Statement</option>
             </select>
           </div>
         </div>
