@@ -49,6 +49,7 @@ const isAuthPage = computed(() => {
 
 const activePageTitle = computed(() => {
   const path = router.currentRoute.value.path
+  if (path === '/overview') return 'Executive Business Overview'
   if (path === '/dashboard') return 'Property Management Dashboard'
   if (path === '/dashboard/operation') return 'Properties Operation Overview'
   if (path === '/dashboard/maintenance') return 'Service & Maintenance'
