@@ -2,7 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { RouterView, RouterLink, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import api from '@/services/api'
+
 import { useReportFilterStore } from './stores/reportFilters'
 import { useGlobalModalStore } from '@/stores/globalModal'
 import { useAuthStore } from '@/stores/auth'
@@ -13,7 +13,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const filterStore = useReportFilterStore()
-const { companyName, companyId, selectedYear, selectedPeriod, activePreset } = storeToRefs(filterStore)
+const { companyName, companyId } = storeToRefs(filterStore)
 
 onMounted(async () => {
   if (!document.getElementById('google-font-royale')) {
@@ -28,26 +28,7 @@ onMounted(async () => {
   }
 })
 
-// --- ROLE CONTROL PERMISSIONS ---
-const hasFinancialDashboard = computed(() => {
-  return authStore.isAdmin || ['kpi_cards', 'capital_growth', 'operating_cash_flow', 'revenue_budget', 'expense_budget'].some(k => authStore.userWidgets.includes(k))
-})
 
-const hasOperationDashboard = computed(() => {
-  return authStore.isAdmin || ['operation_metrics', 'lease_expirations'].some(k => authStore.userWidgets.includes(k))
-})
-
-const hasMaintenanceDashboard = computed(() => {
-  return authStore.isAdmin || ['tickets_kpi', 'maintenance_status', 'tickets_by_category'].some(k => authStore.userWidgets.includes(k))
-})
-
-const hasBalanceSheet = computed(() => {
-  return authStore.isAdmin || authStore.userReports.includes('balance_sheet')
-})
-
-const hasIncomeStatement = computed(() => {
-  return authStore.isAdmin || authStore.userReports.includes('income_statement')
-})
 
 const isAuthPage = computed(() => {
   return authStore.isAuthenticated && router.currentRoute.value.path !== '/' && router.currentRoute.value.path !== '/login'
@@ -62,17 +43,6 @@ const activePageTitle = computed(() => {
   if (path === '/income-statement') return 'Income Statement'
   if (path === '/settings') return 'Account Mapping Wizard'
   return 'Property Management Dashboard'
-})
-
-const activePageSubtitle = computed(() => {
-  const path = router.currentRoute.value.path
-  if (path === '/dashboard') return 'Financials & Operations Overview'
-  if (path === '/dashboard/operation') return 'Occupancy, Revenue & Operations'
-  if (path === '/dashboard/maintenance') return 'Tickets, Requests & Maintenance KPI'
-  if (path === '/balance-sheet') return 'Financial Position & Assets Ledger'
-  if (path === '/income-statement') return 'Revenue, Expenses & Net Profit'
-  if (path === '/settings') return 'Configure Accounts & Financial Groups'
-  return 'Financials & Operations Overview'
 })
 
 // --- DYNAMIC BROWSER TAB TITLE ---
@@ -93,7 +63,7 @@ watch(
 )
 
 const modalStore = useGlobalModalStore()
-const { isOpen, type, title, message, confirmText, cancelText, confirmColor, icon } = storeToRefs(modalStore)
+const { isOpen, type, title, message, confirmText, cancelText, icon } = storeToRefs(modalStore)
 
 // --- SIDEBAR ACCORDION CONTROLS ---
 const expandedMenus = ref({
@@ -142,153 +112,6 @@ const handleLogout = async () => {
   // and update the Pinia auth state before attempting the redirect.
   await authStore.logout()
   router.push('/')
-}
-
-// --- GLOBAL EXCEL EXPORT LOGIC ---
-const monthNames = {
-  "01": "January", "02": "February", "03": "March", "04": "April",
-  "05": "May", "06": "June", "07": "July", "08": "August",
-  "09": "September", "10": "October", "11": "November", "12": "December"
-}
-
-const fetchLedger = async (y, p) => {
-  try {
-    const res = await api.get('/reports/ledger', { 
-      params: { year: y, period: p, preset: activePreset.value, company_id: companyId.value } 
-    })
-    if (res.data.status === 'success') {
-      return { structure: res.data.data, netIncome: res.data.net_income || 0 }
-    }
-  } catch (err) { console.error("Export API Error:", err) }
-  return { structure: {}, netIncome: 0 }
-}
-
-// Runs an array of async factory functions in sequential batches of `size`
-const chunkFetch = async (factories, size = 4) => {
-  const results = []
-  for (let i = 0; i < factories.length; i += size) {
-    const batch = factories.slice(i, i + size).map(fn => fn())
-    const batchResults = await Promise.all(batch)
-    results.push(...batchResults)
-  }
-  return results
-}
-
-const buildExportPayload = async () => {
-  const y = parseInt(selectedYear.value)
-  const p = parseInt(selectedPeriod.value)
-  
-  let lastMoP = p - 1
-  let lastMoY = y
-  if (lastMoP === 0) { lastMoP = 12; lastMoY = y - 1 }
-  
-  const pStr = p.toString().padStart(2, '0')
-  const lastMoPStr = lastMoP.toString().padStart(2, '0')
-
-  const basePromises = [
-    fetchLedger(y.toString(), pStr),
-    fetchLedger(lastMoY.toString(), lastMoPStr),
-    fetchLedger((y - 1).toString(), pStr)
-  ]
-  
-  const qFactories = [
-    () => fetchLedger(y.toString(), '03'), () => fetchLedger(y.toString(), '06'),
-    () => fetchLedger(y.toString(), '09'), () => fetchLedger(y.toString(), '12')
-  ]
-  
-  const yFactories = Array.from({length: 12}, (_, i) => () => fetchLedger(y.toString(), (i+1).toString().padStart(2, '0')))
-
-  const [curr, prevMo, prevYr] = await Promise.all(basePromises)
-  const quarterlyData = await chunkFetch(qFactories, 4)
-  const yearlyData = await chunkFetch(yFactories, 4)
-
-  return {
-    currData: curr,
-    prevMoData: prevMo,
-    prevYrData: prevYr,
-    quarterlyData: quarterlyData,
-    yearlyData: yearlyData,
-    company: companyName.value,
-    year: selectedYear.value,
-    periodName: monthNames[pStr],
-    lastMonthName: monthNames[lastMoPStr],
-    lastMonthYear: lastMoY.toString(),
-    lastYearName: monthNames[pStr],
-    lastYearYear: (y - 1).toString(),
-    pStr
-  }
-}
-
-const triggerExcelExport = async () => {
-  if (!selectedYear.value || !selectedPeriod.value) {
-    modalStore.showAlert('Missing Filters', 'Please ensure a Year and Period are selected.', true)
-    return
-  }
-
-  modalStore.showAlert('Exporting...', 'Compiling your global financial report. This may take a few moments as we gather quarterly and yearly data.', false)
-
-  try {
-    const payload = await buildExportPayload()
-    const pStr = payload.pStr
-    delete payload.pStr
-
-    const response = await api.post('/export/excel', payload, {
-      responseType: 'blob' 
-    })
-    
-    const filename = `${companyName.value}_${monthNames[pStr]}_${selectedYear.value}.xlsx`.replace(/ /g, '_')
-    
-    const url = window.URL.createObjectURL(new Blob([response.data]))
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', filename)
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
-    window.URL.revokeObjectURL(url) 
-    
-    modalStore.closeModal()
-
-  } catch (error) {
-    console.error("Global Export Failed:", error)
-    modalStore.showAlert('Export Failed', 'The server could not generate the Excel file. Please try again.', true)
-  }
-}
-
-const triggerPdfExport = async () => {
-  if (!selectedYear.value || !selectedPeriod.value) {
-    modalStore.showAlert('Missing Filters', 'Please ensure a Year and Period are selected.', true)
-    return
-  }
-
-  modalStore.showAlert('Exporting...', 'Compiling your global financial report. This may take a few moments as we gather quarterly and yearly data.', false)
-
-  try {
-    const payload = await buildExportPayload()
-    const pStr = payload.pStr
-    delete payload.pStr
-
-    const response = await api.post('/export/pdf', payload, {
-      responseType: 'blob' 
-    })
-    
-    const filename = `${companyName.value}_${monthNames[pStr]}_${selectedYear.value}.pdf`.replace(/ /g, '_')
-    
-    const url = window.URL.createObjectURL(new Blob([response.data]))
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', filename)
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
-    window.URL.revokeObjectURL(url) 
-    
-    modalStore.closeModal()
-
-  } catch (error) {
-    console.error("Global Export Failed:", error)
-    modalStore.showAlert('Export Failed', 'The server could not generate the PDF file. Please try again.', true)
-  }
 }
 </script>
 

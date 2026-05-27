@@ -1,4 +1,5 @@
 <script setup>
+defineOptions({ name: 'OverviewDashboard' })
 import ReportLayout from '@/components/ReportLayout.vue'
 </script>
 

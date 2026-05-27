@@ -9,7 +9,7 @@ import ReportLayout from '@/components/ReportLayout.vue'
 const modalStore = useGlobalModalStore()
 
 const filterStore = useReportFilterStore()
-const { companyId, companyName, activePreset, presetNames, accountMappings } = storeToRefs(filterStore)
+const { companyId, activePreset, presetNames, accountMappings } = storeToRefs(filterStore)
 
 const isLoading = ref(false)
 const accounts = ref([]) 

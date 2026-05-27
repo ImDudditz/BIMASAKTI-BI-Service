@@ -46,11 +46,6 @@ const getGroupBudget = (group) => {
   return group.items.reduce((s, i) => s + (i.end_budget || 0), 0);
 }
 
-const getSectionBudget = (section) => {
-  if (!section || !section.groups) return 0;
-  return Object.values(section.groups).reduce((s, g) => s + getGroupBudget(g), 0);
-}
-
 const format1BudgetTotals = computed(() => {
   const curr = multiReports.value.curr;
   const res = {

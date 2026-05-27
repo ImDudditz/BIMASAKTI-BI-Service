@@ -1,4 +1,5 @@
 <script setup>
+defineOptions({ name: 'LandingPage' })
 import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -17,7 +18,7 @@ const activeTab = ref('accounting') // 'accounting', 'tenant'
 const syncing = ref(false)
 const syncProgress = ref(0)
 const syncCount = ref(1482)
-const activeBarIndex = ref(null)
+
 
 // High-fidelity Accounting Mockup States
 const totalInvoiced = ref(842.1)
@@ -35,16 +36,7 @@ const initialLogs = [
 const terminalLogs = ref([...initialLogs])
 const terminalRef = ref(null)
 
-// Mock data for weekly sync bars
-const weeklySyncData = ref([
-  { day: 'Mon', value: 420, active: false },
-  { day: 'Tue', value: 580, active: false },
-  { day: 'Wed', value: 810, active: false },
-  { day: 'Thu', value: 690, active: false },
-  { day: 'Fri', value: 920, active: false },
-  { day: 'Sat', value: 310, active: false },
-  { day: 'Sun', value: 450, active: false }
-])
+
 
 // Simulated continuous background activities
 let backgroundLogInterval = null

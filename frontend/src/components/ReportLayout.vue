@@ -1,6 +1,5 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
 
 defineProps({
   title: { type: String, required: true },
@@ -8,12 +7,6 @@ defineProps({
 })
 
 const router = useRouter()
-const authStore = useAuthStore()
-
-const handleLogout = async () => {
-  await authStore.logout()
-  router.push('/')
-}
 </script>
 
 <template>

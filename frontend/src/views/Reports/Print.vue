@@ -1,4 +1,5 @@
 <script setup>
+defineOptions({ name: 'PrintReport' })
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import api from '@/services/api'
