@@ -9,6 +9,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using BimasaktiReports.FinancialReports.Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BimasaktiReports.FinancialReports.Backend.Engines.Reports
 {
@@ -21,14 +22,15 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Reports
         public JsonNode Data { get; set; } = new JsonObject();
     }
 
+    [Authorize]
     [ApiController]
     [Route("api")]
-    public class rpGlrx0310 : ControllerBase
+    public class rpGlrx0310Controller : ControllerBase
     {
         private readonly IsvcGLRX0310 _ledgerService;
         private readonly IsvcDatabaseSyncService _syncService;
 
-        public rpGlrx0310(IsvcGLRX0310 ledgerService, IsvcDatabaseSyncService syncService)
+        public rpGlrx0310Controller(IsvcGLRX0310 ledgerService, IsvcDatabaseSyncService syncService)
         {
             _ledgerService = ledgerService;
             _syncService = syncService;
@@ -36,8 +38,12 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Reports
 
         // --- 1. Available Filters ---
         [HttpGet("filters")]
-        public async Task<IActionResult> GetFilters([FromQuery(Name = "company_id")] string companyId = "ASHMD")
+        public async Task<IActionResult> GetFilters()
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
             if (!System.IO.File.Exists(databasePath))
@@ -120,16 +126,20 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Reports
                     company_name = companyNameString
                 });
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                return Ok(new { status = "error", message = exception.Message });
+                return Ok(new { status = "error", message = "An unexpected system error occurred." });
             }
         }
 
         // --- 2. Chart of Accounts (COA) ---
         [HttpGet("reports/coa")]
-        public async Task<IActionResult> GetChartOfAccounts([FromQuery(Name = "company_id")] string companyId = "ASHMD")
+        public async Task<IActionResult> GetChartOfAccounts()
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
             var chartOfAccountsList = new List<object>();
 
@@ -169,8 +179,12 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Reports
 
         // --- 3. COA Mappings presets ---
         [HttpGet("mappings")]
-        public async Task<IActionResult> GetMappings([FromQuery(Name = "company_id")] string companyId, [FromQuery] string preset)
+        public async Task<IActionResult> GetMappings([FromQuery] string preset)
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
             
             try
@@ -214,18 +228,32 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Reports
         [HttpPost("mappings")]
         public async Task<IActionResult> SaveMappings([FromBody] MappingSpecification mappingRequest)
         {
-            string databasePath = svcDbUtils.GetSafeDbPath(mappingRequest.CompanyId);
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+            mappingRequest.CompanyId = companyId; // Force override with trusted claim
+
+            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
             try
             {
                 string configDirectory = Path.GetDirectoryName(databasePath)!;
                 string preset = mappingRequest.Preset;
+                
+                // Security: Prevent writing to arbitrary config files (DoS / Path Traversal)
+                if (preset == null || (!preset.Equals("preset1", StringComparison.OrdinalIgnoreCase) && 
+                                       !preset.Equals("preset2", StringComparison.OrdinalIgnoreCase) && 
+                                       !preset.Equals("preset3", StringComparison.OrdinalIgnoreCase)))
+                {
+                    return BadRequest(new { status = "error", message = "Invalid preset specified. Must be preset1, preset2, or preset3." });
+                }
+                
                 string normalizedPreset = preset;
                 if (preset.StartsWith("preset", StringComparison.OrdinalIgnoreCase) && preset.Length > 6)
                 {
                     normalizedPreset = "Preset" + preset.Substring(6);
                 }
-                string presetJsonPath = Path.Combine(configDirectory, $"{mappingRequest.CompanyId.ToUpperInvariant()}_{normalizedPreset}.json");
+                string presetJsonPath = Path.Combine(configDirectory, $"{companyId.ToUpperInvariant()}_{normalizedPreset}.json");
 
                 var incomingDict = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(mappingRequest.Data.ToJsonString()) 
                                    ?? new Dictionary<string, Dictionary<string, string>>();
@@ -413,13 +441,26 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Reports
         }
 
         [HttpDelete("mappings")]
-        public async Task<IActionResult> DeleteMapping([FromQuery(Name = "company_id")] string companyId, [FromQuery] string preset)
+        public async Task<IActionResult> DeleteMapping([FromQuery] string preset)
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
             try
             {
                 string configDirectory = Path.GetDirectoryName(databasePath)!;
+                
+                // Security: Prevent arbitrary config deletion
+                if (preset == null || (!preset.Equals("preset1", StringComparison.OrdinalIgnoreCase) && 
+                                       !preset.Equals("preset2", StringComparison.OrdinalIgnoreCase) && 
+                                       !preset.Equals("preset3", StringComparison.OrdinalIgnoreCase)))
+                {
+                    return BadRequest(new { status = "error", message = "Invalid preset specified." });
+                }
+
                 string normalizedPreset = preset;
                 if (preset.StartsWith("preset", StringComparison.OrdinalIgnoreCase) && preset.Length > 6)
                 {
@@ -518,16 +559,20 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Reports
 
                 return Ok(new { status = "success" });
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                return StatusCode(500, new { status = "error", message = exception.Message });
+                return StatusCode(500, new { status = "error", message = "An unexpected system error occurred." });
             }
         }
 
         // --- 4. COA Preset Names ---
         [HttpGet("preset-names")]
-        public async Task<IActionResult> GetPresetNames([FromQuery(Name = "company_id")] string companyId)
+        public async Task<IActionResult> GetPresetNames()
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+
             var defaultPresetNames = new Dictionary<string, string>
             {
                 { "preset1", "Preset 1" },
@@ -569,7 +614,12 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Reports
         [HttpPost("preset-names")]
         public async Task<IActionResult> SavePresetNames([FromBody] MappingSpecification mappingRequest)
         {
-            string databasePath = svcDbUtils.GetSafeDbPath(mappingRequest.CompanyId);
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+            mappingRequest.CompanyId = companyId;
+
+            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
             try
             {
@@ -602,9 +652,9 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Reports
 
                 return Ok(new { status = "success" });
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                return StatusCode(500, new { status = "error", message = exception.Message });
+                return StatusCode(500, new { status = "error", message = "An unexpected system error occurred." });
             }
         }
 
@@ -613,9 +663,12 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Reports
         public async Task<IActionResult> GetLedgerReport(
             [FromQuery] string? year = null,
             [FromQuery] string? period = null,
-            [FromQuery] string preset = "preset1",
-            [FromQuery(Name = "company_id")] string companyId = "ASHMD")
+            [FromQuery] string preset = "preset1")
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
             var responseResult = await _ledgerService.GenerateLedgerReportAsync(databasePath, year, period, preset, companyId);
@@ -636,8 +689,12 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Reports
 
         // --- 6. Database Synchronization ---
         [HttpPost("sync")]
-        public async Task<IActionResult> SyncDatabase([FromQuery(Name = "company_id")] string companyId = "ASHMD")
+        public async Task<IActionResult> SyncDatabase()
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+
             var result = await _syncService.SyncCompanyDatabaseAsync(companyId);
             if (!result.Success)
             {

@@ -3,16 +3,18 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using BimasaktiReports.FinancialReports.Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BimasaktiReports.FinancialReports.Backend.Engines.Dashboard
 {
+    [Authorize]
     [ApiController]
     [Route("api")]
-    public class dsLMRX0800 : ControllerBase
+    public class dsLMRX0800Controller : ControllerBase
     {
         private readonly IsvcDashboardAnalyticsService _dashboardAnalyticsService;
 
-        public dsLMRX0800(IsvcDashboardAnalyticsService dashboardAnalyticsService)
+        public dsLMRX0800Controller(IsvcDashboardAnalyticsService dashboardAnalyticsService)
         {
             _dashboardAnalyticsService = dashboardAnalyticsService;
         }
@@ -20,10 +22,13 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Dashboard
         // --- Property Maintenance Desk Status ---
         [HttpGet("v1/dashboard/maintenance/status")]
         public async Task<IActionResult> GetMaintenanceStatus(
-            [FromQuery(Name = "company_id")] string companyId = "ASHMD",
             [FromQuery] string? year = null,
             [FromQuery] string? period = null)
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
             var analyticsResult = await _dashboardAnalyticsService.GetMaintenanceStatusAsync(databasePath, companyId, year, period);

@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace BimasaktiReports.FinancialReports.Backend.Engines
 {
@@ -33,9 +35,10 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
     // --- MAIN API CLASS ---
 
+    [Authorize]
     [ApiController]
     [Route("api")]
-    public class dsAdminDashboard : ControllerBase
+    public class dsAdminDashboardController : ControllerBase
     {
         // Helper to enforce admin check
         private async Task<User?> RequireAdmin(TenantDbContext dbContext, string username, string companyId)
@@ -51,10 +54,18 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
         // --- 1. User Dashboard Widgets ---
 
         [HttpGet("dashboard/my-widgets")]
-        public async Task<IActionResult> GetUserWidgets(
-            [FromQuery(Name = "company_id")] string companyId,
-            [FromQuery] string username)
+        public async Task<IActionResult> GetUserWidgets()
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            var usernameClaim = HttpContext.User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(companyIdClaim) || string.IsNullOrEmpty(usernameClaim))
+            {
+                return Unauthorized(new { detail = "Invalid token claims" });
+            }
+
+            string companyId = companyIdClaim.ToUpperInvariant();
+            string username = usernameClaim;
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
             try
@@ -90,17 +101,25 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
                     }));
                 }
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                return StatusCode(500, new { detail = exception.Message });
+                return StatusCode(500, new { detail = "An unexpected system error occurred." });
             }
         }
 
         [HttpGet("dashboard/my-reports")]
-        public async Task<IActionResult> GetUserReports(
-            [FromQuery(Name = "company_id")] string companyId,
-            [FromQuery] string username)
+        public async Task<IActionResult> GetUserReports()
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            var usernameClaim = HttpContext.User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(companyIdClaim) || string.IsNullOrEmpty(usernameClaim))
+            {
+                return Unauthorized(new { detail = "Invalid token claims" });
+            }
+
+            string companyId = companyIdClaim.ToUpperInvariant();
+            string username = usernameClaim;
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
             try
@@ -143,10 +162,18 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
         [HttpPost("dashboard/my-widgets")]
         public async Task<IActionResult> UpdateUserWidgets(
-            [FromQuery(Name = "company_id")] string companyId,
-            [FromQuery] string username,
             [FromBody] List<WidgetLayoutSpecification> widgets)
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            var usernameClaim = HttpContext.User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(companyIdClaim) || string.IsNullOrEmpty(usernameClaim))
+            {
+                return Unauthorized(new { detail = "Invalid token claims" });
+            }
+
+            string companyId = companyIdClaim.ToUpperInvariant();
+            string username = usernameClaim;
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
             try
@@ -199,10 +226,17 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
         // --- 2. Admin Users list ---
 
         [HttpGet("admin/users")]
-        public async Task<IActionResult> GetAdminUsers(
-            [FromQuery(Name = "company_id")] string companyId,
-            [FromQuery(Name = "admin_username")] string adminUsername)
+        public async Task<IActionResult> GetAdminUsers()
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            var adminUsername = HttpContext.User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(companyIdClaim) || string.IsNullOrEmpty(adminUsername))
+            {
+                return Unauthorized(new { detail = "Invalid token claims" });
+            }
+
+            string companyId = companyIdClaim.ToUpperInvariant();
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
             try
@@ -231,10 +265,17 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
         [HttpGet("admin/users/{userIdParameter}/permissions")]
         public async Task<IActionResult> GetUserPermissions(
-            [FromRoute] int userIdParameter,
-            [FromQuery(Name = "company_id")] string companyId,
-            [FromQuery(Name = "admin_username")] string adminUsername)
+            [FromRoute] int userIdParameter)
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            var adminUsername = HttpContext.User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(companyIdClaim) || string.IsNullOrEmpty(adminUsername))
+            {
+                return Unauthorized(new { detail = "Invalid token claims" });
+            }
+
+            string companyId = companyIdClaim.ToUpperInvariant();
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
             try
@@ -274,10 +315,17 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
         [HttpPost("admin/users/{userIdParameter}/permissions")]
         public async Task<IActionResult> UpdateUserPermissions(
             [FromRoute] int userIdParameter,
-            [FromBody] PermissionSettingsSpecification permissionSettings,
-            [FromQuery(Name = "company_id")] string companyId,
-            [FromQuery(Name = "admin_username")] string adminUsername)
+            [FromBody] PermissionSettingsSpecification permissionSettings)
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            var adminUsername = HttpContext.User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(companyIdClaim) || string.IsNullOrEmpty(adminUsername))
+            {
+                return Unauthorized(new { detail = "Invalid token claims" });
+            }
+
+            string companyId = companyIdClaim.ToUpperInvariant();
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
             try
@@ -371,9 +419,9 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
                 return File(pdfStream, "application/pdf", filename);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                return StatusCode(500, new { detail = exception.Message });
+                return StatusCode(500, new { detail = "An unexpected system error occurred." });
             }
         }
     }

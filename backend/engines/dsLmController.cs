@@ -3,12 +3,14 @@ using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BimasaktiReports.FinancialReports.Backend.Engines
 {
+    [Authorize]
     [ApiController]
     [Route("api/engine/lm")]
-    public class dsLm : ControllerBase
+    public class dsLmController : ControllerBase
     {
         public class TicketSummaryRecord
         {

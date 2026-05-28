@@ -69,6 +69,36 @@ namespace BimasaktiReports.FinancialReports.Backend.Services
 
                     if (string.IsNullOrEmpty(url)) continue;
 
+                    // SSRF Protection: Validate URI scheme and prevent loopback/local requests
+                    if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? parsedUri))
+                    {
+                        logMessage("ERROR", $"Invalid URL format: {url}");
+                        continue;
+                    }
+                    if (parsedUri.Scheme != Uri.UriSchemeHttps)
+                    {
+                        logMessage("ERROR", $"Insecure URL scheme rejected. Only HTTPS is allowed: {url}");
+                        continue;
+                    }
+                    
+                    bool isPrivateOrLocal = parsedUri.IsLoopback || parsedUri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase) || parsedUri.Host.Equals("169.254.169.254");
+                    if (parsedUri.HostNameType == UriHostNameType.IPv4 && System.Net.IPAddress.TryParse(parsedUri.Host, out var ipAddress))
+                    {
+                        var ipBytes = ipAddress.GetAddressBytes();
+                        if (ipBytes[0] == 10 || 
+                            (ipBytes[0] == 172 && ipBytes[1] >= 16 && ipBytes[1] <= 31) || 
+                            (ipBytes[0] == 192 && ipBytes[1] == 168))
+                        {
+                            isPrivateOrLocal = true;
+                        }
+                    }
+
+                    if (isPrivateOrLocal)
+                    {
+                        logMessage("ERROR", $"Blocked request to internal/local address: {parsedUri.Host}");
+                        continue;
+                    }
+
                     logMessage("INFO", $"Processing table: {tableName} from URL: {url}");
 
                     try

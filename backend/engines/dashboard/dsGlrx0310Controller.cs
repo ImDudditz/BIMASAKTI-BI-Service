@@ -9,25 +9,31 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using BimasaktiReports.FinancialReports.Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BimasaktiReports.FinancialReports.Backend.Engines.Dashboard
 {
+    [Authorize]
     [ApiController]
     [Route("api")]
-    public class dsGlrx0310 : ControllerBase
+    public class dsGlrx0310Controller : ControllerBase
     {
         private readonly IsvcDashboardAnalyticsService _dashboardAnalyticsService;
         private static readonly HttpClient HttpClientInstance = new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
 
-        public dsGlrx0310(IsvcDashboardAnalyticsService dashboardAnalyticsService)
+        public dsGlrx0310Controller(IsvcDashboardAnalyticsService dashboardAnalyticsService)
         {
             _dashboardAnalyticsService = dashboardAnalyticsService;
         }
 
         // --- 1. Dynamic Azure Data Sync ---
         [HttpPost("dev-load-data")]
-        public async Task<IActionResult> LoadDataOnce([FromQuery(Name = "company_id")] string companyId = "ASHMD")
+        public async Task<IActionResult> LoadDataOnce()
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
             string configDirectory = Path.GetDirectoryName(databasePath)!;
             string configFilePath = Path.Combine(configDirectory, $"{companyId}_config.json");
@@ -160,16 +166,20 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Dashboard
                     details = syncResults
                 });
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                return Ok(new { status = "error", message = exception.Message });
+                return Ok(new { status = "error", message = "An unexpected system error occurred." });
             }
         }
 
         // --- 2. Property Operations Desk Metrics ---
         [HttpGet("v1/dashboard/operation/metrics")]
-        public async Task<IActionResult> GetOperationsMetrics([FromQuery(Name = "company_id")] string companyId = "ASHMD")
+        public async Task<IActionResult> GetOperationsMetrics()
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
             var analyticsResult = await _dashboardAnalyticsService.GetOperationsMetricsAsync(databasePath, companyId);

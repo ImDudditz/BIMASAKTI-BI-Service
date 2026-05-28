@@ -1,4 +1,6 @@
 import axios from 'axios'
+import router from '@/router'
+import { useAuthStore } from '@/stores/auth'
 
 // 1. Dynamically determine the backend URL based on environment mode
 // In development, we use Vite's server proxy on '/api' to avoid SSL certificate trust issues on different ports.
@@ -17,11 +19,24 @@ const api = axios.create({
   }
 })
 
-// Add an interceptor to catch global errors
+// Add an interceptor to catch global errors and handle session expiration redirects
 api.interceptors.response.use(
   response => response,
-  error => {
+  async error => {
     console.error("API Engine Error:", error)
+    
+    if (error.response && error.response.status === 401) {
+      try {
+        const authStore = useAuthStore()
+        await authStore.logout()
+      } catch (storeError) {
+        console.error("Failed to clear auth state on 401:", storeError)
+      }
+      
+      // Kick back to Landing Page
+      router.push('/')
+    }
+    
     return Promise.reject(error)
   }
 )

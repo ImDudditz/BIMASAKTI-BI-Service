@@ -3,25 +3,30 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using BimasaktiReports.FinancialReports.Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BimasaktiReports.FinancialReports.Backend.Engines.Dashboard
 {
+    [Authorize]
     [ApiController]
     [Route("api")]
-    public class dsCBRX7000 : ControllerBase
+    public class dsCBRX7000Controller : ControllerBase
     {
         private readonly IsvcCBRX7000 _cashFlowService;
 
-        public dsCBRX7000(IsvcCBRX7000 cashFlowService)
+        public dsCBRX7000Controller(IsvcCBRX7000 cashFlowService)
         {
             _cashFlowService = cashFlowService;
         }
 
         [HttpGet("v1/dashboard/cashbook/cashflow")]
         public async Task<IActionResult> GetOperatingCashflow(
-            [FromQuery(Name = "company_id")] string companyId = "ASHMD",
             [FromQuery] string? year = null)
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
             if (!System.IO.File.Exists(databasePath))
@@ -39,9 +44,9 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines.Dashboard
                 var result = await _cashFlowService.GetOperatingCashFlowAsync(databasePath, year);
                 return Ok(result);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, new { status = "error", message = ex.Message });
+                return StatusCode(500, new { status = "error", message = "An unexpected system error occurred." });
             }
         }
     }
