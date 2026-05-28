@@ -72,8 +72,6 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
             {
                 using (var dbContext = new TenantDbContext(databasePath))
                 {
-                    await dbContext.Database.EnsureCreatedAsync();
-
                     var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == username && u.CompanyId == companyId);
                     if (user == null)
                     {
@@ -126,8 +124,6 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
             {
                 using (var dbContext = new TenantDbContext(databasePath))
                 {
-                    await dbContext.Database.EnsureCreatedAsync();
-
                     var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == username && u.CompanyId == companyId);
                     if (user == null)
                     {
@@ -180,8 +176,6 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
             {
                 using (var dbContext = new TenantDbContext(databasePath))
                 {
-                    await dbContext.Database.EnsureCreatedAsync();
-
                     var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == username && u.CompanyId == companyId);
                     if (user == null)
                     {
@@ -243,8 +237,6 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
             {
                 using (var dbContext = new TenantDbContext(databasePath))
                 {
-                    await dbContext.Database.EnsureCreatedAsync();
-
                     var adminUser = await RequireAdmin(dbContext, adminUsername, companyId);
                     if (adminUser == null)
                     {
@@ -282,8 +274,6 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
             {
                 using (var dbContext = new TenantDbContext(databasePath))
                 {
-                    await dbContext.Database.EnsureCreatedAsync();
-
                     var adminUser = await RequireAdmin(dbContext, adminUsername, companyId);
                     if (adminUser == null)
                     {
@@ -332,8 +322,6 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
             {
                 using (var dbContext = new TenantDbContext(databasePath))
                 {
-                    await dbContext.Database.EnsureCreatedAsync();
-
                     var adminUser = await RequireAdmin(dbContext, adminUsername, companyId);
                     if (adminUser == null)
                     {

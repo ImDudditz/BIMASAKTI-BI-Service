@@ -9,6 +9,25 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
         // Equivalent to os.path.dirname(os.path.abspath(__file__))
         private static readonly string BaseDir = AppContext.BaseDirectory;
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> CheckedPaths = new();
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> SchemaInitializedDbs = new();
+
+        public static void EnsureSchemaInitialized(string databasePath)
+        {
+            if (SchemaInitializedDbs.ContainsKey(databasePath)) return;
+
+            try
+            {
+                using (var dbContext = new TenantDbContext(databasePath))
+                {
+                    dbContext.Database.EnsureCreated();
+                }
+                SchemaInitializedDbs.TryAdd(databasePath, true);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DB] Warning: Failed to initialize schema for {databasePath}: {ex.Message}");
+            }
+        }
 
         public static string GetSafeDbPath(string companyId, string suffix = "")
         {
@@ -86,6 +105,9 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
                     {
                         try
                         {
+                            // Clear connection pool to release file handles before delete/move operations
+                            Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+
                             bool shouldSwap = false;
                             if (!File.Exists(targetDb))
                             {
@@ -123,7 +145,14 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
             }
 
             string filename = $"{safeId}{suffix}.db";
-            return Path.Combine(dirPath, filename);
+            string dbPath = Path.Combine(dirPath, filename);
+
+            if (string.IsNullOrEmpty(suffix))
+            {
+                EnsureSchemaInitialized(dbPath);
+            }
+
+            return dbPath;
         }
 
         public static string GetGlrxTableName(string databasePath)

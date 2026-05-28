@@ -103,7 +103,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Services
 
                     try
                     {
-                        var response = await HttpClient.GetAsync(url);
+                        using var response = await HttpClient.GetAsync(url);
                         response.EnsureSuccessStatusCode();
                         string jsonContent = await response.Content.ReadAsStringAsync();
 

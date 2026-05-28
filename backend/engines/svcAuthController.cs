@@ -8,6 +8,7 @@ using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using BimasaktiReports.FinancialReports.Backend.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace BimasaktiReports.FinancialReports.Backend.Engines
 {
@@ -20,13 +21,16 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
     public class svcAuthController : ControllerBase
     {
         private readonly IsvcAuthenticationService _authenticationService;
+        private readonly IConfiguration _configuration;
         private static readonly string SecretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new InvalidOperationException("JWT_SECRET is missing.");
 
-        private const int AccessTokenExpireMinutes = 15;
+        private int AccessTokenExpireMinutes => _configuration.GetValue<int>("Jwt:AccessTokenExpireMinutes", 15);
+        private int CookieExpireHours => _configuration.GetValue<int>("Jwt:CookieExpireHours", 1);
 
-        public svcAuthController(IsvcAuthenticationService authenticationService)
+        public svcAuthController(IsvcAuthenticationService authenticationService, IConfiguration configuration)
         {
             _authenticationService = authenticationService;
+            _configuration = configuration;
         }
 
         public class LoginSpecification
@@ -51,9 +55,6 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
 
                 using (var dbContext = new TenantDbContext(databasePath))
                 {
-                    // Equivalent to SQLAlchemy's create_all
-                    await dbContext.Database.EnsureCreatedAsync();
-
                     var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Username.ToUpper() == loginRequest.Username.ToUpper());
 
                     // Normal authentication with strict guard clause early return
@@ -121,7 +122,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
                         HttpOnly = true,
                         Secure = true,
                         SameSite = SameSiteMode.Lax,
-                        MaxAge = TimeSpan.FromHours(1),
+                        MaxAge = TimeSpan.FromHours(CookieExpireHours),
                         Path = "/"
                     });
 

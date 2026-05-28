@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.Configuration;
+using BimasaktiReports.FinancialReports.Backend.Engines;
+using Microsoft.EntityFrameworkCore;
 
 namespace BimasaktiReports.FinancialReports.Backend
 {
@@ -126,6 +129,9 @@ namespace BimasaktiReports.FinancialReports.Backend
             builder.Services.AddSwaggerGen();
 
             // 1.5 Register Authentication
+            int accessTokenExpireMinutes = builder.Configuration.GetValue<int>("Jwt:AccessTokenExpireMinutes", 15);
+            int cookieExpireHours = builder.Configuration.GetValue<int>("Jwt:CookieExpireHours", 1);
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -146,7 +152,7 @@ namespace BimasaktiReports.FinancialReports.Backend
                 // Extract token from HttpOnly cookie and renew if mathematically valid but expired
                 options.Events = new JwtBearerEvents
                 {
-                    OnMessageReceived = context =>
+                    OnMessageReceived = async context =>
                     {
                         if (context.Request.Cookies.ContainsKey("access_token"))
                         {
@@ -181,8 +187,24 @@ namespace BimasaktiReports.FinancialReports.Backend
                                             claimMap[claim.Type] = claim.Value;
                                         }
 
+                                        // SECURITY: Verify if the user account still exists and is active in the database
+                                        if (claimMap.TryGetValue(System.Security.Claims.ClaimTypes.Name, out var username) &&
+                                            claimMap.TryGetValue("company_id", out var userCompanyId))
+                                        {
+                                            string userDbPath = svcDbUtils.GetSafeDbPath(userCompanyId);
+                                            using (var dbContext = new TenantDbContext(userDbPath))
+                                            {
+                                                var dbUser = await dbContext.Users.FirstOrDefaultAsync(u => u.Username.ToUpper() == username.ToUpper() && u.CompanyId.ToUpper() == userCompanyId.ToUpper());
+                                                if (dbUser == null || !dbUser.IsActive)
+                                                {
+                                                    context.Fail("User account is deactivated or does not exist.");
+                                                    return;
+                                                }
+                                            }
+                                        }
+
                                         var authService = context.HttpContext.RequestServices.GetRequiredService<IsvcAuthenticationService>();
-                                        string newJsonWebToken = authService.CreateAccessToken(claimMap, secretKey, 15);
+                                        string newJsonWebToken = authService.CreateAccessToken(claimMap, secretKey, accessTokenExpireMinutes);
 
                                         // Append renewed token back to cookies with 1 hour lifetime
                                         context.Response.Cookies.Append("access_token", newJsonWebToken, new CookieOptions
@@ -190,7 +212,7 @@ namespace BimasaktiReports.FinancialReports.Backend
                                             HttpOnly = true,
                                             Secure = true,
                                             SameSite = SameSiteMode.Lax,
-                                            MaxAge = TimeSpan.FromHours(1),
+                                            MaxAge = TimeSpan.FromHours(cookieExpireHours),
                                             Path = "/"
                                         });
 
@@ -210,7 +232,6 @@ namespace BimasaktiReports.FinancialReports.Backend
                                 }
                             }
                         }
-                        return Task.CompletedTask;
                     }
                 };
             });
