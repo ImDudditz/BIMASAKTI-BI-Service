@@ -75,6 +75,8 @@ export const useReportFilterStore = defineStore('reportFilters', () => {
     } catch (err) { console.error("Failed to load global filters:", err) }
   }
 
+  const isSidebarOpen = ref(false)
+
   const fetchMappings = async () => {
     try {
       const res = await api.get('/mappings', { params: { company_id: companyId.value, preset: activePreset.value } })
@@ -87,6 +89,7 @@ export const useReportFilterStore = defineStore('reportFilters', () => {
     selectedYear, selectedPeriod, displayFormat, showBudget, 
     availableYears, availablePeriods,
     activePreset, presetNames, accountMappings,
-    fetchFilters, fetchMappings
+    fetchFilters, fetchMappings,
+    isSidebarOpen
   }
 })

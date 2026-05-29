@@ -1,10 +1,10 @@
 <template>
-  <div class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-6 overflow-hidden flex flex-col h-[380px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300">
+  <div class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300">
     
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center justify-between mb-3">
       <div>
-        <h4 class="text-sm font-bold text-slate-800 tracking-tight">Operating Cash Inflow vs Outflow</h4>
-        <p class="text-[11px] font-medium text-slate-400">Monthly operating cash flow comparison for {{ props.selectedYear }}</p>
+        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">Operating Cash Inflow vs Outflow</h4>
+        <p class="text-[10px] font-medium text-slate-400">Monthly operating cash flow comparison for {{ props.selectedYear }}</p>
       </div>
     </div>
 

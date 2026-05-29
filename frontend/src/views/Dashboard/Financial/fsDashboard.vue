@@ -257,21 +257,21 @@ watch([selectedYear, selectedPeriod, activePreset, comparisonYears], () => loadD
     :subtitle="`As of ${monthNames[selectedPeriod]} ${selectedYear}`">
     
     <template #controls>
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-1.5">
         <div class="flex items-center bg-white border border-sky-200 rounded shadow-sm overflow-hidden shrink-0" v-if="availableYears.length > 0">
-          <select v-model="selectedPeriod" class="bg-transparent text-[13px] font-medium text-slate-700 px-2.5 py-1 focus:outline-none cursor-pointer hover:bg-sky-50 transition-colors">
+          <select v-model="selectedPeriod" class="bg-transparent text-xs font-semibold text-slate-700 px-2 py-0.5 focus:outline-none cursor-pointer hover:bg-sky-50 transition-colors">
             <option v-for="p in availablePeriods" :key="p" :value="p">{{ monthNames[p] || p }}</option>
           </select>
-          <div class="w-px h-4 bg-sky-200"></div>
-          <select v-model="selectedYear" class="bg-transparent text-[13px] font-medium text-slate-700 px-2.5 py-1 focus:outline-none cursor-pointer hover:bg-sky-50 transition-colors">
+          <div class="w-px h-3.5 bg-sky-200"></div>
+          <select v-model="selectedYear" class="bg-transparent text-xs font-semibold text-slate-700 px-2 py-0.5 focus:outline-none cursor-pointer hover:bg-sky-50 transition-colors">
             <option v-for="y in availableYears" :key="y" :value="y">{{ y }}</option>
           </select>
         </div>
 
-        <div class="flex items-center gap-3 bg-white border border-sky-200 rounded px-3 py-1 shadow-sm shrink-0" v-if="availableYears.length > 1">
-          <span class="text-[13px] font-bold text-sky-900">Compare Years:</span>
-          <label v-for="y in availableYears.filter(year => year !== selectedYear)" :key="y" class="flex items-center gap-1.5 cursor-pointer text-[13px] font-medium text-slate-700">
-            <input type="checkbox" :value="y" v-model="comparisonYears" class="w-3.5 h-3.5 text-sky-600 rounded border-sky-300 focus:ring-sky-500 cursor-pointer">
+        <div class="flex items-center gap-2 bg-white border border-sky-200 rounded px-2 py-0.5 shadow-sm shrink-0" v-if="availableYears.length > 1">
+          <span class="text-xs font-bold text-sky-900">Compare:</span>
+          <label v-for="y in availableYears.filter(year => year !== selectedYear)" :key="y" class="flex items-center gap-1 cursor-pointer text-xs font-semibold text-slate-700">
+            <input type="checkbox" :value="y" v-model="comparisonYears" class="w-3 h-3 text-sky-600 rounded border-sky-300 focus:ring-sky-500 cursor-pointer">
             {{ y }}
           </label>
         </div>
@@ -279,16 +279,16 @@ watch([selectedYear, selectedPeriod, activePreset, comparisonYears], () => loadD
     </template>
 
     <div class="overflow-y-auto custom-scrollbar flex-1 min-h-0 w-full relative z-10">
-      <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col min-h-full w-full">
+      <div class="max-w-screen-2xl mx-auto px-2 sm:px-4 lg:px-6 py-4 flex flex-col min-h-full w-full">
         
         <div v-if="isLoading" class="flex flex-col items-center justify-center flex-1 min-h-0 w-full h-full">
           <div class="w-10 h-10 border-4 border-sky-100 border-t-sky-600 rounded-full animate-spin"></div>
           <p class="text-sky-600 font-medium animate-pulse text-sm mt-4">Loading Executive Data...</p>
         </div>
 
-        <div v-else class="flex flex-col gap-5 pb-8 w-full">
+        <div v-else class="flex flex-col gap-4 pb-6 w-full">
           
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 w-full">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
             <template v-for="widget in activeWidgets" :key="widget.widget_key">
               <div :class="{'lg:col-span-2': ['kpi_cards', 'operation_metrics', 'lease_expirations', 'tickets_kpi', 'maintenance_status', 'tickets_by_category'].includes(widget.widget_key)}">
                 <component 

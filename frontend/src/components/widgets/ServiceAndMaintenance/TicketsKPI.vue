@@ -89,45 +89,45 @@ watch(
   </div>
 
   <!-- Main Grid Layout (Strictly 5 columns on large screens) -->
-  <div v-else class="grid grid-cols-2 lg:grid-cols-5 gap-5 w-full">
+  <div v-else class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 w-full animate-slide-up">
     
     <!-- KPI Card: Total Tickets -->
-    <div class="relative bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-white/50 p-5">
+    <div class="relative bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-white/50 p-3.5 sm:p-4">
       <div class="relative z-10">
-        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Total Tickets</p>
-        <h3 class="text-2xl font-black text-slate-800">{{ formatNumber(kpiData.totalTickets) }}</h3>
+        <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Total Tickets</p>
+        <h3 class="text-lg sm:text-xl md:text-2xl font-black text-slate-800 leading-none mt-1">{{ formatNumber(kpiData.totalTickets) }}</h3>
       </div>
     </div>
 
     <!-- KPI Card: Complaints -->
-    <div class="relative bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-white/50 p-5">
+    <div class="relative bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-white/50 p-3.5 sm:p-4">
       <div class="relative z-10">
-        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Complaints</p>
-        <h3 class="text-2xl font-black text-slate-800">{{ formatNumber(kpiData.complaintTickets) }}</h3>
+        <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Complaints</p>
+        <h3 class="text-lg sm:text-xl md:text-2xl font-black text-slate-800 leading-none mt-1">{{ formatNumber(kpiData.complaintTickets) }}</h3>
       </div>
     </div>
 
     <!-- KPI Card: Maintenance -->
-    <div class="relative bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-white/50 p-5">
+    <div class="relative bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-white/50 p-3.5 sm:p-4">
       <div class="relative z-10">
-        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Maintenance</p>
-        <h3 class="text-2xl font-black text-slate-800">{{ formatNumber(kpiData.maintenanceTickets) }}</h3>
+        <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Maintenance</p>
+        <h3 class="text-lg sm:text-xl md:text-2xl font-black text-slate-800 leading-none mt-1">{{ formatNumber(kpiData.maintenanceTickets) }}</h3>
       </div>
     </div>
 
     <!-- KPI Card: Requests -->
-    <div class="relative bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-white/50 p-5">
+    <div class="relative bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-white/50 p-3.5 sm:p-4">
       <div class="relative z-10">
-        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Requests</p>
-        <h3 class="text-2xl font-black text-slate-800">{{ formatNumber(kpiData.requestTickets) }}</h3>
+        <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Requests</p>
+        <h3 class="text-lg sm:text-xl md:text-2xl font-black text-slate-800 leading-none mt-1">{{ formatNumber(kpiData.requestTickets) }}</h3>
       </div>
     </div>
 
     <!-- KPI Card: Closed -->
-    <div class="relative bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-white/50 p-5">
+    <div class="relative bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-white/50 p-3.5 sm:p-4">
       <div class="relative z-10">
-        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Closed</p>
-        <h3 class="text-2xl font-black text-slate-800">{{ formatNumber(kpiData.closedTickets) }}</h3>
+        <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Closed</p>
+        <h3 class="text-lg sm:text-xl md:text-2xl font-black text-slate-800 leading-none mt-1">{{ formatNumber(kpiData.closedTickets) }}</h3>
       </div>
     </div>
 

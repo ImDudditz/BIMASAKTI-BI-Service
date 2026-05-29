@@ -13,7 +13,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const filterStore = useReportFilterStore()
-const { companyName, companyId } = storeToRefs(filterStore)
+const { companyName, companyId, isSidebarOpen } = storeToRefs(filterStore)
 
 onMounted(async () => {
   if (!document.getElementById('google-font-royale')) {
@@ -93,6 +93,7 @@ const toggleMenu = (menu) => {
 watch(
   () => router.currentRoute.value.path,
   (path) => {
+    isSidebarOpen.value = false // Auto-close sidebar on screen transition
     if (['/dashboard', '/balance-sheet', '/income-statement', '/print'].includes(path)) {
       expandedMenus.value.financials = true
     }
@@ -130,11 +131,10 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <!-- Decorative Royale Light Blue Metallic Ribbon at Top -->
-  <div class="w-full h-1.5 bg-gradient-to-r from-sky-400 via-blue-500 to-sky-300 relative z-30 shrink-0"></div>
-
   <!-- Main layout container with global styles -->
   <div class="h-screen w-screen flex flex-col font-['Plus_Jakarta_Sans',sans-serif] text-[#1c2e4a] overflow-hidden relative bg-[#f1f6fa] select-none selection:bg-sky-500/30">
+    <!-- Decorative Royale Light Blue Metallic Ribbon at Top -->
+    <div class="w-full h-1.5 bg-gradient-to-r from-sky-400 via-blue-500 to-sky-300 relative z-30 shrink-0"></div>
     
     <!-- Beautiful Architectural Skyscraper Grayscale Background with 75% Transparency (opacity-20) -->
     <div v-if="isAuthPage" class="absolute inset-x-0 top-0 h-[750px] lg:h-[900px] pointer-events-none opacity-20 overflow-hidden z-0 flex items-end justify-center select-none">
@@ -142,10 +142,20 @@ const handleLogout = async () => {
     </div>
 
     <!-- AUTHENTICATED PREMIUM WINDOWS XP ROYALE DASHBOARD SHELL -->
-    <div v-if="isAuthPage" class="flex-1 flex gap-6 p-6 overflow-hidden h-full w-full relative z-10">
+    <div v-if="isAuthPage" class="flex-1 flex gap-3 lg:gap-4 p-2 sm:p-3 lg:p-4 overflow-hidden h-full w-full relative z-10">
       
+      <!-- BACKDROP: Semi-transparent backdrop that blurs the background to close the sidebar on mobile/tablet viewports -->
+      <div 
+        v-if="isSidebarOpen" 
+        @click="isSidebarOpen = false" 
+        class="fixed inset-0 bg-slate-900/30 backdrop-blur-[2px] z-[48] lg:hidden transition-opacity duration-300"
+      ></div>
+
       <!-- LEFT-HAND WINDOWS XP ROYALE SIDEBAR (Explorer Task Pane style) -->
-      <aside class="w-[260px] bg-gradient-to-b from-[#d6e5f8] to-[#a2c6ec] border border-[#95bfe9] shadow-xl rounded-2xl flex flex-col p-4 shrink-0 z-40 transition-all duration-500 hover:shadow-sky-100/40 relative select-none">
+      <aside 
+        class="w-[230px] bg-gradient-to-b from-[#d6e5f8] to-[#a2c6ec] border border-[#95bfe9] shadow-xl rounded-2xl flex flex-col p-3 shrink-0 z-[49] lg:z-40 transition-all duration-300 hover:shadow-sky-100/40 select-none fixed top-2 bottom-2 left-2 sm:top-3 sm:bottom-3 sm:left-3 lg:static lg:top-0 lg:bottom-0 lg:left-0"
+        :class="isSidebarOpen ? 'translate-x-0' : '-translate-x-[255px] lg:translate-x-0'"
+      >
         
         <!-- Brand section with Company Logo & Name inside an XP Group Box panel -->
         <div class="bg-white/80 rounded-xl border border-[#95bfe9] p-3 flex flex-col items-center justify-center text-center shadow-sm shrink-0 gap-2 mb-4">
@@ -344,14 +354,25 @@ const handleLogout = async () => {
         <main class="flex-1 bg-[#f3f7fd] rounded-2xl border border-[#1f62d4] shadow-[0_20px_50px_-12px_rgba(31,98,212,0.35)] overflow-hidden relative flex flex-col min-h-0">
           
           <!-- Authentic Windows XP Royale Energy Blue Title Bar -->
-          <div class="flex items-center justify-between px-4 py-2 border-t border-white/40 bg-gradient-to-b from-[#629ef7] via-[#357ae5] to-[#1b56ca] text-white relative z-20 shrink-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.4)] select-none">
-            <div class="flex items-center gap-2">
+          <div class="flex items-center justify-between px-3 sm:px-4 py-1.5 sm:py-2 border-t border-white/40 bg-gradient-to-b from-[#629ef7] via-[#357ae5] to-[#1b56ca] text-white relative z-20 shrink-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.4)] select-none">
+            <div class="flex items-center gap-2 min-w-0">
+              <!-- Burger Menu Toggle Button (only on viewports < lg) -->
+              <button 
+                @click="isSidebarOpen = !isSidebarOpen"
+                class="lg:hidden p-1 mr-0.5 rounded bg-white/10 hover:bg-white/20 active:bg-white/30 border border-white/10 transition-colors shadow-sm cursor-pointer shrink-0 flex items-center justify-center"
+                title="Toggle Menu"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+              </button>
+
               <!-- Computer system icon -->
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-sky-100 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-sky-100 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)] shrink-0">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
               </svg>
               <!-- Dynamic Title Text -->
-              <span class="text-xs font-black tracking-wide text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] font-['Outfit'] uppercase">
+              <span class="text-[10px] sm:text-xs font-black tracking-wide text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] font-['Outfit'] uppercase truncate max-w-[120px] xs:max-w-[180px] sm:max-w-none">
                 Bimasakti BI - {{ activePageTitle }}
               </span>
             </div>

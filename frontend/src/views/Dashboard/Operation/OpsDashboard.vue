@@ -4,21 +4,21 @@
     :subtitle="`As of ${monthNames[selectedPeriod]} ${selectedYear}`">
     
     <template #controls>
-      <div class="flex items-center gap-4" v-if="isAuthorized">
+      <div class="flex items-center gap-1.5" v-if="isAuthorized">
         <div class="flex items-center bg-white border border-sky-200 rounded shadow-sm overflow-hidden shrink-0" v-if="availableYears.length > 0">
-          <select v-model="selectedPeriod" class="bg-transparent text-[13px] font-medium text-slate-700 px-2.5 py-1 focus:outline-none cursor-pointer hover:bg-sky-50 transition-colors">
+          <select v-model="selectedPeriod" class="bg-transparent text-xs font-semibold text-slate-700 px-2 py-0.5 focus:outline-none cursor-pointer hover:bg-sky-50 transition-colors">
             <option v-for="p in availablePeriods" :key="p" :value="p">{{ monthNames[p] || p }}</option>
           </select>
-          <div class="w-px h-4 bg-sky-200"></div>
-          <select v-model="selectedYear" class="bg-transparent text-[13px] font-medium text-slate-700 px-2.5 py-1 focus:outline-none cursor-pointer hover:bg-sky-50 transition-colors">
+          <div class="w-px h-3.5 bg-sky-200"></div>
+          <select v-model="selectedYear" class="bg-transparent text-xs font-semibold text-slate-700 px-2 py-0.5 focus:outline-none cursor-pointer hover:bg-sky-50 transition-colors">
             <option v-for="y in availableYears" :key="y" :value="y">{{ y }}</option>
           </select>
         </div>
 
-        <div class="flex items-center gap-3 bg-white border border-sky-200 rounded px-3 py-1 shadow-sm shrink-0" v-if="availableYears.length > 1">
-          <span class="text-[13px] font-bold text-sky-900">Compare Years:</span>
-          <label v-for="y in availableYears.filter(year => year !== selectedYear)" :key="y" class="flex items-center gap-1.5 cursor-pointer text-[13px] font-medium text-slate-700">
-            <input type="checkbox" :value="y" v-model="comparisonYears" class="w-3.5 h-3.5 text-sky-600 rounded border-sky-300 focus:ring-sky-500 cursor-pointer">
+        <div class="flex items-center gap-2 bg-white border border-sky-200 rounded px-2 py-0.5 shadow-sm shrink-0" v-if="availableYears.length > 1">
+          <span class="text-xs font-bold text-sky-900">Compare:</span>
+          <label v-for="y in availableYears.filter(year => year !== selectedYear)" :key="y" class="flex items-center gap-1 cursor-pointer text-xs font-semibold text-slate-700">
+            <input type="checkbox" :value="y" v-model="comparisonYears" class="w-3 h-3 text-sky-600 rounded border-sky-300 focus:ring-sky-500 cursor-pointer">
             {{ y }}
           </label>
         </div>
@@ -26,7 +26,7 @@
     </template>
 
     <div class="overflow-y-auto custom-scrollbar flex-1 min-h-0 w-full relative z-10">
-      <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col min-h-full w-full">
+      <div class="max-w-screen-2xl mx-auto px-2 sm:px-4 lg:px-6 py-4 flex flex-col min-h-full w-full">
         
         <!-- Access Restricted View -->
         <div v-if="!isAuthorized" class="flex-1 flex flex-col items-center justify-center py-20 px-4 text-center">
@@ -71,7 +71,7 @@
         </div>
 
         <!-- Dashboard Layout Grid -->
-        <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8 w-full">
+        <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4 pb-6 w-full">
           
           <!-- Primary Metrics Chart (Stat cards + daily foot traffic) -->
           <div class="lg:col-span-2">

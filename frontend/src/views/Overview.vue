@@ -180,7 +180,6 @@ const computedTrends = computed(() => {
   const totalUpcomingExpirations = upcomingExpirations.reduce((sum, item) => sum + item.count, 0)
 
   // 3. SERVICES & SLA DATA EXTRACTION
-  const openTickets = maintenanceData.value?.openTickets ?? 59
   const criticalAlerts = maintenanceData.value?.criticalAlerts ?? 2
   const uptimes = maintenanceData.value?.equipmentUptimePercent || []
   const avgUptime = uptimes.length > 0 ? (uptimes.reduce((sum, u) => sum + u.value, 0) / uptimes.length) : 98.7
@@ -540,7 +539,7 @@ watch(topThreeOverall, () => {
     </template>
 
     <div class="overflow-y-auto custom-scrollbar flex-1 min-h-0 w-full relative z-10">
-      <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6 min-h-full w-full">
+      <div class="max-w-screen-2xl mx-auto px-2 sm:px-4 lg:px-6 py-3 sm:py-4 flex flex-col gap-3 sm:gap-4 min-h-full w-full">
         
         <!-- LOADING SPINNER -->
         <div v-if="isLoading" class="flex flex-col items-center justify-center flex-1 min-h-[450px] w-full">
@@ -584,7 +583,7 @@ watch(topThreeOverall, () => {
             </transition>
 
             <!-- Card Layout Workspace -->
-            <div class="relative z-10 px-8 py-10 md:py-12 flex flex-col md:flex-row gap-8 items-stretch justify-between min-h-[440px] text-white">
+            <div class="relative z-10 px-4 sm:px-6 py-4 sm:py-8 md:py-10 flex flex-col md:flex-row gap-5 md:gap-6 items-stretch justify-between min-h-[350px] text-white">
               
               <!-- Left side: Trend metrics & Large visual -->
               <div class="flex-1 flex flex-col justify-between gap-6">
@@ -604,7 +603,7 @@ watch(topThreeOverall, () => {
 
                 <!-- Slide Title & Large Stat Metric block -->
                 <div class="space-y-4">
-                  <h3 class="text-2xl md:text-4xl font-extrabold tracking-tight drop-shadow-md">
+                  <h3 class="text-xl md:text-3xl font-extrabold tracking-tight drop-shadow-md">
                     {{ topThreeOverall[activeSlideIndex]?.title }}
                   </h3>
                   
@@ -614,7 +613,7 @@ watch(topThreeOverall, () => {
                     </div>
                     <div class="flex flex-col">
                       <span class="text-xs text-white/60 font-bold uppercase tracking-wider">{{ topThreeOverall[activeSlideIndex]?.metricName }}</span>
-                      <span class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-sky-200 tracking-tighter drop-shadow-lg">
+                      <span class="text-2xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-sky-200 tracking-tighter drop-shadow-lg">
                         {{ topThreeOverall[activeSlideIndex]?.valueText }}
                       </span>
                     </div>
@@ -645,13 +644,13 @@ watch(topThreeOverall, () => {
               <div class="flex-1 flex flex-col justify-between gap-6">
                 
                 <!-- Written commentary box -->
-                <div class="bg-white/5 backdrop-blur-lg border border-white/10 rounded-3xl p-6 md:p-8 shadow-inner flex-grow flex flex-col justify-center">
+                <div class="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-3 sm:p-4 md:p-6 shadow-inner flex-grow flex flex-col justify-center">
                   <div class="flex items-center gap-2 mb-3.5">
                     <span class="text-lg">✍️</span>
                     <span class="text-[11px] font-black text-sky-200 uppercase tracking-widest font-['Outfit']">Written Executive Commentary</span>
                   </div>
                   <p 
-                    class="text-sm md:text-base text-slate-100 font-medium leading-relaxed drop-shadow" 
+                    class="text-xs sm:text-sm md:text-sm text-slate-100 font-medium leading-relaxed drop-shadow" 
                     v-html="topThreeOverall[activeSlideIndex]?.narration"
                   ></p>
                 </div>
@@ -676,10 +675,10 @@ watch(topThreeOverall, () => {
             </div>
 
             <!-- Slide navigation bottom control drawer -->
-            <div class="bg-black/35 backdrop-blur-md px-8 py-3.5 flex items-center justify-between gap-4 border-t border-white/10 relative z-20">
+            <div class="bg-black/35 backdrop-blur-md px-4 sm:px-8 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-t border-white/10 relative z-20">
               
               <!-- Progress slider line -->
-              <div class="absolute top-0 inset-x-0 h-0.5 bg-white/10">
+              <div class="absolute top-0 inset-x-0 h-[1.5px] bg-white/10">
                 <div 
                   class="h-full bg-gradient-to-r from-sky-400 to-indigo-400 transition-all duration-100 shadow-[0_0_8px_#38bdf8]" 
                   :style="{ width: `${slideProgress}%` }"
