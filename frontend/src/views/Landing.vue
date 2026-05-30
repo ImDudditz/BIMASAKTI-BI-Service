@@ -3,6 +3,7 @@ defineOptions({ name: 'LandingPage' })
 import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import api from '@/services/api'
 
 // Core assets
 const bimasaktiLogo = new URL('../../../backend/assets/BMS/img/BMS_logo.png', import.meta.url).href
@@ -62,6 +63,9 @@ watch(terminalLogs, () => {
   scrollToBottom()
 }, { deep: true })
 
+const backendPort = ref(8001)
+const frontendPort = ref(5173)
+
 const runSimulatedSync = () => {
   if (syncing.value) return
   
@@ -73,7 +77,7 @@ const runSimulatedSync = () => {
   
   const steps = [
     { progress: 15, log: 'SQLITE: Accessing secure SQLite binary tables...' },
-    { progress: 35, log: 'PROXY: Routing sync traffic via local gateway port 8001...' },
+    { progress: 35, log: `PROXY: Routing sync traffic via local gateway port ${backendPort.value}...` },
     { progress: 55, log: 'TAX: Formatting VAT declarations for direct e-Faktur linking...' },
     { progress: 75, log: 'SQLITE: Reconciling ledger for Invoice #INV-2026-083 (Rp 62.0M)...' },
     { progress: 92, log: 'SYNC: Pushing billing records and e-Faktur outputs to Azure DB...' },
@@ -108,8 +112,23 @@ const handleActionClick = () => {
 }
 
 // Scroll detection for animations and Google Fonts loading
-onMounted(() => {
+onMounted(async () => {
   document.title = 'BIMASAKTI BI'
+
+  try {
+    const res = await api.get('/auth/config')
+    if (res.data) {
+      backendPort.value = res.data.backendPort || 8001
+      frontendPort.value = res.data.frontendPort || 5173
+      
+      // Update initial terminal logs with correct port
+      terminalLogs.value = terminalLogs.value.map(log => 
+        log.replace('8001', backendPort.value.toString())
+      )
+    }
+  } catch (e) {
+    console.warn('Failed to load dynamic port configuration, using defaults:', e)
+  }
 
   // Load Outfit and Plus Jakarta Sans Google Fonts
   if (!document.getElementById('google-font-royale')) {
@@ -325,7 +344,7 @@ const scrollToSection = (id) => {
               
               <div class="ml-auto flex items-center gap-2 pr-1">
                 <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse"></span>
-                <span class="text-[9px] font-bold text-sky-600 font-mono tracking-wider uppercase">SQLITE CONNECTED &bull; PORT 8001</span>
+                <span class="text-[9px] font-bold text-sky-600 font-mono tracking-wider uppercase">SQLITE CONNECTED &bull; PORT {{ backendPort }}</span>
               </div>
             </div>
 
@@ -698,7 +717,7 @@ const scrollToSection = (id) => {
                       <span class="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse"></span>
                       <span class="text-[7.5px] uppercase tracking-wider text-slate-400 font-bold">Diag Cluster Synchronization Stream Log</span>
                     </div>
-                    <span class="text-[7.5px] text-slate-500 font-mono font-bold">DAEMON_PORT: 8001</span>
+                    <span class="text-[7.5px] text-slate-500 font-mono font-bold">DAEMON_PORT: {{ backendPort }}</span>
                   </div>
                   
                   <!-- Scrollable logs box -->

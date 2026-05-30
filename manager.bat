@@ -10,6 +10,15 @@ set "BACKEND_DIR=%ROOT_DIR%backend"
 set "FRONTEND_DIR=%ROOT_DIR%frontend"
 set "GODMODE_FILE=%BACKEND_DIR%\engines\.god_mode_enabled"
 
+:: Parse defined ports dynamically from settings files
+set "BACKEND_PORT="
+for /f %%a in ('powershell -Command "(Get-Content '%ROOT_DIR%backend\appsettings.json' | ConvertFrom-Json).Server.Port" 2^>nul') do set "BACKEND_PORT=%%a"
+if "%BACKEND_PORT%"=="" set "BACKEND_PORT=8001"
+
+set "FRONTEND_PORT="
+for /f %%a in ('powershell -Command "$txt = Get-Content '%ROOT_DIR%frontend\vite.config.js' -Raw; if ($txt -match 'port:\s*(\d+)') { $Matches[1] } else { '5173' }" 2^>nul') do set "FRONTEND_PORT=%%a"
+if "%FRONTEND_PORT%"=="" set "FRONTEND_PORT=5173"
+
 :: Set dynamic developer theme (Cyan/Aqua on Black)
 color 0B
 
@@ -33,16 +42,16 @@ if errorlevel 1 (
     set "MGR_STATUS=ACTIVE "
 )
 
-:: 2. Check if Backend API (Port 8001) is active
-netstat -ano | findstr LISTENING | findstr :8001 >nul
+:: 2. Check if Backend API (Port !BACKEND_PORT!) is active
+netstat -ano | findstr LISTENING | findstr :!BACKEND_PORT! >nul
 if errorlevel 1 (
     set "BACK_STATUS=OFFLINE"
 ) else (
     set "BACK_STATUS=ACTIVE "
 )
 
-:: 3. Check if Frontend Web (Port 5173) is active
-netstat -ano | findstr LISTENING | findstr :5173 >nul
+:: 3. Check if Frontend Web (Port !FRONTEND_PORT!) is active
+netstat -ano | findstr LISTENING | findstr :!FRONTEND_PORT! >nul
 if errorlevel 1 (
     set "FRONT_STATUS=OFFLINE"
 ) else (
@@ -68,8 +77,8 @@ if "%LOCAL_IP%"=="" set "LOCAL_IP=127.0.0.1"
 set "COOL_ALIAS=%COMPUTERNAME%.local"
 
 echo   » Web Manager (Port 5050) : [!MGR_STATUS!]
-echo   » Backend API (Port 8001) : [!BACK_STATUS!]
-echo   » Frontend App (Port 5173): [!FRONT_STATUS!]
+echo   » Backend API (Port !BACKEND_PORT!) : [!BACK_STATUS!]
+echo   » Frontend App (Port !FRONTEND_PORT!): [!FRONT_STATUS!]
 echo   » Developer God Mode      : [!GOD_STATUS!]
 echo   » Local Network Endpoint  : http://!LOCAL_IP!:5050  (Alias: http://!COOL_ALIAS!:5050)
 echo  -------------------------------------------------------------
@@ -128,36 +137,36 @@ echo ====================================================================
 echo   [OPTION 2] Launching Developer Services (Separate Windows)
 echo ====================================================================
 echo.
-echo  Step 1: Releasing ports (8001, 5173) to avoid server conflicts...
-:: Port 8001 check
-netstat -ano | findstr LISTENING | findstr :8001 >nul
+echo  Step 1: Releasing ports (!BACKEND_PORT!, !FRONTEND_PORT!) to avoid server conflicts...
+:: Port !BACKEND_PORT! check
+netstat -ano | findstr LISTENING | findstr :!BACKEND_PORT! >nul
 if not errorlevel 1 (
-    echo  Port 8001 is active. Releasing port 8001...
-    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :8001') do (
+    echo  Port !BACKEND_PORT! is active. Releasing port !BACKEND_PORT!...
+    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :!BACKEND_PORT!') do (
         taskkill /F /T /PID %%a >nul 2>&1
     )
 )
-:: Port 5173 check
-netstat -ano | findstr LISTENING | findstr :5173 >nul
+:: Port !FRONTEND_PORT! check
+netstat -ano | findstr LISTENING | findstr :!FRONTEND_PORT! >nul
 if not errorlevel 1 (
-    echo  Port 5173 is active. Releasing port 5173...
-    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :5173') do (
+    echo  Port !FRONTEND_PORT! is active. Releasing port !FRONTEND_PORT!...
+    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :!FRONTEND_PORT!') do (
         taskkill /F /T /PID %%a >nul 2>&1
     )
 )
 
-echo  Step 2: Spawning C# Backend API Service (Port 8001) in separate console...
+echo  Step 2: Spawning C# Backend API Service (Port !BACKEND_PORT!) in separate console...
 start "Bimasakti C# Backend API" /D "%BACKEND_DIR%" cmd /k "color 0A & echo Running Bimasakti API Backend... & dotnet run --project BiPortal.csproj"
 
-echo  Step 3: Spawning Vue Frontend Web Server (Port 5173) in separate console...
+echo  Step 3: Spawning Vue Frontend Web Server (Port !FRONTEND_PORT!) in separate console...
 start "Bimasakti Vue Frontend" /D "%FRONTEND_DIR%" cmd /k "color 0E & echo Running Bimasakti Frontend... & npm run dev"
 
 echo.
 echo  ==============================================================
 echo  ✔ Both services have been launched in separate terminal windows!
 echo  ==============================================================
-echo  » C# Backend API listening on:  http://localhost:8001
-echo  » Vue Frontend Web listening on: http://localhost:5173
+echo  » C# Backend API listening on:  http://localhost:!BACKEND_PORT!
+echo  » Vue Frontend Web listening on: http://localhost:!FRONTEND_PORT!
 echo  --------------------------------------------------------------
 echo.
 echo  Press any key to return to the dashboard menu...
@@ -222,8 +231,8 @@ echo ====================================================================
 echo.
 echo  This tool terminates any background process locking the dev ports:
 echo  - Port 5050 (BI Web Manager)
-echo  - Port 8001 (C# Web API Backend)
-echo  - Port 5173 (Vue Frontend)
+echo  - Port !BACKEND_PORT! (C# Web API Backend)
+echo  - Port !FRONTEND_PORT! (Vue Frontend)
 echo.
 
 set "KILLED_ANY=0"
@@ -241,30 +250,30 @@ if not errorlevel 1 (
     echo  [-] Port 5050: Clean (No active process)
 )
 
-:: 8001
-netstat -ano | findstr LISTENING | findstr :8001 >nul
+:: !BACKEND_PORT!
+netstat -ano | findstr LISTENING | findstr :!BACKEND_PORT! >nul
 if not errorlevel 1 (
-    echo  [+] Port 8001: Found active process! Terminating...
-    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :8001') do (
+    echo  [+] Port !BACKEND_PORT!: Found active process! Terminating...
+    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :!BACKEND_PORT!') do (
         taskkill /F /T /PID %%a >nul 2>&1
         echo      ✔ PID %%a successfully terminated.
     )
     set "KILLED_ANY=1"
 ) else (
-    echo  [-] Port 8001: Clean (No active process)
+    echo  [-] Port !BACKEND_PORT!: Clean (No active process)
 )
 
-:: 5173
-netstat -ano | findstr LISTENING | findstr :5173 >nul
+:: !FRONTEND_PORT!
+netstat -ano | findstr LISTENING | findstr :!FRONTEND_PORT! >nul
 if not errorlevel 1 (
-    echo  [+] Port 5173: Found active process! Terminating...
-    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :5173') do (
+    echo  [+] Port !FRONTEND_PORT!: Found active process! Terminating...
+    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :!FRONTEND_PORT!') do (
         taskkill /F /T /PID %%a >nul 2>&1
         echo      ✔ PID %%a successfully terminated.
     )
     set "KILLED_ANY=1"
 ) else (
-    echo  [-] Port 5173: Clean (No active process)
+    echo  [-] Port !FRONTEND_PORT!: Clean (No active process)
 )
 
 echo.

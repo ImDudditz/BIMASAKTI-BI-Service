@@ -37,6 +37,8 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
+    port: 8002,
+    strictPort: false,
     https: true,
     allowedHosts: true, // Allows any hostname on your local network
     fs: {

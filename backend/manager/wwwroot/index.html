@@ -769,7 +769,7 @@
                     <div class="server-status-card">
                         <div class="server-info">
                             <span class="server-name">C# Backend Service</span>
-                            <span class="server-port">HTTP API / Port 8001</span>
+                            <span class="server-port" id="lbl-backend-port">HTTP API / Resolving Port...</span>
                         </div>
                         <div class="status-badge status-stopped" id="status-backend">
                             <span class="pulse-dot"></span>
@@ -780,7 +780,7 @@
                     <div class="server-status-card">
                         <div class="server-info">
                             <span class="server-name">Vue Frontend Server</span>
-                            <span class="server-port">Vite Webpack / Port 5173</span>
+                            <span class="server-port" id="lbl-frontend-port">Vite Webpack / Resolving Port...</span>
                         </div>
                         <div class="status-badge status-stopped" id="status-frontend">
                             <span class="pulse-dot"></span>
@@ -824,15 +824,15 @@
                     <div class="network-list">
                         <div class="network-item">
                             <span class="network-label">🔒 Localhost (Safe):</span>
-                            <a href="https://127.0.0.1:5173" target="_blank" class="network-value">https://127.0.0.1:5173</a>
+                            <a href="#" target="_blank" class="network-value" id="link-localhost">Resolving from configuration...</a>
                         </div>
                         <div class="network-item">
                             <span class="network-label">✨ Custom Alias Link:</span>
-                            <a href="#" target="_blank" class="network-value" id="link-alias">https://localhost:5173</a>
+                            <a href="#" target="_blank" class="network-value" id="link-alias">Resolving from configuration...</a>
                         </div>
                         <div class="network-item">
                             <span class="network-label">Direct IP Connection:</span>
-                            <a href="#" target="_blank" class="network-value" id="link-direct">https://127.0.0.1:5173</a>
+                            <a href="#" target="_blank" class="network-value" id="link-direct">Resolving from configuration...</a>
                         </div>
                     </div>
                 </div>
@@ -1167,6 +1167,8 @@
         let logsLength = 0;
         let coolAlias = 'localhost.local';
         let localIp = '127.0.0.1';
+        let activeFrontendPort = 0;
+        let activeBackendPort = 0;
 
         // Initialize and Start Status Polling Loop
         document.addEventListener('DOMContentLoaded', () => {
@@ -1214,17 +1216,29 @@
                 // Update Frontend status badge
                 updateStatusBadge('status-frontend', status.frontendStatus);
 
+                // Update active port states
+                activeFrontendPort = status.frontendPort || 0;
+                activeBackendPort = status.backendPort || 0;
+
+                // Update port display labels in cards
+                document.getElementById('lbl-backend-port').textContent = `HTTP API / Port ${activeBackendPort}`;
+                document.getElementById('lbl-frontend-port').textContent = `Vite Webpack / Port ${activeFrontendPort}`;
+
                 // Update networks links
                 localIp = status.localIp;
                 coolAlias = status.coolAlias;
 
+                const linkLocalhost = document.getElementById('link-localhost');
+                linkLocalhost.href = `https://127.0.0.1:${activeFrontendPort}`;
+                linkLocalhost.textContent = `https://127.0.0.1:${activeFrontendPort}`;
+
                 const linkAlias = document.getElementById('link-alias');
-                linkAlias.href = `https://${coolAlias}:5173`;
-                linkAlias.textContent = `https://${coolAlias}:5173`;
+                linkAlias.href = `https://${coolAlias}:${activeFrontendPort}`;
+                linkAlias.textContent = `https://${coolAlias}:${activeFrontendPort}`;
 
                 const linkDirect = document.getElementById('link-direct');
-                linkDirect.href = `https://${localIp}:5173`;
-                linkDirect.textContent = `https://${localIp}:5173`;
+                linkDirect.href = `https://${localIp}:${activeFrontendPort}`;
+                linkDirect.textContent = `https://${localIp}:${activeFrontendPort}`;
 
                 // Update God Mode slider state
                 const chkGod = document.getElementById('chk-godmode');
@@ -1315,12 +1329,12 @@
 
         // Launch vue frontend portal
         function launchPortal() {
-            window.open(`https://${localIp}:5173`, '_blank');
+            window.open(`https://localhost:${activeFrontendPort}`, '_blank');
         }
 
         // Launch scalar backend api documentation
         function launchScalar() {
-            window.open(`http://${localIp}:8001/docs`, '_blank');
+            window.open(`http://localhost:${activeBackendPort}/docs`, '_blank');
         }
 
         // Fetch logs for the Live Terminal Log Console

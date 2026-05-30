@@ -254,18 +254,30 @@ namespace BiPortal.FinancialReports.Backend
             {
                 options.AddPolicy("BimasaktiCorsPolicy", policy =>
                 {
-                    if (allowedOrigins.Length == 0 || allowedOrigins.Contains("*"))
+                    policy.SetIsOriginAllowed(origin =>
                     {
-                        Console.WriteLine("WARNING: Wildcard origins ('*') or empty AllowedOrigins detected in configuration. The application is running with restrictive CORS settings to prevent security vulnerabilities. Please configure specific origins.");
-                        policy.SetIsOriginAllowed(origin => false); // Disallow wildcard when credentials are required
-                    }
-                    else
-                    {
-                        policy.WithOrigins(allowedOrigins)
-                              .AllowAnyMethod()
-                              .AllowAnyHeader()
-                              .AllowCredentials();
-                    }
+                        if (string.IsNullOrEmpty(origin)) return false;
+                        
+                        // Trust standard configured origins
+                        if (allowedOrigins.Contains(origin)) return true;
+                        
+                        try
+                        {
+                            var uri = new Uri(origin);
+                            // Dynamically trust any loopback/local developer origin on any port
+                            return uri.Host == "localhost" || 
+                                   uri.Host == "127.0.0.1" || 
+                                   uri.Host == "0.0.0.0" || 
+                                   uri.Host.StartsWith("192.168.");
+                        }
+                        catch
+                        {
+                            return false;
+                        }
+                    })
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
                 });
             });
 

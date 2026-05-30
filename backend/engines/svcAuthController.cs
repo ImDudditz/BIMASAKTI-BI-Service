@@ -163,5 +163,39 @@ namespace BiPortal.FinancialReports.Backend.Engines
 
             return Ok(new { status = "success", message = "Successfully logged out and session cleared" });
         }
+
+        [HttpGet("config")]
+        public IActionResult GetConfig()
+        {
+            var backendPort = _configuration.GetValue<int>("Server:Port", 8001);
+            int frontendPort = 5173;
+            try
+            {
+                string current = AppDomain.CurrentDomain.BaseDirectory;
+                while (!string.IsNullOrEmpty(current))
+                {
+                    if (Directory.Exists(Path.Combine(current, "frontend")) && Directory.Exists(Path.Combine(current, "backend")))
+                    {
+                        string possibleVite = Path.Combine(current, "frontend", "vite.config.js");
+                        if (System.IO.File.Exists(possibleVite))
+                        {
+                            string content = System.IO.File.ReadAllText(possibleVite);
+                            var match = System.Text.RegularExpressions.Regex.Match(content, @"port:\s*(\d+)");
+                            if (match.Success && int.TryParse(match.Groups[1].Value, out int p))
+                            {
+                                frontendPort = p;
+                                break;
+                            }
+                        }
+                    }
+                    string? parent = Path.GetDirectoryName(current);
+                    if (parent == current || string.IsNullOrEmpty(parent)) break;
+                    current = parent;
+                }
+            }
+            catch {}
+
+            return Ok(new { backendPort, frontendPort });
+        }
     }
 }

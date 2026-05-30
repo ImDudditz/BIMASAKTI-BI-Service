@@ -41,6 +41,13 @@ namespace BiPortal.FinancialReports.Manager
         private static string _localIp;
         private static string _coolAlias;
 
+        // Active dynamic ports
+        private static int _frontendRunningPort = 5173;
+        private static int _backendRunningPort = 8001;
+
+        public static int FrontendRunningPort => _frontendRunningPort;
+        public static int BackendRunningPort => _backendRunningPort;
+
         // Cached static resources to optimize allocations and resolve analyzer warnings
         private static readonly char[] UrlSplitSeparators = ['\r', '\n'];
         private static readonly string[] LineSplitSeparators = ["\r\n", "\n"];
@@ -55,6 +62,10 @@ namespace BiPortal.FinancialReports.Manager
             
             // God Mode file path: backend/engines/.god_mode_enabled
             _godModePath = Path.GetFullPath(Path.Combine(GetRootDirectory(), "backend", "engines", ".god_mode_enabled"));
+
+            // Resolve defined ports dynamically from settings
+            _backendRunningPort = GetBackendPortFromSettings();
+            _frontendRunningPort = GetFrontendPortFromSettings();
 
             Log("Bimasakti BI Service Web Manager Initializing...");
             Log("Detected Network IP: " + _localIp);
@@ -79,7 +90,7 @@ namespace BiPortal.FinancialReports.Manager
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
-            // Check if backend/frontend are already running externally on ports 8001/5173
+            // Check if backend/frontend are already running externally on configured ports
             CheckExternalServers();
 
             // --- API ENDPOINTS REGISTRATION ---
@@ -133,8 +144,9 @@ namespace BiPortal.FinancialReports.Manager
                     return;
                 }
 
-                // Ensure port 8001 is completely free to prevent restart collisions
-                KillProcessOnPort(8001);
+                _backendRunningPort = GetBackendPortFromSettings();
+                // Ensure port is completely free to prevent restart collisions
+                KillProcessOnPort(_backendRunningPort);
 
                 // Use pre-compiled DLL if present for near-instant boot, fallback to dotnet run
                 string dllPath = Path.Combine(backendDir, "bin", "Debug", "net8.0", "BiPortal.FinancialReports.Backend.dll");
@@ -190,7 +202,7 @@ namespace BiPortal.FinancialReports.Manager
                 _backendProcess.BeginOutputReadLine();
                 _backendProcess.BeginErrorReadLine();
 
-                Log("Starting C# Web API Backend on port 8001...");
+                Log($"Starting C# Web API Backend on port {_backendRunningPort}...");
             }
             catch (Exception ex)
             {
@@ -210,7 +222,8 @@ namespace BiPortal.FinancialReports.Manager
             }
             else
             {
-                KillProcessOnPort(8001);
+                _backendRunningPort = GetBackendPortFromSettings();
+                KillProcessOnPort(_backendRunningPort);
             }
         }
 
@@ -227,8 +240,9 @@ namespace BiPortal.FinancialReports.Manager
                     return;
                 }
 
-                // Ensure port 5173 is completely free to prevent restart collisions
-                KillProcessOnPort(5173);
+                _frontendRunningPort = GetFrontendPortFromSettings();
+                // Ensure port is completely free to prevent restart collisions
+                KillProcessOnPort(_frontendRunningPort);
 
                 _frontendProcess = new Process
                 {
@@ -249,6 +263,15 @@ namespace BiPortal.FinancialReports.Manager
                     if (e.Data != null)
                     {
                         Log("[Vite] " + e.Data, true);
+                        if (e.Data.Contains("Local:", StringComparison.OrdinalIgnoreCase) || e.Data.Contains("Network:", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var match = System.Text.RegularExpressions.Regex.Match(e.Data, @":(\d+)");
+                            if (match.Success && int.TryParse(match.Groups[1].Value, out int p))
+                            {
+                                _frontendRunningPort = p;
+                                Log($"[Vite] Detected active listening port: {p}");
+                            }
+                        }
                         if (e.Data.Contains("failed to compile", StringComparison.OrdinalIgnoreCase) ||
                             e.Data.Contains("Failed to compile", StringComparison.OrdinalIgnoreCase) ||
                             e.Data.Contains("Syntax Error", StringComparison.OrdinalIgnoreCase) ||
@@ -282,7 +305,7 @@ namespace BiPortal.FinancialReports.Manager
                 _frontendProcess.BeginOutputReadLine();
                 _frontendProcess.BeginErrorReadLine();
 
-                Log("Starting Vue Frontend on port 5173...");
+                Log($"Starting Vue Frontend on port {_frontendRunningPort}...");
             }
             catch (Exception ex)
             {
@@ -302,7 +325,7 @@ namespace BiPortal.FinancialReports.Manager
             }
             else
             {
-                KillProcessOnPort(5173);
+                KillProcessOnPort(_frontendRunningPort);
             }
         }
 
@@ -470,18 +493,59 @@ namespace BiPortal.FinancialReports.Manager
             });
         }
 
+        private static int GetBackendPortFromSettings()
+        {
+            try
+            {
+                string appSettingsPath = Path.Combine(GetRootDirectory(), "backend", "appsettings.json");
+                if (File.Exists(appSettingsPath))
+                {
+                    string json = File.ReadAllText(appSettingsPath);
+                    using var doc = JsonDocument.Parse(json);
+                    if (doc.RootElement.TryGetProperty("Server", out var serverProp) &&
+                        serverProp.TryGetProperty("Port", out var portProp))
+                    {
+                        return portProp.GetInt32();
+                    }
+                }
+            }
+            catch {}
+            return 8001;
+        }
+
+        private static int GetFrontendPortFromSettings()
+        {
+            try
+            {
+                string configPath = Path.Combine(GetRootDirectory(), "frontend", "vite.config.js");
+                if (File.Exists(configPath))
+                {
+                    string content = File.ReadAllText(configPath);
+                    var match = System.Text.RegularExpressions.Regex.Match(content, @"port:\s*(\d+)");
+                    if (match.Success && int.TryParse(match.Groups[1].Value, out int p))
+                    {
+                        return p;
+                    }
+                }
+            }
+            catch {}
+            return 5173;
+        }
+
         private static void CheckExternalServers()
         {
-            bool backRunning = IsPortActiveAsync("127.0.0.1", 8001).GetAwaiter().GetResult();
-            bool frontRunning = IsPortActiveAsync("127.0.0.1", 5173).GetAwaiter().GetResult();
+            _backendRunningPort = GetBackendPortFromSettings();
+            
+            bool backRunning = IsPortActiveAsync("127.0.0.1", _backendRunningPort).GetAwaiter().GetResult();
+            bool frontRunning = IsPortActiveAsync("127.0.0.1", _frontendRunningPort).GetAwaiter().GetResult();
 
             if (backRunning)
             {
-                Log("[System] Detected C# Backend is already running externally on port 8001.");
+                Log($"[System] Detected C# Backend is already running externally on port {_backendRunningPort}.");
             }
             if (frontRunning)
             {
-                Log("[System] Detected Vue Frontend is already running externally on port 5173.");
+                Log($"[System] Detected Vue Frontend is already running externally on port {_frontendRunningPort}.");
             }
         }
 
@@ -709,6 +773,21 @@ namespace BiPortal.FinancialReports.Manager
         public static bool BackendHasError => _backendHasError;
         public static bool FrontendHasError => _frontendHasError;
         public static ConcurrentQueue<string> LogQueue => _logQueue;
+
+        public static bool BackendProcessActive => _backendProcess != null && !_backendProcess.HasExited;
+        public static bool FrontendProcessActive => _frontendProcess != null && !_frontendProcess.HasExited;
+
+        public static int RefreshBackendPort()
+        {
+            _backendRunningPort = GetBackendPortFromSettings();
+            return _backendRunningPort;
+        }
+
+        public static int RefreshFrontendPort()
+        {
+            _frontendRunningPort = GetFrontendPortFromSettings();
+            return _frontendRunningPort;
+        }
     }
 
     public static class ManagerEndpointExtensions
@@ -718,8 +797,11 @@ namespace BiPortal.FinancialReports.Manager
             // 1. Get process and server status (Refactored to be Async & Non-blocking)
             app.MapGet("/api/status", async () =>
             {
-                bool backendPortActive = await ManagerServer.IsPortActiveAsync("127.0.0.1", 8001);
-                bool frontendPortActive = await ManagerServer.IsPortActiveAsync("127.0.0.1", 5173);
+                int currentBack = ManagerServer.BackendProcessActive ? ManagerServer.BackendRunningPort : ManagerServer.RefreshBackendPort();
+                int currentFront = ManagerServer.FrontendProcessActive ? ManagerServer.FrontendRunningPort : ManagerServer.RefreshFrontendPort();
+
+                bool backendPortActive = await ManagerServer.IsPortActiveAsync("127.0.0.1", currentBack);
+                bool frontendPortActive = await ManagerServer.IsPortActiveAsync("127.0.0.1", currentFront);
 
                 bool backendProcessActive = backendPortActive; // simplified as port active indicates running status
                 bool frontendProcessActive = frontendPortActive;
@@ -752,7 +834,9 @@ namespace BiPortal.FinancialReports.Manager
                     frontendStatus = frontendStatus.ToString(),
                     godMode = File.Exists(ManagerServer.GodModePath),
                     localIp = ManagerServer.LocalIp,
-                    coolAlias = ManagerServer.CoolAlias
+                    coolAlias = ManagerServer.CoolAlias,
+                    backendPort = currentBack,
+                    frontendPort = currentFront
                 });
             });
 
