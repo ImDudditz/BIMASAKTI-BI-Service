@@ -84,7 +84,10 @@ namespace BiPortal.FinancialReports.Backend.Services
                 {
                     string configDirectory = Path.GetDirectoryName(databasePath)!;
                     string normalizedPreset = preset;
-                        normalizedPreset = $"Preset{preset.AsSpan(6)}";
+                    if (preset.StartsWith("preset", StringComparison.OrdinalIgnoreCase) && preset.Length > 6)
+                    {
+                        normalizedPreset = "Preset" + preset.Substring(6);
+                    }
                     string presetJsonPath = Path.Combine(configDirectory, $"{companyId.ToUpperInvariant()}_{normalizedPreset}.json");
 
                     if (System.IO.File.Exists(presetJsonPath))

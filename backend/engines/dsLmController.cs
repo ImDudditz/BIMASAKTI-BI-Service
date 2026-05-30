@@ -41,6 +41,12 @@ namespace BiPortal.FinancialReports.Backend.Engines
         [HttpGet("tickets/summary/{companyId}")]
         public IActionResult GetTicketsSummary([FromRoute] string companyId)
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim) || !companyId.Equals(companyIdClaim, StringComparison.OrdinalIgnoreCase))
+            {
+                return Unauthorized(new { detail = "Access to requested company database is denied." });
+            }
+
             string dbPath = svcDbUtils.GetSafeDbPath(companyId);
 
             if (!System.IO.File.Exists(dbPath))
@@ -114,6 +120,12 @@ namespace BiPortal.FinancialReports.Backend.Engines
             [FromQuery] string year,
             [FromQuery] string period)
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim) || !companyId.Equals(companyIdClaim, StringComparison.OrdinalIgnoreCase))
+            {
+                return Unauthorized(new { detail = "Access to requested company database is denied." });
+            }
+
             string dbPath = svcDbUtils.GetSafeDbPath(companyId);
 
             if (!System.IO.File.Exists(dbPath))

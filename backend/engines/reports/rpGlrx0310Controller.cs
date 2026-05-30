@@ -190,11 +190,15 @@ namespace BiPortal.FinancialReports.Backend.Engines.Reports
             try
             {
                 string configDirectory = Path.GetDirectoryName(databasePath)!;
-                string normalizedPreset = preset;
-                if (preset.StartsWith("preset", StringComparison.OrdinalIgnoreCase) && preset.Length > 6)
+                string normalizedPreset = preset ?? "preset1";
+                if (!normalizedPreset.Equals("preset1", StringComparison.OrdinalIgnoreCase) && 
+                    !normalizedPreset.Equals("preset2", StringComparison.OrdinalIgnoreCase) && 
+                    !normalizedPreset.Equals("preset3", StringComparison.OrdinalIgnoreCase))
                 {
-                    normalizedPreset = "Preset" + preset.Substring(6);
+                    return BadRequest(new { status = "error", message = "Invalid preset specified. Must be preset1, preset2, or preset3." });
                 }
+
+                normalizedPreset = "Preset" + normalizedPreset.Substring(6);
                 string presetJsonPath = Path.Combine(configDirectory, $"{companyId.ToUpperInvariant()}_{normalizedPreset}.json");
 
                 if (System.IO.File.Exists(presetJsonPath))
@@ -670,6 +674,13 @@ namespace BiPortal.FinancialReports.Backend.Engines.Reports
             string companyId = companyIdClaim.ToUpperInvariant();
 
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+
+            if (!preset.Equals("preset1", StringComparison.OrdinalIgnoreCase) && 
+                !preset.Equals("preset2", StringComparison.OrdinalIgnoreCase) && 
+                !preset.Equals("preset3", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest(new { status = "error", message = "Invalid preset specified. Must be preset1, preset2, or preset3." });
+            }
 
             var responseResult = await _ledgerService.GenerateLedgerReportAsync(databasePath, year, period, preset, companyId);
             
