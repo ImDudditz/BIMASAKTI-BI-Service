@@ -27,10 +27,10 @@ namespace BiPortal.FinancialReports.Backend.Engines.Reports
     [Route("api")]
     public class rpGlrx0310Controller : ControllerBase
     {
-        private readonly IsvcGLRX0310 _ledgerService;
+        private readonly IsvcGlrx0310 _ledgerService;
         private readonly IsvcDatabaseSyncService _syncService;
 
-        public rpGlrx0310Controller(IsvcGLRX0310 ledgerService, IsvcDatabaseSyncService syncService)
+        public rpGlrx0310Controller(IsvcGlrx0310 ledgerService, IsvcDatabaseSyncService syncService)
         {
             _ledgerService = ledgerService;
             _syncService = syncService;

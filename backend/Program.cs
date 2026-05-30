@@ -238,8 +238,8 @@ namespace BiPortal.FinancialReports.Backend
 
             // 2. Register Application Business Services for Dependency Injection
             builder.Services.AddScoped<IsvcAuthenticationService, svcAuthenticationService>();
-            builder.Services.AddScoped<IsvcGLRX0310, svcGLRX0310>();
-            builder.Services.AddScoped<IsvcCBRX7000, svcCBRX7000>();
+            builder.Services.AddScoped<IsvcGlrx0310, svcGlrx0310>();
+            builder.Services.AddScoped<IsvcCbrx7000, svcCbrx7000>();
             builder.Services.AddScoped<IsvcDashboardAnalyticsService, svcDashboardAnalyticsService>();
             builder.Services.AddScoped<IsvcDatabaseSyncService, svcDatabaseSyncService>();
 

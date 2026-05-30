@@ -10,11 +10,11 @@ namespace BiPortal.FinancialReports.Backend.Engines.Dashboard
     [Authorize]
     [ApiController]
     [Route("api")]
-    public class dsLMRX0800Controller : ControllerBase
+    public class dsLmrx0800Controller : ControllerBase
     {
         private readonly IsvcDashboardAnalyticsService _dashboardAnalyticsService;
 
-        public dsLMRX0800Controller(IsvcDashboardAnalyticsService dashboardAnalyticsService)
+        public dsLmrx0800Controller(IsvcDashboardAnalyticsService dashboardAnalyticsService)
         {
             _dashboardAnalyticsService = dashboardAnalyticsService;
         }

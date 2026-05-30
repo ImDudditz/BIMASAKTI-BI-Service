@@ -10,11 +10,11 @@ namespace BiPortal.FinancialReports.Backend.Engines.Dashboard
     [Authorize]
     [ApiController]
     [Route("api")]
-    public class dsCBRX7000Controller : ControllerBase
+    public class dsCbrx7000Controller : ControllerBase
     {
-        private readonly IsvcCBRX7000 _cashFlowService;
+        private readonly IsvcCbrx7000 _cashFlowService;
 
-        public dsCBRX7000Controller(IsvcCBRX7000 cashFlowService)
+        public dsCbrx7000Controller(IsvcCbrx7000 cashFlowService)
         {
             _cashFlowService = cashFlowService;
         }

@@ -754,6 +754,16 @@
                     if (id.length !== 5) return showToast('Company ID must be exactly 5 characters', 'error');
                     
                     const mode = companies.value.includes(id) ? 'Update' : 'New';
+                    
+                    if (mode === 'New') {
+                        const urls = companyUrls.value.split('\n')
+                            .map(u => u.trim())
+                            .filter(u => u.length > 0);
+                        if (urls.length === 0) {
+                            return showToast('At least one synchronization URL is required for a new company', 'error');
+                        }
+                    }
+                    
                     showToast(`Saving configuration for ${id}...`, 'info');
                     
                     const res = await req('/api/companies', 'POST', { CompanyId: id, Mode: mode, SyncUrls: companyUrls.value });

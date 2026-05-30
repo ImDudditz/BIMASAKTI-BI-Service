@@ -19,12 +19,12 @@ namespace BiPortal.FinancialReports.Backend.Services
         public decimal ActualAmount { get; set; }
     }
 
-    public interface IsvcCBRX7000
+    public interface IsvcCbrx7000
     {
         Task<List<CashFlowItem>> GetOperatingCashFlowAsync(string databasePath, string year);
     }
 
-    public class svcCBRX7000 : IsvcCBRX7000
+    public class svcCbrx7000 : IsvcCbrx7000
     {
         public async Task<List<CashFlowItem>> GetOperatingCashFlowAsync(string databasePath, string year)
         {

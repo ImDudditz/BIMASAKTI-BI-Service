@@ -40,7 +40,7 @@ namespace BiPortal.FinancialReports.Backend.Services
         public string? ErrorMessage { get; set; }
     }
 
-    public interface IsvcGLRX0310
+    public interface IsvcGlrx0310
     {
         Task<LedgerReportResponse> GenerateLedgerReportAsync(
             string databasePath,
@@ -50,7 +50,7 @@ namespace BiPortal.FinancialReports.Backend.Services
             string companyId);
     }
 
-    public class svcGLRX0310 : IsvcGLRX0310
+    public class svcGlrx0310 : IsvcGlrx0310
     {
         public async Task<LedgerReportResponse> GenerateLedgerReportAsync(
             string databasePath,

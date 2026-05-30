@@ -82,9 +82,9 @@ namespace BiPortal.FinancialReports.Backend.Tests
 
     // --- 2. LEDGER SERVICE TESTS ---
 
-    public class svcGLRX0310Tests
+    public class svcGlrx0310Tests
     {
-        private readonly IsvcGLRX0310 _ledgerService = new svcGLRX0310();
+        private readonly IsvcGlrx0310 _ledgerService = new svcGlrx0310();
 
         [Fact]
         public async Task GenerateLedgerReportAsync_ShouldReturnErrorResponse_WhenDatabaseFileDoesNotExist()

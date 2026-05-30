@@ -18,7 +18,7 @@ namespace BiPortal.FinancialReports.Backend.Engines
 
     [ApiController]
     [Route("api/auth")]
-    public class svcAuthController : ControllerBase
+    public class svcAuthenticationController : ControllerBase
     {
         private readonly IsvcAuthenticationService _authenticationService;
         private readonly IConfiguration _configuration;
@@ -27,7 +27,7 @@ namespace BiPortal.FinancialReports.Backend.Engines
         private int AccessTokenExpireMinutes => _configuration.GetValue<int>("Jwt:AccessTokenExpireMinutes", 15);
         private int CookieExpireHours => _configuration.GetValue<int>("Jwt:CookieExpireHours", 1);
 
-        public svcAuthController(IsvcAuthenticationService authenticationService, IConfiguration configuration)
+        public svcAuthenticationController(IsvcAuthenticationService authenticationService, IConfiguration configuration)
         {
             _authenticationService = authenticationService;
             _configuration = configuration;

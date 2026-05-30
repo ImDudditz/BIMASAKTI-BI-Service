@@ -147,6 +147,19 @@ app.MapPost("/api/companies", (PortalCompanySaveRequest req) => {
     string targetDir = Path.GetFullPath(Path.Combine(assetsDir, companyId));
 
     if (req.Mode == "New") {
+        var validUrlsCount = 0;
+        foreach (var url in (req.SyncUrls ?? "").Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)) {
+            string t = url.Trim();
+            if (string.IsNullOrEmpty(t)) continue;
+            string key = string.Concat(Path.GetFileNameWithoutExtension(t).Where(c => char.IsLetterOrDigit(c) || c == '_'));
+            if (!string.IsNullOrEmpty(key) && char.IsLetter(key[0])) {
+                validUrlsCount++;
+            }
+        }
+        if (validUrlsCount == 0) {
+            return Results.BadRequest(new { message = "At least one synchronization URL starting with a letter-based endpoint name is required." });
+        }
+
         Directory.CreateDirectory(targetDir);
         foreach (string dirPath in Directory.GetDirectories(tmplDir, "*", SearchOption.AllDirectories)) {
             Directory.CreateDirectory(dirPath.Replace(tmplDir, targetDir));
@@ -359,13 +372,14 @@ public static class PortalManagerCore {
         } catch {}
     }
 
-    public static async Task<bool> IsPortActiveAsync(string host, int port) {
+    public static Task<bool> IsPortActiveAsync(string host, int port) {
+        _ = host;
         try {
             var properties = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties();
             var listeners = properties.GetActiveTcpListeners();
-            return listeners.Any(l => l.Port == port);
+            return Task.FromResult(listeners.Any(l => l.Port == port));
         } catch {}
-        return false;
+        return Task.FromResult(false);
     }
 
     public static string GetRootDirectory() {
