@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>disable</Nullable>
-    <ImplicitUsings>disable</ImplicitUsings>
+    <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>BiPortal.FinancialReports.Manager</RootNamespace>
     <AssemblyName>BiPortalWebManager</AssemblyName>
   </PropertyGroup>
@@ -11,4 +11,5 @@
   <ItemGroup>
     <ProjectReference Include="../BiPortal.csproj" />
   </ItemGroup>
+
 </Project>

@@ -168,7 +168,7 @@ namespace BiPortal.FinancialReports.Backend.Engines
         public IActionResult GetConfig()
         {
             var backendPort = _configuration.GetValue<int>("Server:Port", 8001);
-            int frontendPort = 5173;
+            int frontendPort = 8002;
             try
             {
                 string current = AppDomain.CurrentDomain.BaseDirectory;

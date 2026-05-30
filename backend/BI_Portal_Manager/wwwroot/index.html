@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BI Portal Manager - Windows XP Royale Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #f0f6fc; /* Ice-blue classic background */
+            --bg-surface: #ffffff; /* Crisp white surface cards */
+            --bg-surface-hover: #eaf2fc;
+            --text-primary: #102a50; /* Deep blue-gray text */
+            --text-secondary: #576d8b; /* Slate secondary text */
+            --accent: #1964d4; /* Classic Windows XP Royale Blue */
+            --accent-hover: #104ba3;
+            --xp-orange: #ff8500; /* Windows XP Royale Accent Orange */
+            --xp-orange-hover: #e07400;
+            --border-color: #a8cbf3; /* Royale Blue borders */
+            --success: #ff8500; /* Green/Orange accent */
+            --success-color: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --glow: rgba(25, 100, 212, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Moving Bliss-inspired Sky Blue Background Blobs */
+        .bg-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(140px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 25s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bg-blob.b1 { top: -10%; left: -10%; width: 550px; height: 550px; background: rgba(59, 130, 246, 0.15); }
+        .bg-blob.b2 { bottom: -20%; right: -10%; width: 650px; height: 650px; background: rgba(14, 165, 233, 0.15); animation-delay: -7s; }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(120px, 60px) scale(1.15); }
+        }
+
+        /* Authentic Windows XP Royale Gradient Title Bar Header */
+        header {
+            padding: 1rem 3rem;
+            background: linear-gradient(to bottom, #729cf7, #3667eb 12%, #194ad1 50%, #103ba8 50%, #2053f0 88%, #4679fa);
+            border-bottom: 2px solid #0f308a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .brand h1 {
+            font-size: 1.65rem;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 1.5px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand h1::before {
+            content: '💻';
+            font-size: 1.35rem;
+            filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.4));
+        }
+        
+        .brand p { 
+            font-size: 0.72rem; 
+            color: #ffca80; 
+            font-weight: 700; 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.4); 
+            margin-left: 2.2rem;
+            margin-top: -0.2rem;
+        }
+
+        .nav-tabs { 
+            display: flex; 
+            gap: 0.5rem; 
+            background: rgba(0,0,0,0.18); 
+            padding: 0.25rem; 
+            border-radius: 8px; 
+            border: 1px solid rgba(0,0,0,0.12); 
+        }
+        
+        .tab-btn {
+            background: transparent; border: none; color: #eaf2fc;
+            padding: 0.5rem 1.25rem; font-size: 0.9rem; font-weight: 800;
+            border-radius: 6px; cursor: pointer; transition: 0.2s;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .tab-btn:hover { color: #ffffff; background: rgba(255,255,255,0.1); }
+        
+        /* Royale Orange active tab indicator */
+        .tab-btn.active {
+            background: linear-gradient(to bottom, #ffbe4d, #ff941a 50%, #e67a00 50%, #ff9c1a);
+            color: #ffffff;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid #c85a00;
+        }
+
+        main { flex: 1; padding: 2.5rem; max-width: 1400px; width: 100%; margin: 0 auto; }
+        .tab-content { display: none; animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        .tab-content.active { display: block; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glass / Glossy XP Panels */
+        .glass-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.75rem;
+            box-shadow: 0 8px 30px rgba(25, 100, 212, 0.08);
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        .glass-card:hover { border-color: #729cf7; box-shadow: 0 8px 35px rgba(25, 100, 212, 0.14); }
+        
+        .glass-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0; transition: 0.4s;
+        }
+        .glass-card:hover::before { opacity: 1; }
+
+        .card-header { 
+            margin-bottom: 1.5rem; 
+            font-size: 1.15rem; 
+            font-weight: 900; 
+            color: var(--accent); 
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #ebf3fd;
+            padding-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
+
+        /* Server Status Badge */
+        .status-row {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #f5f9fe; padding: 1.25rem; border-radius: 10px; margin-bottom: 1rem;
+            border: 1px solid #d5e6f9;
+        }
+        .server-info h3 { font-size: 1.05rem; margin-bottom: 0.2rem; font-weight: 800; color: var(--text-primary); }
+        .server-info p { font-size: 0.8rem; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; }
+        
+        .badge {
+            padding: 0.4rem 0.85rem; border-radius: 50px; font-size: 0.72rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        
+        .status-running { background: rgba(16, 185, 129, 0.08); color: var(--success-color); border: 1px solid var(--success-color); }
+        .status-running .dot { background: var(--success-color); box-shadow: 0 0 8px var(--success-color); animation: pulse 1.5s infinite; }
+        .status-stopped { background: rgba(87, 109, 139, 0.08); color: var(--text-secondary); border: 1px solid var(--text-secondary); }
+        .status-stopped .dot { background: var(--text-secondary); }
+        .status-error { background: rgba(239, 68, 68, 0.08); color: var(--danger); border: 1px solid var(--danger); }
+        .status-error .dot { background: var(--danger); box-shadow: 0 0 8px var(--danger); animation: pulse 1.5s infinite; }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.25); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        /* Glossy XP Buttons */
+        .btn {
+            background: linear-gradient(to bottom, #ffffff, #f1f3f6); 
+            color: var(--text-primary); 
+            border: 1px solid #b1c3d9;
+            padding: 0.85rem 1.25rem; border-radius: 8px; font-size: 0.85rem; font-weight: 800;
+            cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
+            width: 100%; margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .btn:hover { 
+            transform: translateY(-2px); 
+            background: linear-gradient(to bottom, #ffffff, #e6ebf2);
+            border-color: #729cf7;
+            box-shadow: 0 4px 8px rgba(25, 100, 212, 0.1); 
+        }
+        .btn:active { transform: translateY(0); }
+        
+        .btn-primary { 
+            background: linear-gradient(to bottom, #7ce698, #35b058 50%, #1d8c3c 50%, #2fa34f); 
+            color: #fff; border: 1px solid #146128; 
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+        }
+        .btn-primary:hover { 
+            background: linear-gradient(to bottom, #8df0a7, #3fc465 50%, #219c43 50%, #34b55b);
+            box-shadow: 0 4px 12px rgba(29, 140, 60, 0.25); 
+            border-color: #104f20;
+        }
+        
+        .btn-danger { 
+            background: linear-gradient(to bottom, #ff9485, #e04b38 50%, #bd2513 50%, #d63723); 
+            color: #fff; border: 1px solid #7c1206; 
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+        }
+        .btn-danger:hover { 
+            background: linear-gradient(to bottom, #ffa396, #ee5642 50%, #cc2916 50%, #e6422d);
+            box-shadow: 0 4px 12px rgba(189, 37, 19, 0.25); 
+            border-color: #640d04;
+        }
+        
+        .btn-accent { 
+            background: linear-gradient(to bottom, #ffbe4d, #ff941a 50%, #e67a00 50%, #ff9c1a); 
+            color: #fff; border: 1px solid #ab5b00; 
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+        }
+        .btn-accent:hover { 
+            background: linear-gradient(to bottom, #ffc966, #ff9f2e 50%, #f58400 50%, #ffa733);
+            box-shadow: 0 4px 12px rgba(230, 122, 0, 0.25); 
+            border-color: #8c4b00;
+        }
+
+        /* Metallic Blue Portal Redirect Button */
+        .btn-portal {
+            background: linear-gradient(to bottom, #7fc8ff, #3fa5ff 50%, #007bf0 50%, #0088ff);
+            color: #fff; border: 1px solid #0050c0;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+        }
+        .btn-portal:hover {
+            background: linear-gradient(to bottom, #94d4ff, #54b2ff 50%, #0c86ff 50%, #1ea0ff);
+            box-shadow: 0 4px 12px rgba(0, 123, 240, 0.25);
+            border-color: #00409c;
+        }
+
+        /* Terminal styling */
+        .terminal {
+            background: #09090b; border-radius: 10px; border: 1px solid #cbdff8;
+            height: 550px; display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+        .term-header { background: #1f2937; padding: 0.75rem 1.25rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #9ca3af; display: flex; justify-content: space-between; border-bottom: 1px solid #374151; }
+        .term-body { flex: 1; padding: 1.25rem; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.5; color: #f3f4f6; }
+        
+        .log { margin-bottom: 0.2rem; word-break: break-all; }
+        .log-backend { color: #60a5fa; }
+        .log-vite { color: #c084fc; }
+        .log-sync { color: #34d399; }
+        .log-err { color: #f87171; font-weight: bold; }
+
+        /* Forms & Inputs */
+        .input-group { margin-bottom: 1.25rem; }
+        .input-group label { display: block; font-size: 0.78rem; font-weight: 800; color: var(--text-secondary); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .input-field {
+            width: 100%; background: #ffffff; border: 1px solid var(--border-color);
+            color: var(--text-primary); padding: 0.85rem; border-radius: 8px; font-size: 0.95rem; transition: 0.2s;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .input-field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 8px rgba(25, 100, 212, 0.25); background: #ffffff; }
+        .input-field.mono { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+        textarea.input-field { min-height: 120px; resize: vertical; }
+        
+        select.input-field {
+            cursor: pointer;
+            padding-right: 2rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%231964d4' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.5rem;
+        }
+
+        /* Checkbox lists */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-primary);
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: 0.2s;
+            border: 1px solid transparent;
+            font-size: 0.9rem;
+            user-select: none;
+        }
+        .checkbox-container:hover {
+            background: #eaf2fc;
+            border-color: #cbdff8;
+        }
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+        
+        /* Grid Layouts for Companies */
+        .company-grid { display: grid; grid-template-columns: 320px 1fr; gap: 2rem; }
+        .list-container { max-height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; padding-right: 0.5rem; }
+        
+        .list-item {
+            background: #f8fbfe; border: 1px solid var(--border-color); padding: 0.85rem 1.25rem;
+            border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: 700; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            color: var(--text-primary);
+        }
+        .list-item:hover { background: #e6effc; border-color: #729cf7; transform: translateX(3px); }
+        .list-item.selected { background: #d0e2fc; border-color: var(--accent); color: var(--accent); }
+
+        /* Toasts */
+        .toast-container { position: fixed; bottom: 2rem; right: 2rem; display: flex; flex-direction: column; gap: 1rem; z-index: 100; }
+        .toast {
+            background: #ffffff; border-left: 4px solid var(--accent); padding: 0.9rem 1.4rem; border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(25, 100, 212, 0.16); font-weight: 700; font-size: 0.88rem;
+            animation: toastIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            border: 1px solid #d5e6f9;
+            border-left-width: 5px;
+            color: var(--text-primary);
+        }
+        @keyframes toastIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f0f4f9; }
+        ::-webkit-scrollbar-thumb { background: #c2d7ef; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        .godmode-toggle {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #fbf8ff; padding: 1.25rem; border-radius: 10px;
+            border: 1px solid #ecdffd; margin-top: 1rem;
+        }
+        .switch { position: relative; display: inline-block; width: 48px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: #8b5cf6; }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+    </style>
+</head>
+<body>
+    <div class="bg-blob b1"></div>
+    <div class="bg-blob b2"></div>
+
+    <header>
+        <div class="brand">
+            <h1>BI_PORTAL_MANAGER</h1>
+            <p>Royale Control Interface</p>
+        </div>
+        <nav class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="tab-btn" onclick="switchTab('company')">🏢 Company</button>
+            <button class="tab-btn" onclick="switchTab('widget-access')">🔒 Widget Access</button>
+            <button class="tab-btn" onclick="switchTab('terminal')">💻 Live Console</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- DASHBOARD -->
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="grid-2">
+                <div class="glass-card">
+                    <div class="card-header">NODE STATUS MONITOR</div>
+                    <div class="status-row">
+                        <div class="server-info">
+                            <h3>Backend API Node</h3>
+                            <p id="lbl-backend-port">Port: Resolving...</p>
+                        </div>
+                        <div class="badge status-stopped" id="status-backend">
+                            <div class="dot"></div> <span id="txt-backend">OFFLINE</span>
+                        </div>
+                    </div>
+                    <div class="status-row">
+                        <div class="server-info">
+                            <h3>Frontend Web Node</h3>
+                            <p id="lbl-frontend-port">Port: Resolving...</p>
+                        </div>
+                        <div class="badge status-stopped" id="status-frontend">
+                            <div class="dot"></div> <span id="txt-frontend">OFFLINE</span>
+                        </div>
+                    </div>
+
+                    <div class="godmode-toggle">
+                        <div>
+                            <h3 style="color: #6d28d9; margin-bottom: 0.15rem; font-weight: 800;">Developer God Mode</h3>
+                            <p style="font-size: 0.8rem; color: #7c3aed; font-weight: 600;">Bypass security constraints.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="godmode-cb" onchange="toggleGodMode()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">EXECUTION CONTROLS</div>
+                    <button class="btn btn-primary" onclick="req('/api/start')">▶ Ignite Sequence</button>
+                    <button class="btn btn-danger" onclick="req('/api/stop')">⏹ Terminate Sequence</button>
+                    <button class="btn btn-accent" onclick="req('/api/restart')">🔄 Reboot Systems</button>
+                    <button class="btn btn-portal" onclick="openFrontendPortal()">🌐 Open Frontend Portal</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMPANY (Renamed from Tenants) -->
+        <div id="tab-company" class="tab-content">
+            <div class="glass-card">
+                <div class="card-header" id="company-suite-title">COMPANY MANAGEMENT SUITE</div>
+                <div class="company-grid">
+                    <div class="list-container" id="company-list">
+                        <!-- Loaded dynamically -->
+                    </div>
+                    
+                    <div>
+                        <div class="input-group">
+                            <label>Company ID (5 Characters)</label>
+                            <input type="text" id="company-id" class="input-field" maxlength="5" placeholder="e.g. ALPHA">
+                        </div>
+                        <div class="input-group">
+                            <label>Synchronization Endpoints</label>
+                            <textarea id="company-urls" class="input-field mono" placeholder="https://api.example.com/sync"></textarea>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                            <button class="btn btn-primary" style="flex: 2; margin-bottom: 0;" onclick="saveCompany()">💾 Provision/Update Company</button>
+                            <button class="btn btn-accent" style="flex: 2; margin-bottom: 0;" onclick="syncCompany()">🔄 Force Database Sync</button>
+                            <button class="btn" style="flex: 1; margin-bottom: 0; font-weight: 800;" onclick="clearCompanyForm()">➕ New</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WIDGET ACCESS -->
+        <div id="tab-widget-access" class="tab-content">
+            <div class="glass-card">
+                <div class="card-header">WIDGET & REPORT ACCESS CONTROL</div>
+                
+                <!-- Filters -->
+                <div class="grid-2" style="margin-bottom: 1.5rem;">
+                    <div class="input-group">
+                        <label>Select Company</label>
+                        <select id="access-company-select" class="input-field" onchange="handleAccessCompanyChange()">
+                            <option value="">-- Loading Companies --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group" id="access-user-group" style="display: none;">
+                        <label>Select User</label>
+                        <select id="access-user-select" class="input-field" onchange="handleAccessUserChange()">
+                            <option value="">-- Select User --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Permissions Checklist Panels -->
+                <div id="access-permissions-panel" style="display: none; border-top: 2px solid #ebf3fd; padding-top: 1.5rem;">
+                    <h3 id="access-username-title" style="margin-bottom: 1.25rem; color: var(--accent); font-weight: 800; font-size: 1.1rem; text-transform: uppercase;">Permissions</h3>
+                    
+                    <div class="grid-2">
+                        <!-- Widget Access -->
+                        <div class="glass-card" style="padding: 1.5rem; background: #fafcff; border-color: #cbdff8;">
+                            <h4 style="margin-bottom: 1rem; border-bottom: 1.5px solid #cbdff8; padding-bottom: 0.35rem; color: var(--text-primary); font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px;">WIDGET ACCESS LIST</h4>
+                            <div class="checkbox-list" style="display: flex; flex-direction: column; gap: 0.4rem;">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="perm-widget-kpi_cards">
+                                    <span>📊 Financial KPI Summary Cards</span>
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="perm-widget-capital_growth">
+                                    <span>📈 Capital Growth Trend</span>
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="perm-widget-operating_cash_flow">
+                                    <span>💸 Operating Cash Flow Stream</span>
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="perm-widget-revenue_budget">
+                                    <span>📥 Revenue Budget vs Actual</span>
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="perm-widget-expense_budget">
+                                    <span>📤 Expense Budget vs Actual</span>
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="perm-widget-operation_metrics">
+                                    <span>🔑 Property Operations Metrics</span>
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="perm-widget-lease_expirations">
+                                    <span>📅 Upcoming Lease Expirations</span>
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="perm-widget-tickets_kpi">
+                                    <span>🛠️ Tenant Helpdesk KPI Status</span>
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="perm-widget-maintenance_status">
+                                    <span>📋 Maintenance Orders Log</span>
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="perm-widget-tickets_by_category">
+                                    <span>🏷️ Tickets Distribution Chart</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Report Access & Save Button -->
+                        <div class="glass-card" style="padding: 1.5rem; background: #fafcff; border-color: #cbdff8; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <h4 style="margin-bottom: 1rem; border-bottom: 1.5px solid #cbdff8; padding-bottom: 0.35rem; color: var(--text-primary); font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px;">REPORT ACCESS LIST</h4>
+                                <div class="checkbox-list" style="display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 2rem;">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" id="perm-report-balance_sheet">
+                                        <span>📝 Balance Sheet Statement</span>
+                                    </label>
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" id="perm-report-income_statement">
+                                        <span>📉 Income Statement Statement</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <button class="btn btn-primary" style="margin-bottom: 0;" onclick="saveAccessPermissions()">💾 Save Permissions Set</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TERMINAL -->
+        <div id="tab-terminal" class="tab-content">
+            <div class="terminal">
+                <div class="term-header">
+                    <span>> system_monitor_stream.log</span>
+                    <button style="background:none; border:none; color:#9ca3af; cursor:pointer; font-weight: bold;" onclick="req('/api/logs/clear')">[ CLEAR CONSOLE ]</button>
+                </div>
+                <div class="term-body" id="term-body">
+                    <!-- Logs -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast-container" id="toasts"></div>
+
+    <script>
+        const API = window.location.origin;
+        let isPolling = false;
+        let frontendPort = 8002;
+
+        function switchTab(id) {
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (id === 'company') {
+                loadCompanies();
+            } else if (id === 'widget-access') {
+                loadAccessCompanies();
+            }
+        }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toasts');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.borderLeftColor = type === 'error' ? 'var(--danger)' : (type === 'success' ? 'var(--success-color)' : 'var(--xp-orange)');
+            toast.innerHTML = msg;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        async function req(endpoint, method = 'POST', body = null) {
+            try {
+                const opt = { method, headers: { 'Content-Type': 'application/json' } };
+                if (body) opt.body = JSON.stringify(body);
+                const res = await fetch(API + endpoint, opt);
+                if (method === 'POST') showToast(await res.json().then(d => d.message || d.error || 'Command Executed').catch(()=>'Executed'), res.ok ? 'success' : 'error');
+                return res.ok ? await res.json() : null;
+            } catch (e) {
+                if(method === 'POST') showToast('Network Error', 'error');
+                return null;
+            }
+        }
+
+        async function pollStatus() {
+            if (isPolling) return;
+            isPolling = true;
+            const res = await req('/api/status', 'GET');
+            if (res) {
+                const bStat = document.getElementById('status-backend');
+                const fStat = document.getElementById('status-frontend');
+                
+                bStat.className = `badge status-${res.backendStatus.toLowerCase()}`;
+                document.getElementById('txt-backend').innerText = res.backendStatus.toUpperCase();
+                document.getElementById('lbl-backend-port').innerText = `Port: ${res.backendPort}`;
+                
+                fStat.className = `badge status-${res.frontendStatus.toLowerCase()}`;
+                document.getElementById('txt-frontend').innerText = res.frontendStatus.toUpperCase();
+                document.getElementById('lbl-frontend-port').innerText = `Port: ${res.frontendPort}`;
+                
+                document.getElementById('godmode-cb').checked = res.godMode;
+                frontendPort = res.frontendPort;
+            }
+
+            const logs = await req('/api/logs', 'GET');
+            if (logs) {
+                const tb = document.getElementById('term-body');
+                const wasScrolledToBottom = tb.scrollHeight - tb.clientHeight <= tb.scrollTop + 1;
+                
+                tb.innerHTML = logs.map(l => {
+                    let cls = '';
+                    if (l.includes('[Backend]')) cls = 'log-backend';
+                    if (l.includes('[Vite]')) cls = 'log-vite';
+                    if (l.includes('[Sync]')) cls = 'log-sync';
+                    if (l.includes('Error') || l.includes('Exception') || l.includes('fail:')) cls = 'log-err';
+                    return `<div class="log ${cls}">${l.replace(/</g, '&lt;')}</div>`;
+                }).join('');
+
+                if (wasScrolledToBottom) tb.scrollTop = tb.scrollHeight;
+            }
+
+            isPolling = false;
+        }
+
+        function openFrontendPortal() {
+            window.open(`https://localhost:${frontendPort}`, '_blank');
+        }
+
+        async function toggleGodMode() { await req('/api/godmode'); }
+
+        // --- COMPANY DIRECTORY LOGIC ---
+        async function loadCompanies() {
+            const comps = await req('/api/companies', 'GET');
+            if (comps) {
+                document.getElementById('company-list').innerHTML = comps.map(c => 
+                    `<div class="list-item" id="comp-item-${c}" onclick="selectCompany('${c}')">
+                        <span>🏢 ${c}</span>
+                        <span style="font-size: 0.72rem; color: var(--accent); font-weight: 800;">EDIT</span>
+                     </div>`
+                ).join('');
+            }
+        }
+
+        function clearCompanyForm() {
+            document.getElementById('company-id').value = '';
+            document.getElementById('company-id').disabled = false;
+            document.getElementById('company-urls').value = '';
+            document.getElementById('company-suite-title').innerText = "COMPANY MANAGEMENT SUITE - CREATE";
+            document.querySelectorAll('.list-item').forEach(e => e.classList.remove('selected'));
+        }
+
+        async function selectCompany(id) {
+            document.querySelectorAll('.list-item').forEach(e => e.classList.remove('selected'));
+            const element = document.getElementById(`comp-item-${id}`);
+            if (element) element.classList.add('selected');
+
+            document.getElementById('company-id').value = id;
+            document.getElementById('company-id').disabled = true;
+            document.getElementById('company-suite-title').innerText = `COMPANY MANAGEMENT SUITE - EDIT: ${id}`;
+            const res = await req(`/api/companies/${id}`, 'GET');
+            if (res) {
+                document.getElementById('company-urls').value = (res.urls || []).join('\n');
+            }
+        }
+
+        async function saveCompany() {
+            const id = document.getElementById('company-id').value.trim().toUpperCase();
+            const urls = document.getElementById('company-urls').value;
+            if (id.length !== 5) return showToast('Company ID must be exactly 5 characters', 'error');
+            
+            const comps = await req('/api/companies', 'GET') || [];
+            const mode = comps.includes(id) ? 'Update' : 'New';
+            
+            showToast(`Saving company ${id}...`, 'info');
+            const res = await req('/api/companies', 'POST', { CompanyId: id, Mode: mode, SyncUrls: urls });
+            if (res) {
+                clearCompanyForm();
+                loadCompanies();
+            }
+        }
+
+        async function syncCompany() {
+            const id = document.getElementById('company-id').value.trim().toUpperCase();
+            if (id.length !== 5) return showToast('Please select or specify a valid 5-char Company first', 'error');
+            await req(`/api/companies/${id}/sync`, 'POST');
+            switchTab('terminal');
+        }
+
+        // --- WIDGET ACCESS LOGIC ---
+        async function loadAccessCompanies() {
+            const comps = await req('/api/companies', 'GET');
+            const select = document.getElementById('access-company-select');
+            
+            document.getElementById('access-user-group').style.display = 'none';
+            document.getElementById('access-permissions-panel').style.display = 'none';
+            
+            if (!comps || comps.length === 0) {
+                select.innerHTML = '<option value="">-- No Companies Found --</option>';
+                return;
+            }
+            
+            select.innerHTML = '<option value="">-- Select Company --</option>';
+            comps.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = `🏢 ${c}`;
+                select.appendChild(opt);
+            });
+        }
+
+        function handleAccessCompanyChange() {
+            const companyId = document.getElementById('access-company-select').value;
+            const userGroup = document.getElementById('access-user-group');
+            const permPanel = document.getElementById('access-permissions-panel');
+            
+            permPanel.style.display = 'none';
+            if (!companyId) {
+                userGroup.style.display = 'none';
+                return;
+            }
+            
+            userGroup.style.display = 'block';
+            fetchAccessUsers(companyId);
+        }
+
+        async function fetchAccessUsers(companyId) {
+            try {
+                const select = document.getElementById('access-user-select');
+                select.innerHTML = '<option value="">-- Loading Users --</option>';
+                
+                const users = await req(`/api/manager/companies/${companyId}/users`, 'GET');
+                if (!users || users.length === 0) {
+                    select.innerHTML = '<option value="">-- No Users Found --</option>';
+                    return;
+                }
+                
+                select.innerHTML = '<option value="">-- Select User --</option>';
+                users.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.id;
+                    opt.textContent = `👤 ${u.username} (${u.role})`;
+                    opt.dataset.username = u.username;
+                    select.appendChild(opt);
+                });
+            } catch (err) {
+                showToast("Failed to load company users", 'error');
+            }
+        }
+
+        function handleAccessUserChange() {
+            const companyId = document.getElementById('access-company-select').value;
+            const select = document.getElementById('access-user-select');
+            const userId = select.value;
+            const permPanel = document.getElementById('access-permissions-panel');
+            
+            if (!companyId || !userId) {
+                permPanel.style.display = 'none';
+                return;
+            }
+            
+            const selectedOpt = select.options[select.selectedIndex];
+            const username = selectedOpt.dataset.username || '';
+            document.getElementById('access-username-title').textContent = `User Permissions: ${username}`;
+            
+            permPanel.style.display = 'block';
+            fetchUserPermissions(companyId, userId);
+        }
+
+        async function fetchUserPermissions(companyId, userId) {
+            showToast("Loading user permissions...", 'info');
+            try {
+                const res = await req(`/api/manager/companies/${companyId}/users/${userId}/permissions`, 'GET');
+                if (!res) {
+                    showToast("Failed to retrieve permissions set", 'error');
+                    return;
+                }
+                
+                const widgetKeys = [
+                    'kpi_cards', 'capital_growth', 'operating_cash_flow', 'revenue_budget', 'expense_budget',
+                    'operation_metrics', 'lease_expirations',
+                    'tickets_kpi', 'maintenance_status', 'tickets_by_category'
+                ];
+                const reportKeys = ['balance_sheet', 'income_statement'];
+                
+                const defaultFinancials = ['kpi_cards', 'capital_growth', 'operating_cash_flow', 'revenue_budget', 'expense_budget'];
+                
+                widgetKeys.forEach(key => {
+                    const chk = document.getElementById(`perm-widget-${key}`);
+                    if (chk) {
+                        if (res.widgets && res.widgets.hasOwnProperty(key)) {
+                            chk.checked = res.widgets[key] === true;
+                        } else {
+                            chk.checked = defaultFinancials.includes(key);
+                        }
+                    }
+                });
+                
+                reportKeys.forEach(key => {
+                    const chk = document.getElementById(`perm-report-${key}`);
+                    if (chk) {
+                        if (res.reports && res.reports.hasOwnProperty(key)) {
+                            chk.checked = res.reports[key] === true;
+                        } else {
+                            chk.checked = true; // Default reports are true
+                        }
+                    }
+                });
+                
+                showToast("Permissions loaded", 'success');
+            } catch (err) {
+                showToast("Error loading permissions from database", 'error');
+            }
+        }
+
+        async function saveAccessPermissions() {
+            const companyId = document.getElementById('access-company-select').value;
+            const userId = document.getElementById('access-user-select').value;
+            
+            if (!companyId || !userId) {
+                showToast("Please select both company and user first", 'error');
+                return;
+            }
+            
+            const widgetKeys = [
+                'kpi_cards', 'capital_growth', 'operating_cash_flow', 'revenue_budget', 'expense_budget',
+                'operation_metrics', 'lease_expirations',
+                'tickets_kpi', 'maintenance_status', 'tickets_by_category'
+            ];
+            const reportKeys = ['balance_sheet', 'income_statement'];
+            
+            const widgetsPayload = {};
+            widgetKeys.forEach(key => {
+                const chk = document.getElementById(`perm-widget-${key}`);
+                if (chk) widgetsPayload[key] = chk.checked;
+            });
+            
+            const reportsPayload = {};
+            reportKeys.forEach(key => {
+                const chk = document.getElementById(`perm-report-${key}`);
+                if (chk) reportsPayload[key] = chk.checked;
+            });
+            
+            const payload = {
+                widgets: widgetsPayload,
+                reports: reportsPayload
+            };
+            
+            showToast("Updating database permissions...", 'info');
+            const res = await req(`/api/manager/companies/${companyId}/users/${userId}/permissions`, 'POST', payload);
+            if (res) {
+                showToast("Permissions successfully saved!", 'success');
+            }
+        }
+
+        // Initialize status poll
+        setInterval(pollStatus, 1500);
+        pollStatus();
+    </script>
+</body>
+</html>

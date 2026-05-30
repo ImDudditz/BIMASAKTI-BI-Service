@@ -27,16 +27,19 @@
     <Compile Remove="BiPortal.Tests\**" />
     <Compile Remove="BimasaktiReports.Tests\**" />
     <Compile Remove="manager\**" />
+    <Compile Remove="BI_Portal_Manager\**" />
     <Compile Remove="assets\**" />
     <None Remove="tests\**" />
     <None Remove="BiPortal.Tests\**" />
     <None Remove="BimasaktiReports.Tests\**" />
     <None Remove="manager\**" />
+    <None Remove="BI_Portal_Manager\**" />
     <None Remove="assets\**" />
     <Content Remove="tests\**" />
     <Content Remove="BiPortal.Tests\**" />
     <Content Remove="BimasaktiReports.Tests\**" />
     <Content Remove="manager\**" />
+    <Content Remove="BI_Portal_Manager\**" />
     <Content Remove="assets\**" />
   </ItemGroup>
 

@@ -64,7 +64,7 @@ watch(terminalLogs, () => {
 }, { deep: true })
 
 const backendPort = ref(8001)
-const frontendPort = ref(5173)
+const frontendPort = ref(8002)
 
 const runSimulatedSync = () => {
   if (syncing.value) return
@@ -119,7 +119,7 @@ onMounted(async () => {
     const res = await api.get('/auth/config')
     if (res.data) {
       backendPort.value = res.data.backendPort || 8001
-      frontendPort.value = res.data.frontendPort || 5173
+      frontendPort.value = res.data.frontendPort || 8002
       
       // Update initial terminal logs with correct port
       terminalLogs.value = terminalLogs.value.map(log => 
