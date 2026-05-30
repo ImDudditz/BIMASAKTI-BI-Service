@@ -218,7 +218,7 @@ public static class PortalManagerCore {
                     return port.GetInt32();
             }
         } catch {}
-        return 5050; // default if not found
+        return 8003; // default if not found
     }
 
     public static int RefreshBackendPort() {

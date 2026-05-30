@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BI Portal Manager - Windows XP Royale Edition</title>
+    <title>BI Portal Service Manager - System Console</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,7 +17,7 @@
             --xp-orange: #ff8500; /* Windows XP Royale Accent Orange */
             --xp-orange-hover: #e07400;
             --border-color: #a8cbf3; /* Royale Blue borders */
-            --success: #ff8500; /* Green/Orange accent */
+            --success: #ff8500;
             --success-color: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -369,527 +369,545 @@
     </style>
 </head>
 <body>
-    <div class="bg-blob b1"></div>
-    <div class="bg-blob b2"></div>
+    <div id="app">
+        <div class="bg-blob b1"></div>
+        <div class="bg-blob b2"></div>
 
-    <header>
-        <div class="brand">
-            <h1>BI_PORTAL_MANAGER</h1>
-            <p>Royale Control Interface</p>
-        </div>
-        <nav class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
-            <button class="tab-btn" onclick="switchTab('company')">🏢 Company</button>
-            <button class="tab-btn" onclick="switchTab('widget-access')">🔒 Widget Access</button>
-            <button class="tab-btn" onclick="switchTab('terminal')">💻 Live Console</button>
-        </nav>
-    </header>
-
-    <main>
-        <!-- DASHBOARD -->
-        <div id="tab-dashboard" class="tab-content active">
-            <div class="grid-2">
-                <div class="glass-card">
-                    <div class="card-header">NODE STATUS MONITOR</div>
-                    <div class="status-row">
-                        <div class="server-info">
-                            <h3>Backend API Node</h3>
-                            <p id="lbl-backend-port">Port: Resolving...</p>
-                        </div>
-                        <div class="badge status-stopped" id="status-backend">
-                            <div class="dot"></div> <span id="txt-backend">OFFLINE</span>
-                        </div>
-                    </div>
-                    <div class="status-row">
-                        <div class="server-info">
-                            <h3>Frontend Web Node</h3>
-                            <p id="lbl-frontend-port">Port: Resolving...</p>
-                        </div>
-                        <div class="badge status-stopped" id="status-frontend">
-                            <div class="dot"></div> <span id="txt-frontend">OFFLINE</span>
-                        </div>
-                    </div>
-
-                    <div class="godmode-toggle">
-                        <div>
-                            <h3 style="color: #6d28d9; margin-bottom: 0.15rem; font-weight: 800;">Developer God Mode</h3>
-                            <p style="font-size: 0.8rem; color: #7c3aed; font-weight: 600;">Bypass security constraints.</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="godmode-cb" onchange="toggleGodMode()">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="glass-card">
-                    <div class="card-header">EXECUTION CONTROLS</div>
-                    <button class="btn btn-primary" onclick="req('/api/start')">▶ Ignite Sequence</button>
-                    <button class="btn btn-danger" onclick="req('/api/stop')">⏹ Terminate Sequence</button>
-                    <button class="btn btn-accent" onclick="req('/api/restart')">🔄 Reboot Systems</button>
-                    <button class="btn btn-portal" onclick="openFrontendPortal()">🌐 Open Frontend Portal</button>
-                </div>
+        <header>
+            <div class="brand">
+                <h1>BI_PORTAL_MANAGER</h1>
+                <p>System Console</p>
             </div>
-        </div>
+            <nav class="nav-tabs">
+                <button :class="['tab-btn', activeTab === 'dashboard' ? 'active' : '']" @click="switchTab('dashboard')">📊 Service Status</button>
+                <button :class="['tab-btn', activeTab === 'company' ? 'active' : '']" @click="switchTab('company')">🏢 Company Registry</button>
+                <button :class="['tab-btn', activeTab === 'widget-access' ? 'active' : '']" @click="switchTab('widget-access')">🔒 Access Controls</button>
+                <button :class="['tab-btn', activeTab === 'terminal' ? 'active' : '']" @click="switchTab('terminal')">💻 System stdout</button>
+            </nav>
+        </header>
 
-        <!-- COMPANY (Renamed from Tenants) -->
-        <div id="tab-company" class="tab-content">
-            <div class="glass-card">
-                <div class="card-header" id="company-suite-title">COMPANY MANAGEMENT SUITE</div>
-                <div class="company-grid">
-                    <div class="list-container" id="company-list">
-                        <!-- Loaded dynamically -->
-                    </div>
-                    
-                    <div>
-                        <div class="input-group">
-                            <label>Company ID (5 Characters)</label>
-                            <input type="text" id="company-id" class="input-field" maxlength="5" placeholder="e.g. ALPHA">
-                        </div>
-                        <div class="input-group">
-                            <label>Synchronization Endpoints</label>
-                            <textarea id="company-urls" class="input-field mono" placeholder="https://api.example.com/sync"></textarea>
+        <main>
+            <!-- SERVICE RUNTIME STATUS -->
+            <div v-if="activeTab === 'dashboard'" class="tab-content active">
+                <div class="grid-2">
+                    <div class="glass-card">
+                        <div class="card-header">SERVICE RUNTIME STATUS</div>
+                        
+                        <div class="status-row">
+                            <div class="server-info">
+                                <h3>Backend API Node</h3>
+                                <p>Port: {{ backendPort }}</p>
+                            </div>
+                            <div :class="['badge', 'status-' + backendStatus.toLowerCase()]">
+                                <div class="dot"></div> <span>{{ backendStatus }}</span>
+                            </div>
                         </div>
                         
-                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                            <button class="btn btn-primary" style="flex: 2; margin-bottom: 0;" onclick="saveCompany()">💾 Provision/Update Company</button>
-                            <button class="btn btn-accent" style="flex: 2; margin-bottom: 0;" onclick="syncCompany()">🔄 Force Database Sync</button>
-                            <button class="btn" style="flex: 1; margin-bottom: 0; font-weight: 800;" onclick="clearCompanyForm()">➕ New</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- WIDGET ACCESS -->
-        <div id="tab-widget-access" class="tab-content">
-            <div class="glass-card">
-                <div class="card-header">WIDGET & REPORT ACCESS CONTROL</div>
-                
-                <!-- Filters -->
-                <div class="grid-2" style="margin-bottom: 1.5rem;">
-                    <div class="input-group">
-                        <label>Select Company</label>
-                        <select id="access-company-select" class="input-field" onchange="handleAccessCompanyChange()">
-                            <option value="">-- Loading Companies --</option>
-                        </select>
-                    </div>
-                    
-                    <div class="input-group" id="access-user-group" style="display: none;">
-                        <label>Select User</label>
-                        <select id="access-user-select" class="input-field" onchange="handleAccessUserChange()">
-                            <option value="">-- Select User --</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Permissions Checklist Panels -->
-                <div id="access-permissions-panel" style="display: none; border-top: 2px solid #ebf3fd; padding-top: 1.5rem;">
-                    <h3 id="access-username-title" style="margin-bottom: 1.25rem; color: var(--accent); font-weight: 800; font-size: 1.1rem; text-transform: uppercase;">Permissions</h3>
-                    
-                    <div class="grid-2">
-                        <!-- Widget Access -->
-                        <div class="glass-card" style="padding: 1.5rem; background: #fafcff; border-color: #cbdff8;">
-                            <h4 style="margin-bottom: 1rem; border-bottom: 1.5px solid #cbdff8; padding-bottom: 0.35rem; color: var(--text-primary); font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px;">WIDGET ACCESS LIST</h4>
-                            <div class="checkbox-list" style="display: flex; flex-direction: column; gap: 0.4rem;">
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="perm-widget-kpi_cards">
-                                    <span>📊 Financial KPI Summary Cards</span>
-                                </label>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="perm-widget-capital_growth">
-                                    <span>📈 Capital Growth Trend</span>
-                                </label>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="perm-widget-operating_cash_flow">
-                                    <span>💸 Operating Cash Flow Stream</span>
-                                </label>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="perm-widget-revenue_budget">
-                                    <span>📥 Revenue Budget vs Actual</span>
-                                </label>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="perm-widget-expense_budget">
-                                    <span>📤 Expense Budget vs Actual</span>
-                                </label>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="perm-widget-operation_metrics">
-                                    <span>🔑 Property Operations Metrics</span>
-                                </label>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="perm-widget-lease_expirations">
-                                    <span>📅 Upcoming Lease Expirations</span>
-                                </label>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="perm-widget-tickets_kpi">
-                                    <span>🛠️ Tenant Helpdesk KPI Status</span>
-                                </label>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="perm-widget-maintenance_status">
-                                    <span>📋 Maintenance Orders Log</span>
-                                </label>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="perm-widget-tickets_by_category">
-                                    <span>🏷️ Tickets Distribution Chart</span>
-                                </label>
+                        <div class="status-row">
+                            <div class="server-info">
+                                <h3>Frontend Web Node</h3>
+                                <p>Port: {{ frontendPort }}</p>
+                            </div>
+                            <div :class="['badge', 'status-' + frontendStatus.toLowerCase()]">
+                                <div class="dot"></div> <span>{{ frontendStatus }}</span>
                             </div>
                         </div>
 
-                        <!-- Report Access & Save Button -->
-                        <div class="glass-card" style="padding: 1.5rem; background: #fafcff; border-color: #cbdff8; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div class="status-row" style="margin-top: 1rem; border-top: 1.5px solid #ebf3fd; padding-top: 0.85rem; font-size: 0.76rem; color: var(--text-secondary); display: flex; justify-content: space-between; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 0; background: none; border: none; padding-left: 0; padding-right: 0;">
+                            <span>Local Address: <span style="font-family: 'JetBrains Mono', monospace; color: var(--accent); text-transform: none;">{{ localIp }}</span></span>
+                            <span>Host Domain: <span style="font-family: 'JetBrains Mono', monospace; color: var(--accent); text-transform: none;">{{ coolAlias }}</span></span>
+                        </div>
+
+                        <div class="godmode-toggle">
                             <div>
-                                <h4 style="margin-bottom: 1rem; border-bottom: 1.5px solid #cbdff8; padding-bottom: 0.35rem; color: var(--text-primary); font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px;">REPORT ACCESS LIST</h4>
-                                <div class="checkbox-list" style="display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 2rem;">
+                                <h3 style="color: #6d28d9; margin-bottom: 0.15rem; font-weight: 800;">Bypass Security Restrictions</h3>
+                                <p style="font-size: 0.8rem; color: #7c3aed; font-weight: 600;">Bypass standard authorization checks.</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" :checked="godMode" @change="toggleGodMode">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="card-header">PROCESS CONTROL OPERATIONS</div>
+                        <button class="btn btn-primary" @click="startServices">▶ Start System Services</button>
+                        <button class="btn btn-danger" @click="stopServices">⏹ Stop System Services</button>
+                        <button class="btn btn-accent" @click="restartServices">🔄 Restart System Services</button>
+                        <button class="btn btn-portal" @click="openFrontendPortal">🌐 Launch Client Portal</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPANY REGISTRY -->
+            <div v-if="activeTab === 'company'" class="tab-content active">
+                <div class="glass-card">
+                    <div class="card-header">COMPANY CONFIGURATION PANEL {{ isEditingCompany ? '- EDIT: ' + companyId : '- REGISTER' }}</div>
+                    <div class="company-grid">
+                        <div class="list-container">
+                            <div v-for="c in companies" :key="c" :class="['list-item', companyId === c ? 'selected' : '']" @click="selectCompany(c)">
+                                <span>🏢 {{ c }}</span>
+                                <span style="font-size: 0.72rem; color: var(--accent); font-weight: 800;">EDIT</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="input-group">
+                                <label>Company ID (5 Characters)</label>
+                                <input type="text" v-model="companyId" class="input-field" maxlength="5" :disabled="isEditingCompany" placeholder="e.g. ALPHA">
+                            </div>
+                            <div class="input-group">
+                                <label>Synchronization Endpoints</label>
+                                <textarea v-model="companyUrls" class="input-field mono" placeholder="https://api.example.com/sync"></textarea>
+                            </div>
+                            
+                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                                <button class="btn btn-primary" style="flex: 2; margin-bottom: 0;" @click="saveCompany">💾 Save Company Profile</button>
+                                <button class="btn btn-accent" style="flex: 2; margin-bottom: 0;" @click="syncCompany">🔄 Synchronize Database Now</button>
+                                <button class="btn" style="flex: 1; margin-bottom: 0; font-weight: 800;" @click="clearCompanyForm">➕ Add New</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FEATURE ACCESS SECURITY POLICIES -->
+            <div v-if="activeTab === 'widget-access'" class="tab-content active">
+                <div class="glass-card">
+                    <div class="card-header">FEATURE ACCESS SECURITY POLICIES</div>
+                    
+                    <div class="grid-2" style="margin-bottom: 1.5rem;">
+                        <div class="input-group">
+                            <label>Select Company</label>
+                            <select v-model="selectedAccessCompany" class="input-field" @change="handleAccessCompanyChange">
+                                <option value="">-- Select Company --</option>
+                                <option v-for="c in accessCompanies" :key="c" :value="c">🏢 {{ c }}</option>
+                            </select>
+                        </div>
+                        
+                        <div v-if="accessUsers.length > 0" class="input-group">
+                            <label>Select User</label>
+                            <select v-model="selectedAccessUser" class="input-field" @change="handleAccessUserChange">
+                                <option value="">-- Select User --</option>
+                                <option v-for="u in accessUsers" :key="u.id" :value="u.id">👤 {{ u.username }} ({{ u.role }})</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div v-if="showPermissionsPanel" style="border-top: 2px solid #ebf3fd; padding-top: 1.5rem;">
+                        <h3 style="margin-bottom: 1.25rem; color: var(--accent); font-weight: 800; font-size: 1.1rem; text-transform: uppercase;">USER PERMISSIONS: {{ getSelectedUsername() }}</h3>
+                        
+                        <div class="grid-2">
+                            <!-- Widget Permissions -->
+                            <div class="glass-card" style="padding: 1.5rem; background: #fafcff; border-color: #cbdff8;">
+                                <h4 style="margin-bottom: 1rem; border-bottom: 1.5px solid #cbdff8; padding-bottom: 0.35rem; color: var(--text-primary); font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px;">WIDGET PERMISSIONS</h4>
+                                <div class="checkbox-list" style="display: flex; flex-direction: column; gap: 0.4rem;">
                                     <label class="checkbox-container">
-                                        <input type="checkbox" id="perm-report-balance_sheet">
-                                        <span>📝 Balance Sheet Statement</span>
+                                        <input type="checkbox" v-model="userPermissions.widgets.kpi_cards">
+                                        <span>📊 Financial KPI Summary Cards</span>
                                     </label>
                                     <label class="checkbox-container">
-                                        <input type="checkbox" id="perm-report-income_statement">
-                                        <span>📉 Income Statement Statement</span>
+                                        <input type="checkbox" v-model="userPermissions.widgets.capital_growth">
+                                        <span>📈 Capital Growth Trend</span>
+                                    </label>
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" v-model="userPermissions.widgets.operating_cash_flow">
+                                        <span>💸 Operating Cash Flow Stream</span>
+                                    </label>
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" v-model="userPermissions.widgets.revenue_budget">
+                                        <span>📥 Revenue Budget vs Actual</span>
+                                    </label>
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" v-model="userPermissions.widgets.expense_budget">
+                                        <span>📤 Expense Budget vs Actual</span>
+                                    </label>
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" v-model="userPermissions.widgets.operation_metrics">
+                                        <span>🔑 Property Operations Metrics</span>
+                                    </label>
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" v-model="userPermissions.widgets.lease_expirations">
+                                        <span>📅 Upcoming Lease Expirations</span>
+                                    </label>
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" v-model="userPermissions.widgets.tickets_kpi">
+                                        <span>🛠️ Tenant Helpdesk KPI Status</span>
+                                    </label>
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" v-model="userPermissions.widgets.maintenance_status">
+                                        <span>📋 Maintenance Orders Log</span>
+                                    </label>
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" v-model="userPermissions.widgets.tickets_by_category">
+                                        <span>🏷️ Tickets Distribution Chart</span>
                                     </label>
                                 </div>
                             </div>
-                            
-                            <div>
-                                <button class="btn btn-primary" style="margin-bottom: 0;" onclick="saveAccessPermissions()">💾 Save Permissions Set</button>
+
+                            <!-- Report Permissions & Save Button -->
+                            <div class="glass-card" style="padding: 1.5rem; background: #fafcff; border-color: #cbdff8; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="margin-bottom: 1rem; border-bottom: 1.5px solid #cbdff8; padding-bottom: 0.35rem; color: var(--text-primary); font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px;">REPORT PERMISSIONS</h4>
+                                    <div class="checkbox-list" style="display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 2rem;">
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" v-model="userPermissions.reports.balance_sheet">
+                                            <span>📝 Balance Sheet Statement</span>
+                                        </label>
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" v-model="userPermissions.reports.income_statement">
+                                            <span>📉 Income Statement Statement</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <button class="btn btn-primary" style="margin-bottom: 0;" @click="saveAccessPermissions">💾 Update Access Policies</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- TERMINAL -->
-        <div id="tab-terminal" class="tab-content">
-            <div class="terminal">
-                <div class="term-header">
-                    <span>> system_monitor_stream.log</span>
-                    <button style="background:none; border:none; color:#9ca3af; cursor:pointer; font-weight: bold;" onclick="req('/api/logs/clear')">[ CLEAR CONSOLE ]</button>
-                </div>
-                <div class="term-body" id="term-body">
-                    <!-- Logs -->
+            <!-- SYSTEM STDOUT -->
+            <div v-if="activeTab === 'terminal'" class="tab-content active">
+                <div class="terminal">
+                    <div class="term-header">
+                        <span>> system_stdout.log</span>
+                        <button style="background:none; border:none; color:#9ca3af; cursor:pointer; font-weight: bold;" @click="clearLogs">[ CLEAR STDOUT ]</button>
+                    </div>
+                    <div class="term-body" id="term-body">
+                        <div v-for="(l, index) in logs" :key="index" :class="['log', getLogClass(l)]">
+                            {{ l }}
+                        </div>
+                    </div>
                 </div>
             </div>
+        </main>
+
+        <div class="toast-container">
+            <div v-for="t in toasts" :key="t.id" class="toast" :style="{ borderLeftColor: getToastColor(t.type) }">
+                {{ t.message }}
+            </div>
         </div>
-    </main>
+    </div>
 
-    <div class="toast-container" id="toasts"></div>
-
+    <!-- Load Vue 3 global library -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script>
-        const API = window.location.origin;
-        let isPolling = false;
-        let frontendPort = 8002;
+        const { createApp, ref, onMounted, onUnmounted, nextTick } = Vue;
 
-        function switchTab(id) {
-            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
-            document.getElementById('tab-' + id).classList.add('active');
-            event.target.classList.add('active');
-            
-            if (id === 'company') {
-                loadCompanies();
-            } else if (id === 'widget-access') {
-                loadAccessCompanies();
-            }
-        }
-
-        function showToast(msg, type = 'info') {
-            const container = document.getElementById('toasts');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.style.borderLeftColor = type === 'error' ? 'var(--danger)' : (type === 'success' ? 'var(--success-color)' : 'var(--xp-orange)');
-            toast.innerHTML = msg;
-            container.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
-        }
-
-        async function req(endpoint, method = 'POST', body = null) {
-            try {
-                const opt = { method, headers: { 'Content-Type': 'application/json' } };
-                if (body) opt.body = JSON.stringify(body);
-                const res = await fetch(API + endpoint, opt);
-                if (method === 'POST') showToast(await res.json().then(d => d.message || d.error || 'Command Executed').catch(()=>'Executed'), res.ok ? 'success' : 'error');
-                return res.ok ? await res.json() : null;
-            } catch (e) {
-                if(method === 'POST') showToast('Network Error', 'error');
-                return null;
-            }
-        }
-
-        async function pollStatus() {
-            if (isPolling) return;
-            isPolling = true;
-            const res = await req('/api/status', 'GET');
-            if (res) {
-                const bStat = document.getElementById('status-backend');
-                const fStat = document.getElementById('status-frontend');
+        createApp({
+            setup() {
+                const API = window.location.origin;
+                const activeTab = ref('dashboard');
+                const isPolling = ref(false);
+                const frontendPort = ref(8002);
+                let failedPolls = 0;
                 
-                bStat.className = `badge status-${res.backendStatus.toLowerCase()}`;
-                document.getElementById('txt-backend').innerText = res.backendStatus.toUpperCase();
-                document.getElementById('lbl-backend-port').innerText = `Port: ${res.backendPort}`;
+                // Status states
+                const backendStatus = ref('OFFLINE');
+                const backendPort = ref(8001);
+                const frontendStatus = ref('OFFLINE');
+                const localIp = ref('127.0.0.1');
+                const coolAlias = ref('localhost');
+                const godMode = ref(false);
                 
-                fStat.className = `badge status-${res.frontendStatus.toLowerCase()}`;
-                document.getElementById('txt-frontend').innerText = res.frontendStatus.toUpperCase();
-                document.getElementById('lbl-frontend-port').innerText = `Port: ${res.frontendPort}`;
+                // Logs
+                const logs = ref([]);
                 
-                document.getElementById('godmode-cb').checked = res.godMode;
-                frontendPort = res.frontendPort;
-            }
+                // Company state
+                const companies = ref([]);
+                const companyId = ref('');
+                const companyUrls = ref('');
+                const isEditingCompany = ref(false);
 
-            const logs = await req('/api/logs', 'GET');
-            if (logs) {
-                const tb = document.getElementById('term-body');
-                const wasScrolledToBottom = tb.scrollHeight - tb.clientHeight <= tb.scrollTop + 1;
-                
-                tb.innerHTML = logs.map(l => {
-                    let cls = '';
-                    if (l.includes('[Backend]')) cls = 'log-backend';
-                    if (l.includes('[Vite]')) cls = 'log-vite';
-                    if (l.includes('[Sync]')) cls = 'log-sync';
-                    if (l.includes('Error') || l.includes('Exception') || l.includes('fail:')) cls = 'log-err';
-                    return `<div class="log ${cls}">${l.replace(/</g, '&lt;')}</div>`;
-                }).join('');
+                // Widget Access state
+                const accessCompanies = ref([]);
+                const selectedAccessCompany = ref('');
+                const accessUsers = ref([]);
+                const selectedAccessUser = ref('');
+                const userPermissions = ref({ widgets: {}, reports: {} });
+                const showPermissionsPanel = ref(false);
 
-                if (wasScrolledToBottom) tb.scrollTop = tb.scrollHeight;
-            }
+                // Toasts list
+                const toasts = ref([]);
 
-            isPolling = false;
-        }
+                const showToast = (message, type = 'info') => {
+                    const id = Date.now() + Math.random();
+                    toasts.value.push({ id, message, type });
+                    setTimeout(() => {
+                        toasts.value = toasts.value.filter(t => t.id !== id);
+                    }, 3000);
+                };
 
-        function openFrontendPortal() {
-            window.open(`https://localhost:${frontendPort}`, '_blank');
-        }
+                const getToastColor = (type) => {
+                    if (type === 'error') return 'var(--danger)';
+                    if (type === 'success') return 'var(--success-color)';
+                    return 'var(--xp-orange)';
+                };
 
-        async function toggleGodMode() { await req('/api/godmode'); }
+                const req = async (endpoint, method = 'POST', body = null) => {
+                    try {
+                        const opt = { method, headers: { 'Content-Type': 'application/json' } };
+                        if (body) opt.body = JSON.stringify(body);
+                        const res = await fetch(API + endpoint, opt);
+                        if (method === 'POST') {
+                            const data = await res.json();
+                            showToast(data.message || data.error || 'Operation Executed', res.ok ? 'success' : 'error');
+                        }
+                        return res.ok ? await res.json() : null;
+                    } catch (e) {
+                        if (method === 'POST') showToast('Network connection failed', 'error');
+                        return null;
+                    }
+                };
 
-        // --- COMPANY DIRECTORY LOGIC ---
-        async function loadCompanies() {
-            const comps = await req('/api/companies', 'GET');
-            if (comps) {
-                document.getElementById('company-list').innerHTML = comps.map(c => 
-                    `<div class="list-item" id="comp-item-${c}" onclick="selectCompany('${c}')">
-                        <span>🏢 ${c}</span>
-                        <span style="font-size: 0.72rem; color: var(--accent); font-weight: 800;">EDIT</span>
-                     </div>`
-                ).join('');
-            }
-        }
+                const closeTab = () => {
+                    window.open('', '_self', '');
+                    window.close();
+                };
 
-        function clearCompanyForm() {
-            document.getElementById('company-id').value = '';
-            document.getElementById('company-id').disabled = false;
-            document.getElementById('company-urls').value = '';
-            document.getElementById('company-suite-title').innerText = "COMPANY MANAGEMENT SUITE - CREATE";
-            document.querySelectorAll('.list-item').forEach(e => e.classList.remove('selected'));
-        }
-
-        async function selectCompany(id) {
-            document.querySelectorAll('.list-item').forEach(e => e.classList.remove('selected'));
-            const element = document.getElementById(`comp-item-${id}`);
-            if (element) element.classList.add('selected');
-
-            document.getElementById('company-id').value = id;
-            document.getElementById('company-id').disabled = true;
-            document.getElementById('company-suite-title').innerText = `COMPANY MANAGEMENT SUITE - EDIT: ${id}`;
-            const res = await req(`/api/companies/${id}`, 'GET');
-            if (res) {
-                document.getElementById('company-urls').value = (res.urls || []).join('\n');
-            }
-        }
-
-        async function saveCompany() {
-            const id = document.getElementById('company-id').value.trim().toUpperCase();
-            const urls = document.getElementById('company-urls').value;
-            if (id.length !== 5) return showToast('Company ID must be exactly 5 characters', 'error');
-            
-            const comps = await req('/api/companies', 'GET') || [];
-            const mode = comps.includes(id) ? 'Update' : 'New';
-            
-            showToast(`Saving company ${id}...`, 'info');
-            const res = await req('/api/companies', 'POST', { CompanyId: id, Mode: mode, SyncUrls: urls });
-            if (res) {
-                clearCompanyForm();
-                loadCompanies();
-            }
-        }
-
-        async function syncCompany() {
-            const id = document.getElementById('company-id').value.trim().toUpperCase();
-            if (id.length !== 5) return showToast('Please select or specify a valid 5-char Company first', 'error');
-            await req(`/api/companies/${id}/sync`, 'POST');
-            switchTab('terminal');
-        }
-
-        // --- WIDGET ACCESS LOGIC ---
-        async function loadAccessCompanies() {
-            const comps = await req('/api/companies', 'GET');
-            const select = document.getElementById('access-company-select');
-            
-            document.getElementById('access-user-group').style.display = 'none';
-            document.getElementById('access-permissions-panel').style.display = 'none';
-            
-            if (!comps || comps.length === 0) {
-                select.innerHTML = '<option value="">-- No Companies Found --</option>';
-                return;
-            }
-            
-            select.innerHTML = '<option value="">-- Select Company --</option>';
-            comps.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c;
-                opt.textContent = `🏢 ${c}`;
-                select.appendChild(opt);
-            });
-        }
-
-        function handleAccessCompanyChange() {
-            const companyId = document.getElementById('access-company-select').value;
-            const userGroup = document.getElementById('access-user-group');
-            const permPanel = document.getElementById('access-permissions-panel');
-            
-            permPanel.style.display = 'none';
-            if (!companyId) {
-                userGroup.style.display = 'none';
-                return;
-            }
-            
-            userGroup.style.display = 'block';
-            fetchAccessUsers(companyId);
-        }
-
-        async function fetchAccessUsers(companyId) {
-            try {
-                const select = document.getElementById('access-user-select');
-                select.innerHTML = '<option value="">-- Loading Users --</option>';
-                
-                const users = await req(`/api/manager/companies/${companyId}/users`, 'GET');
-                if (!users || users.length === 0) {
-                    select.innerHTML = '<option value="">-- No Users Found --</option>';
-                    return;
-                }
-                
-                select.innerHTML = '<option value="">-- Select User --</option>';
-                users.forEach(u => {
-                    const opt = document.createElement('option');
-                    opt.value = u.id;
-                    opt.textContent = `👤 ${u.username} (${u.role})`;
-                    opt.dataset.username = u.username;
-                    select.appendChild(opt);
-                });
-            } catch (err) {
-                showToast("Failed to load company users", 'error');
-            }
-        }
-
-        function handleAccessUserChange() {
-            const companyId = document.getElementById('access-company-select').value;
-            const select = document.getElementById('access-user-select');
-            const userId = select.value;
-            const permPanel = document.getElementById('access-permissions-panel');
-            
-            if (!companyId || !userId) {
-                permPanel.style.display = 'none';
-                return;
-            }
-            
-            const selectedOpt = select.options[select.selectedIndex];
-            const username = selectedOpt.dataset.username || '';
-            document.getElementById('access-username-title').textContent = `User Permissions: ${username}`;
-            
-            permPanel.style.display = 'block';
-            fetchUserPermissions(companyId, userId);
-        }
-
-        async function fetchUserPermissions(companyId, userId) {
-            showToast("Loading user permissions...", 'info');
-            try {
-                const res = await req(`/api/manager/companies/${companyId}/users/${userId}/permissions`, 'GET');
-                if (!res) {
-                    showToast("Failed to retrieve permissions set", 'error');
-                    return;
-                }
-                
-                const widgetKeys = [
-                    'kpi_cards', 'capital_growth', 'operating_cash_flow', 'revenue_budget', 'expense_budget',
-                    'operation_metrics', 'lease_expirations',
-                    'tickets_kpi', 'maintenance_status', 'tickets_by_category'
-                ];
-                const reportKeys = ['balance_sheet', 'income_statement'];
-                
-                const defaultFinancials = ['kpi_cards', 'capital_growth', 'operating_cash_flow', 'revenue_budget', 'expense_budget'];
-                
-                widgetKeys.forEach(key => {
-                    const chk = document.getElementById(`perm-widget-${key}`);
-                    if (chk) {
-                        if (res.widgets && res.widgets.hasOwnProperty(key)) {
-                            chk.checked = res.widgets[key] === true;
-                        } else {
-                            chk.checked = defaultFinancials.includes(key);
+                const pollStatus = async () => {
+                    if (isPolling.value) return;
+                    isPolling.value = true;
+                    
+                    const res = await req('/api/status', 'GET');
+                    if (res) {
+                        failedPolls = 0;
+                        backendStatus.value = res.backendStatus.toUpperCase();
+                        backendPort.value = res.backendPort;
+                        frontendStatus.value = res.frontendStatus.toUpperCase();
+                        frontendPort.value = res.frontendPort;
+                        localIp.value = res.localIp;
+                        coolAlias.value = res.coolAlias;
+                        godMode.value = res.godMode;
+                    } else {
+                        failedPolls++;
+                        if (failedPolls >= 3) {
+                            closeTab();
                         }
                     }
-                });
-                
-                reportKeys.forEach(key => {
-                    const chk = document.getElementById(`perm-report-${key}`);
-                    if (chk) {
-                        if (res.reports && res.reports.hasOwnProperty(key)) {
-                            chk.checked = res.reports[key] === true;
-                        } else {
-                            chk.checked = true; // Default reports are true
+
+                    const logData = await req('/api/logs', 'GET');
+                    if (logData) {
+                        logs.value = logData;
+                        // Auto scroll terminal if active
+                        if (activeTab.value === 'terminal') {
+                            nextTick(() => {
+                                const tb = document.getElementById('term-body');
+                                if (tb) tb.scrollTop = tb.scrollHeight;
+                            });
                         }
                     }
+
+                    isPolling.value = false;
+                };
+
+                const switchTab = (tab) => {
+                    activeTab.value = tab;
+                    if (tab === 'company') {
+                        loadCompanies();
+                    } else if (tab === 'widget-access') {
+                        loadAccessCompanies();
+                    }
+                };
+
+                // Actions
+                const startServices = () => req('/api/start');
+                const stopServices = () => req('/api/stop');
+                const restartServices = () => req('/api/restart');
+                const toggleGodMode = () => req('/api/godmode');
+                const openFrontendPortal = () => {
+                    window.open(`https://localhost:${frontendPort.value}`, '_blank');
+                };
+                const clearLogs = () => {
+                    req('/api/logs/clear');
+                    logs.value = [];
+                };
+
+                // Company operations
+                const loadCompanies = async () => {
+                    const res = await req('/api/companies', 'GET');
+                    if (res) companies.value = res;
+                };
+
+                const selectCompany = async (id) => {
+                    companyId.value = id;
+                    isEditingCompany.value = true;
+                    const res = await req(`/api/companies/${id}`, 'GET');
+                    if (res) {
+                        companyUrls.value = (res.urls || []).join('\n');
+                    }
+                };
+
+                const clearCompanyForm = () => {
+                    companyId.value = '';
+                    companyUrls.value = '';
+                    isEditingCompany.value = false;
+                };
+
+                const saveCompany = async () => {
+                    const id = companyId.value.trim().toUpperCase();
+                    if (id.length !== 5) return showToast('Company ID must be exactly 5 characters', 'error');
+                    
+                    const mode = companies.value.includes(id) ? 'Update' : 'New';
+                    showToast(`Saving configuration for ${id}...`, 'info');
+                    
+                    const res = await req('/api/companies', 'POST', { CompanyId: id, Mode: mode, SyncUrls: companyUrls.value });
+                    if (res) {
+                        clearCompanyForm();
+                        loadCompanies();
+                    }
+                };
+
+                const syncCompany = async () => {
+                    const id = companyId.value.trim().toUpperCase();
+                    if (id.length !== 5) return showToast('Please select or specify a valid 5-char Company ID', 'error');
+                    await req(`/api/companies/${id}/sync`, 'POST');
+                    switchTab('terminal');
+                };
+
+                // Widget access operations
+                const loadAccessCompanies = async () => {
+                    selectedAccessCompany.value = '';
+                    selectedAccessUser.value = '';
+                    accessUsers.value = [];
+                    showPermissionsPanel.value = false;
+                    
+                    const res = await req('/api/companies', 'GET');
+                    if (res) accessCompanies.value = res;
+                };
+
+                const handleAccessCompanyChange = async () => {
+                    selectedAccessUser.value = '';
+                    accessUsers.value = [];
+                    showPermissionsPanel.value = false;
+                    
+                    if (!selectedAccessCompany.value) return;
+                    
+                    const res = await req(`/api/manager/companies/${selectedAccessCompany.value}/users`, 'GET');
+                    if (res) accessUsers.value = res;
+                };
+
+                const handleAccessUserChange = async () => {
+                    if (!selectedAccessCompany.value || !selectedAccessUser.value) {
+                        showPermissionsPanel.value = false;
+                        return;
+                    }
+                    
+                    showPermissionsPanel.value = true;
+                    showToast("Loading access rules...", 'info');
+                    
+                    const res = await req(`/api/manager/companies/${selectedAccessCompany.value}/users/${selectedAccessUser.value}/permissions`, 'GET');
+                    if (res) {
+                        const widgetKeys = [
+                            'kpi_cards', 'capital_growth', 'operating_cash_flow', 'revenue_budget', 'expense_budget',
+                            'operation_metrics', 'lease_expirations',
+                            'tickets_kpi', 'maintenance_status', 'tickets_by_category'
+                        ];
+                        const reportKeys = ['balance_sheet', 'income_statement'];
+                        const defaultFinancials = ['kpi_cards', 'capital_growth', 'operating_cash_flow', 'revenue_budget', 'expense_budget'];
+                        
+                        const widgets = {};
+                        widgetKeys.forEach(k => {
+                            if (res.widgets && res.widgets.hasOwnProperty(k)) {
+                                widgets[k] = res.widgets[k] === true;
+                            } else {
+                                widgets[k] = defaultFinancials.includes(k);
+                            }
+                        });
+
+                        const reports = {};
+                        reportKeys.forEach(k => {
+                            if (res.reports && res.reports.hasOwnProperty(k)) {
+                                reports[k] = res.reports[k] === true;
+                            } else {
+                                reports[k] = true;
+                            }
+                        });
+
+                        userPermissions.value = { widgets, reports };
+                        showToast("Access rules loaded", 'success');
+                    }
+                };
+
+                const saveAccessPermissions = async () => {
+                    if (!selectedAccessCompany.value || !selectedAccessUser.value) return;
+                    
+                    showToast("Saving security policies...", 'info');
+                    const res = await req(`/api/manager/companies/${selectedAccessCompany.value}/users/${selectedAccessUser.value}/permissions`, 'POST', userPermissions.value);
+                    if (res) {
+                        showToast("Access policies updated successfully!", 'success');
+                    }
+                };
+
+                const getSelectedUsername = () => {
+                    const user = accessUsers.value.find(u => u.id == selectedAccessUser.value);
+                    return user ? user.username : '';
+                };
+
+                const getLogClass = (line) => {
+                    if (line.includes('[Backend]')) return 'log-backend';
+                    if (line.includes('[Vite]')) return 'log-vite';
+                    if (line.includes('[Sync]')) return 'log-sync';
+                    if (line.includes('Error') || line.includes('Exception') || line.includes('fail:')) return 'log-err';
+                    return '';
+                };
+
+                let pollInterval = null;
+                onMounted(() => {
+                    pollStatus();
+                    pollInterval = setInterval(pollStatus, 1500);
                 });
-                
-                showToast("Permissions loaded", 'success');
-            } catch (err) {
-                showToast("Error loading permissions from database", 'error');
-            }
-        }
 
-        async function saveAccessPermissions() {
-            const companyId = document.getElementById('access-company-select').value;
-            const userId = document.getElementById('access-user-select').value;
-            
-            if (!companyId || !userId) {
-                showToast("Please select both company and user first", 'error');
-                return;
-            }
-            
-            const widgetKeys = [
-                'kpi_cards', 'capital_growth', 'operating_cash_flow', 'revenue_budget', 'expense_budget',
-                'operation_metrics', 'lease_expirations',
-                'tickets_kpi', 'maintenance_status', 'tickets_by_category'
-            ];
-            const reportKeys = ['balance_sheet', 'income_statement'];
-            
-            const widgetsPayload = {};
-            widgetKeys.forEach(key => {
-                const chk = document.getElementById(`perm-widget-${key}`);
-                if (chk) widgetsPayload[key] = chk.checked;
-            });
-            
-            const reportsPayload = {};
-            reportKeys.forEach(key => {
-                const chk = document.getElementById(`perm-report-${key}`);
-                if (chk) reportsPayload[key] = chk.checked;
-            });
-            
-            const payload = {
-                widgets: widgetsPayload,
-                reports: reportsPayload
-            };
-            
-            showToast("Updating database permissions...", 'info');
-            const res = await req(`/api/manager/companies/${companyId}/users/${userId}/permissions`, 'POST', payload);
-            if (res) {
-                showToast("Permissions successfully saved!", 'success');
-            }
-        }
+                onUnmounted(() => {
+                    if (pollInterval) clearInterval(pollInterval);
+                });
 
-        // Initialize status poll
-        setInterval(pollStatus, 1500);
-        pollStatus();
+                return {
+                    activeTab,
+                    frontendPort,
+                    backendStatus,
+                    backendPort,
+                    frontendStatus,
+                    localIp,
+                    coolAlias,
+                    godMode,
+                    logs,
+                    companies,
+                    companyId,
+                    companyUrls,
+                    isEditingCompany,
+                    accessCompanies,
+                    selectedAccessCompany,
+                    accessUsers,
+                    selectedAccessUser,
+                    userPermissions,
+                    showPermissionsPanel,
+                    toasts,
+                    getToastColor,
+                    switchTab,
+                    startServices,
+                    stopServices,
+                    restartServices,
+                    toggleGodMode,
+                    openFrontendPortal,
+                    clearLogs,
+                    selectCompany,
+                    clearCompanyForm,
+                    saveCompany,
+                    syncCompany,
+                    handleAccessCompanyChange,
+                    handleAccessUserChange,
+                    saveAccessPermissions,
+                    getSelectedUsername,
+                    getLogClass
+                };
+            }
+        }).mount('#app');
     </script>
 </body>
 </html>

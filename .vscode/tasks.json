@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/backend/BimasaktiReports.csproj",
+                "${workspaceFolder}/backend/BiPortal.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/backend/BimasaktiReports.csproj",
+                "${workspaceFolder}/backend/BiPortal.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/backend/BimasaktiReports.csproj"
+                "${workspaceFolder}/backend/BiPortal.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

@@ -3,6 +3,9 @@ title BI Portal Manager
 chcp 65001 >nul
 setlocal enabledelayedexpansion
 
+:: Disable Console Window Close Button (Force Option 5 exit to ensure clean port/cache shutdown)
+powershell -Command "`$q = [char]34; `$code = 'using System; using System.Runtime.InteropServices; public class WindowHelper { [DllImport(' + `$q + 'kernel32.dll' + `$q + ')] public static extern IntPtr GetConsoleWindow(); [DllImport(' + `$q + 'user32.dll' + `$q + ')] public static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert); [DllImport(' + `$q + 'user32.dll' + `$q + ')] public static extern bool DeleteMenu(IntPtr hMenu, uint uPosition, uint uFlags); }'; Add-Type -TypeDefinition `$code; `$hWnd = [WindowHelper]::GetConsoleWindow(); `$hMenu = [WindowHelper]::GetSystemMenu(`$hWnd, `$false); [void][WindowHelper]::DeleteMenu(`$hMenu, 0xF060, 0x00000000)" >nul 2>&1
+
 set "ROOT_DIR=%~dp0"
 set "BACKEND_DIR=%ROOT_DIR%backend"
 set "FRONTEND_DIR=%ROOT_DIR%frontend"
@@ -100,17 +103,17 @@ for /L %%i in (1,1,24) do (
         )
     )
 )
-echo ] Done!
+echo ] Done.
 echo.
 
 :: Verify if running
 if !BOOT_SUCCESS!==0 (
-    echo  [!] The server failed to respond on Port %MANAGER_PORT% within 12 seconds.
-    echo  [!] Please review '%MANAGER_DIR%\manager_startup.log' for details.
+    echo  [x] The server failed to respond on Port %MANAGER_PORT% within 12 seconds.
+    echo  [x] Please review '%MANAGER_DIR%\manager_startup.log' for details.
     echo.
     pause
 ) else (
-    echo  [+] Web Control Panel is online!
+    echo  [+] Web Control Panel is online.
     echo  [+] Redirecting your browser to http://localhost:%MANAGER_PORT% ...
     start "" "http://localhost:%MANAGER_PORT%"
     timeout /t 2 >nul
@@ -126,7 +129,7 @@ echo  ============================================================
 echo.
 
 :: Animated Loading Bar
-powershell -Command "Write-Host -NoNewline ' Clearing temporary folders: ['; 1..20 | %% { Write-Host -NoNewline '■'; Start-Sleep -m 60 }; Write-Host '] Done!'"
+powershell -Command "Write-Host -NoNewline ' Clearing temporary folders: ['; 1..20 | %% { Write-Host -NoNewline '■'; Start-Sleep -m 60 }; Write-Host '] Done.'"
 echo.
 
 set "cleaned=0"
@@ -163,7 +166,7 @@ echo  ============================================================
 echo.
 
 :: Animated Loading Bar
-powershell -Command "Write-Host -NoNewline ' Terminating active ports:   ['; 1..20 | %% { Write-Host -NoNewline '■'; Start-Sleep -m 50 }; Write-Host '] Done!'"
+powershell -Command "Write-Host -NoNewline ' Terminating active ports:   ['; 1..20 | %% { Write-Host -NoNewline '■'; Start-Sleep -m 50 }; Write-Host '] Done.'"
 echo.
 
 set "freed=0"
@@ -197,13 +200,13 @@ echo  ============================================================
 echo.
 
 :: Animated Loading Bar
-powershell -Command "Write-Host -NoNewline ' Running environment diagnostic: ['; 1..20 | %% { Write-Host -NoNewline '■'; Start-Sleep -m 40 }; Write-Host '] Verified!'"
+powershell -Command "Write-Host -NoNewline ' Running environment diagnostic: ['; 1..20 | %% { Write-Host -NoNewline '■'; Start-Sleep -m 40 }; Write-Host '] Verified.'"
 echo.
 echo.
 
 dotnet --version >nul 2>&1
 if errorlevel 1 (
-    echo  [x] .NET CLI is NOT installed or not present in your system PATH!
+    echo  [x] .NET CLI is NOT installed or not present in your system PATH.
     echo      Please install .NET Core SDK 8.0 or newer to run the server.
 ) else (
     for /f "delims=" %%v in ('dotnet --version') do set "DOTNET_VERSION=%%v"
@@ -218,12 +221,12 @@ if errorlevel 1 (
         echo      Manager Project file found. Building dry-run test...
         dotnet build "%MANAGER_DIR%\BI_Portal_Manager.csproj" --no-restore >nul 2>&1
         if errorlevel 1 (
-            echo  [x] Project Build Health: FAILED! Run option [2] to clean cache and try again.
+            echo  [x] Project Build Health: FAILED. Run option [2] to clean cache and try again.
         ) else (
             echo  [+] Project Build Health: STABLE (Ready to run)
         )
     ) else (
-        echo  [x] Error: Manager project file not found at %MANAGER_DIR%!
+        echo  [x] Error: Manager project file not found at %MANAGER_DIR%.
     )
 )
 echo.
@@ -239,8 +242,11 @@ echo  ============================================================
 echo.
 
 :: Exit loader
-powershell -Command "Write-Host -NoNewline ' Force closing active sessions: ['; 1..25 | %% { Write-Host -NoNewline '■'; Start-Sleep -m 30 }; Write-Host '] Closed!'"
+powershell -Command "Write-Host -NoNewline ' Force closing active sessions: ['; 1..25 | %% { Write-Host -NoNewline '■'; Start-Sleep -m 30 }; Write-Host '] Closed.'"
 echo.
+
+:: Close open browser windows/tabs for the BI Portal Manager and Frontend Portal
+powershell -Command "Get-Process | Where-Object { `$_.MainWindowTitle -like '*BI Portal*' -or `$_.MainWindowTitle -like '*Financial Reports*' } | ForEach-Object { `$_.CloseMainWindow() }" >nul 2>&1
 
 :: 1. Free ports (close any running manager, backend, frontend)
 for %%p in (%MANAGER_PORT% %BACKEND_PORT% %FRONTEND_PORT%) do (
@@ -262,6 +268,6 @@ if exist "%FRONTEND_DIR%\node_modules\.vite" (
 
 echo.
 echo  [+] All systems shut down, ports freed, and cache cleaned.
-echo  [+] Goodbye!
+echo  [+] Goodbye.
 timeout /t 2 >nul
 exit
