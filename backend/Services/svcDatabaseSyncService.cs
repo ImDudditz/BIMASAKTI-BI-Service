@@ -6,9 +6,9 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
-using BimasaktiReports.FinancialReports.Backend.Engines;
+using BiPortal.FinancialReports.Backend.Engines;
 
-namespace BimasaktiReports.FinancialReports.Backend.Services
+namespace BiPortal.FinancialReports.Backend.Services
 {
     public interface IsvcDatabaseSyncService
     {

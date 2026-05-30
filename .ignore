@@ -1,0 +1,22 @@
+# C# Output directories
+**/bin/
+**/obj/
+**/publish/
+
+# Node/Vite packages and outputs
+**/node_modules/
+**/dist/
+**/.eslintcache
+
+# Databases and Logs
+**/*.db
+**/*.log
+**/logs/
+
+# Secrets and editor metadata
+.env
+.env.*
+.vs/
+.vscode/
+.idea/
+.DS_Store

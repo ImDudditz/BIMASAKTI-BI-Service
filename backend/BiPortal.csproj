@@ -4,8 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <RootNamespace>BimasaktiReports.FinancialReports.Backend</RootNamespace>
-    <AssemblyName>BimasaktiReports.FinancialReports.Backend</AssemblyName>
+    <RootNamespace>BiPortal.FinancialReports.Backend</RootNamespace>
+    <AssemblyName>BiPortal.FinancialReports.Backend</AssemblyName>
     <UseAppHost>false</UseAppHost>
   </PropertyGroup>
 
@@ -24,14 +24,20 @@
 
   <ItemGroup>
     <Compile Remove="tests\**" />
+    <Compile Remove="BiPortal.Tests\**" />
     <Compile Remove="BimasaktiReports.Tests\**" />
     <Compile Remove="manager\**" />
+    <Compile Remove="assets\**" />
     <None Remove="tests\**" />
+    <None Remove="BiPortal.Tests\**" />
     <None Remove="BimasaktiReports.Tests\**" />
     <None Remove="manager\**" />
+    <None Remove="assets\**" />
     <Content Remove="tests\**" />
+    <Content Remove="BiPortal.Tests\**" />
     <Content Remove="BimasaktiReports.Tests\**" />
     <Content Remove="manager\**" />
+    <Content Remove="assets\**" />
   </ItemGroup>
 
 </Project>

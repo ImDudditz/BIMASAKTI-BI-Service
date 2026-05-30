@@ -10,17 +10,17 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using BimasaktiReports.FinancialReports.Backend.Services;
+using BiPortal.FinancialReports.Backend.Services;
 using Scalar.AspNetCore;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
-using BimasaktiReports.FinancialReports.Backend.Engines;
+using BiPortal.FinancialReports.Backend.Engines;
 using Microsoft.EntityFrameworkCore;
 
-namespace BimasaktiReports.FinancialReports.Backend
+namespace BiPortal.FinancialReports.Backend
 {
     public class Program
     {

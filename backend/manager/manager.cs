@@ -13,9 +13,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
-using BimasaktiReports.FinancialReports.Backend.Engines;
+using BiPortal.FinancialReports.Backend.Engines;
 
-namespace BimasaktiReports.FinancialReports.Manager
+namespace BiPortal.FinancialReports.Manager
 {
     public enum ServerStatus
     {
@@ -137,7 +137,7 @@ namespace BimasaktiReports.FinancialReports.Manager
                 KillProcessOnPort(8001);
 
                 // Use pre-compiled DLL if present for near-instant boot, fallback to dotnet run
-                string dllPath = Path.Combine(backendDir, "bin", "Debug", "net8.0", "BimasaktiReports.FinancialReports.Backend.dll");
+                string dllPath = Path.Combine(backendDir, "bin", "Debug", "net8.0", "BiPortal.FinancialReports.Backend.dll");
                 bool useDll = File.Exists(dllPath);
                 string executableArguments = useDll ? $"\"{dllPath}\"" : "run";
 

@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Xunit;
 using Moq;
 using Microsoft.Data.Sqlite;
-using BimasaktiReports.FinancialReports.Backend.Services;
-using BimasaktiReports.FinancialReports.Backend.Engines;
+using BiPortal.FinancialReports.Backend.Services;
+using BiPortal.FinancialReports.Backend.Engines;
 
-namespace BimasaktiReports.FinancialReports.Backend.Tests
+namespace BiPortal.FinancialReports.Backend.Tests
 {
     // --- 1. AUTHENTICATION SERVICE TESTS ---
 

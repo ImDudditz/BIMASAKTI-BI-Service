@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
-namespace BimasaktiReports.FinancialReports.Backend.Engines
+namespace BiPortal.FinancialReports.Backend.Engines
 {
     // --- SPECIFICATION CLASSES ---
 

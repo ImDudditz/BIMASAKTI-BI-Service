@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BimasaktiReports.FinancialReports.Backend.Services
+namespace BiPortal.FinancialReports.Backend.Services
 {
     public class DailyFootTrafficItem
     {

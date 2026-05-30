@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace BimasaktiReports.FinancialReports.Backend.Engines
+namespace BiPortal.FinancialReports.Backend.Engines
 {
     public static class prFinancialPDF
     {

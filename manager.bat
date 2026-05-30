@@ -147,7 +147,7 @@ if not errorlevel 1 (
 )
 
 echo  Step 2: Spawning C# Backend API Service (Port 8001) in separate console...
-start "Bimasakti C# Backend API" /D "%BACKEND_DIR%" cmd /k "color 0A & echo Running Bimasakti API Backend... & dotnet run --project BimasaktiReports.csproj"
+start "Bimasakti C# Backend API" /D "%BACKEND_DIR%" cmd /k "color 0A & echo Running Bimasakti API Backend... & dotnet run --project BiPortal.csproj"
 
 echo  Step 3: Spawning Vue Frontend Web Server (Port 5173) in separate console...
 start "Bimasakti Vue Frontend" /D "%FRONTEND_DIR%" cmd /k "color 0E & echo Running Bimasakti Frontend... & npm run dev"

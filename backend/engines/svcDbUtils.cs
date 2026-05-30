@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace BimasaktiReports.FinancialReports.Backend.Engines
+namespace BiPortal.FinancialReports.Backend.Engines
 {
     public static class svcDbUtils
     {
@@ -48,7 +48,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
                     backendDir = current;
                     break;
                 }
-                if (File.Exists(Path.Combine(current, "BimasaktiReports.slnx")))
+                if (File.Exists(Path.Combine(current, "BiPortal.slnx")))
                 {
                     backendDir = Path.Combine(current, "backend");
                     break;
@@ -69,7 +69,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Engines
                         backendDir = current;
                         break;
                     }
-                    if (File.Exists(Path.Combine(current, "BimasaktiReports.slnx")))
+                    if (File.Exists(Path.Combine(current, "BiPortal.slnx")))
                     {
                         backendDir = Path.Combine(current, "backend");
                         break;

@@ -4,11 +4,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <RootNamespace>BimasaktiReports.FinancialReports.Manager</RootNamespace>
-    <AssemblyName>BimasaktiWebManager</AssemblyName>
+    <RootNamespace>BiPortal.FinancialReports.Manager</RootNamespace>
+    <AssemblyName>BiPortalWebManager</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../BimasaktiReports.csproj" />
+    <ProjectReference Include="../BiPortal.csproj" />
   </ItemGroup>
 </Project>

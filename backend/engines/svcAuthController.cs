@@ -7,10 +7,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using BimasaktiReports.FinancialReports.Backend.Services;
+using BiPortal.FinancialReports.Backend.Services;
 using Microsoft.Extensions.Configuration;
 
-namespace BimasaktiReports.FinancialReports.Backend.Engines
+namespace BiPortal.FinancialReports.Backend.Engines
 {
     // Models are defined in TenantModels.cs
 

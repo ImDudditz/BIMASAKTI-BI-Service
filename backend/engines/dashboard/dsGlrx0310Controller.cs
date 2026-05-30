@@ -8,10 +8,10 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
-using BimasaktiReports.FinancialReports.Backend.Services;
+using BiPortal.FinancialReports.Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BimasaktiReports.FinancialReports.Backend.Engines.Dashboard
+namespace BiPortal.FinancialReports.Backend.Engines.Dashboard
 {
     [Authorize]
     [ApiController]

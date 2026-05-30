@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BimasaktiReports.FinancialReports.Backend.Services
+namespace BiPortal.FinancialReports.Backend.Services
 {
     public interface IsvcAuthenticationService
     {

@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using BimasaktiReports.FinancialReports.Backend.Services;
+using BiPortal.FinancialReports.Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BimasaktiReports.FinancialReports.Backend.Engines.Dashboard
+namespace BiPortal.FinancialReports.Backend.Engines.Dashboard
 {
     [Authorize]
     [ApiController]

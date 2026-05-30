@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
-namespace BimasaktiReports.FinancialReports.Backend.Engines
+namespace BiPortal.FinancialReports.Backend.Engines
 {
     public class User
     {

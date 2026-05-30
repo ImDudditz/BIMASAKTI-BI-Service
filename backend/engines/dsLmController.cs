@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BimasaktiReports.FinancialReports.Backend.Engines
+namespace BiPortal.FinancialReports.Backend.Engines
 {
     [Authorize]
     [ApiController]

@@ -13,7 +13,7 @@ def run_dotnet_sync():
     backend_dir = None
     curr = current_dir
     while curr:
-        if os.path.exists(os.path.join(curr, "BimasaktiReports.csproj")):
+        if os.path.exists(os.path.join(curr, "BiPortal.csproj")):
             backend_dir = curr
             break
         parent = os.path.dirname(curr)
@@ -22,14 +22,14 @@ def run_dotnet_sync():
         curr = parent
 
     if not backend_dir:
-        print("Error: Could not find BimasaktiReports backend folder.")
+        print("Error: Could not find BiPortal backend folder.")
         sys.exit(1)
 
     print(f"Triggering standalone C# sync engine for tenant: {company_id}...")
     try:
         # Run C# standalone command line synchronizer
         res = subprocess.run(
-            ["dotnet", "run", "--project", os.path.join(backend_dir, "BimasaktiReports.csproj"), "--", "--sync", company_id],
+            ["dotnet", "run", "--project", os.path.join(backend_dir, "BiPortal.csproj"), "--", "--sync", company_id],
             capture_output=True,
             text=True
         )

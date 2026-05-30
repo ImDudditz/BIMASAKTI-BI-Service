@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-namespace BimasaktiReports.FinancialReports.Backend.Services
+namespace BiPortal.FinancialReports.Backend.Services
 {
     public class LedgerReportItem
     {
@@ -119,7 +119,7 @@ namespace BimasaktiReports.FinancialReports.Backend.Services
                 using var connection = new SqliteConnection($"Data Source={databasePath};Mode=ReadOnly;");
                 await connection.OpenAsync();
 
-                var schema = BimasaktiReports.FinancialReports.Backend.Engines.svcDbUtils.GetGlrxSchema(databasePath);
+                var schema = BiPortal.FinancialReports.Backend.Engines.svcDbUtils.GetGlrxSchema(databasePath);
                 string tableName = schema.TableName;
                 string yearCol = schema.YearColumn;
                 string periodCol = schema.PeriodColumn;
