@@ -19,7 +19,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options => {
     options.AddPolicy("ManagerCorsPolicy", policy => {
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        policy.SetIsOriginAllowed(origin => {
+            if (string.IsNullOrEmpty(origin)) return false;
+            try {
+                var uri = new Uri(origin);
+                return uri.Host == "localhost" || uri.Host == "127.0.0.1" || uri.Host == "::1";
+            } catch {
+                return false;
+            }
+        })
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
     });
 });
 
