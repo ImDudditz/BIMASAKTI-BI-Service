@@ -18,14 +18,65 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using BiPortal.FinancialReports.Backend.Engines;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace BiPortal.FinancialReports.Backend
 {
     public class Program
     {
+        // ==========================================
+        // OS-LEVEL FILE LOCK (Protects DB from accidental overwrite)
+        // ==========================================
+        private static FileStream _centralDbLock;
+        public static void LockDatabase()
+        {
+            try {
+                string dbPath = svcDbUtils.GetCentralDbPath();
+                if (!File.Exists(dbPath)) {
+                    using var db = new CentralDbContext(dbPath);
+                    db.Database.EnsureCreated();
+                }
+                // Holds the file open at the OS level so Windows Explorer cannot overwrite/delete it
+                // FileShare.ReadWrite allows EF Core and the Manager API to still function normally.
+                _centralDbLock = new FileStream(dbPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            } catch { /* Ignore if it fails to lock */ }
+        }
+
         public static async Task Main(string[] args)
         {
+            LockDatabase();
+            if (args.Contains("--sync-all"))
+            {
+                Console.WriteLine("==================================================");
+                Console.WriteLine("[BMS-Core] Scheduled Background Sync Triggered");
+                Console.WriteLine("==================================================");
+                try {
+                    string centralDbPath = svcDbUtils.GetCentralDbPath();
+                    using var db = new CentralDbContext(centralDbPath);
+                    var syncService = new BiPortal.FinancialReports.Backend.Services.svcDatabaseSyncService();
+                    var activeCompanies = db.Companies.Where(c => c.IsActive).ToList();
+                    
+                    if (activeCompanies.Count == 0) {
+                        Console.WriteLine("[Sync] No active companies found in Central DB.");
+                    }
+
+                    foreach(var c in activeCompanies)
+                    {
+                        Console.WriteLine($"\n[Sync] Starting synchronization for company: {c.CompanyId}");
+                        var result = await syncService.SyncCompanyDatabaseAsync(c.CompanyId);
+                        if (result.Success)
+                            Console.WriteLine($"[Sync] SUCCESS: {c.CompanyId}");
+                        else
+                            Console.WriteLine($"[Sync] FAILED: {c.CompanyId} - {result.Message}");
+                    }
+                } catch (Exception ex) {
+                    Console.WriteLine($"[Sync] FATAL ERROR: {ex.Message}");
+                }
+                
+                Console.WriteLine("\n[BMS-Core] Global sync execution completed. Exiting.");
+                Environment.Exit(0);
+            }
             EnsureJwtSecret();
             if (args.Length > 0 && args[0] == "--sync")
             {

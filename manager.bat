@@ -276,26 +276,48 @@ echo  ============================================================
 echo   COMPILE PRODUCTION PUBLISH BUILD
 echo  ============================================================
 echo.
-echo  Select Target Architecture:
-echo   [1] Windows x64 (Standard 64-bit)
-echo   [2] Windows x86 (Standard 32-bit)
-echo   [3] Cancel
+echo  Select Component to Compile:
+echo   [1] Full Stack (Backend + Frontend)
+echo   [2] Backend Services Only
+echo   [3] Frontend Proxy Only
+echo   [4] Cancel
 echo.
-set "arch_choice="
-set /p arch_choice="Select an option [1-3]: "
+set "comp_choice="
+set /p comp_choice="Select an option [1-4]: "
 
-if "%arch_choice%"=="1" set "TARGET_ARCH=win-x64"
-if "%arch_choice%"=="2" set "TARGET_ARCH=win-x86"
-if "%arch_choice%"=="3" goto MENU
-if "%TARGET_ARCH%"=="" goto COMPILE_PUBLISH
+if "%comp_choice%"=="4" goto MENU
+if "%comp_choice%"=="" goto COMPILE_PUBLISH
+
+set "COMPILE_BACKEND=0"
+set "COMPILE_FRONTEND=0"
+if "%comp_choice%"=="1" ( set "COMPILE_BACKEND=1" & set "COMPILE_FRONTEND=1" )
+if "%comp_choice%"=="2" ( set "COMPILE_BACKEND=1" )
+if "%comp_choice%"=="3" ( set "COMPILE_FRONTEND=1" )
+
+set "TARGET_ARCH=win-x64"
+if "%COMPILE_BACKEND%"=="1" (
+    echo.
+    echo  Select Target Architecture:
+    echo   [1] Windows x64 (Standard 64-bit)
+    echo   [2] Windows x86 (Standard 32-bit)
+    echo.
+    set "arch_choice="
+    set /p arch_choice="Select an option [1-2]: "
+    if "!arch_choice!"=="1" set "TARGET_ARCH=win-x64"
+    if "!arch_choice!"=="2" set "TARGET_ARCH=win-x86"
+)
 
 echo.
-echo  [+] Target Architecture: !TARGET_ARCH!
 echo  [+] Preparing output directory...
 set "PUB_DIR=%ROOT_DIR%Publish"
-if exist "%PUB_DIR%" rmdir /s /q "%PUB_DIR%"
+if not exist "%PUB_DIR%" mkdir "%PUB_DIR%"
+
+if "%COMPILE_BACKEND%"=="1" goto DO_COMPILE_BACKEND
+goto CHECK_FRONTEND
+
+:DO_COMPILE_BACKEND
+if exist "%PUB_DIR%\Backend" rmdir /s /q "%PUB_DIR%\Backend"
 mkdir "%PUB_DIR%\Backend"
-mkdir "%PUB_DIR%\Frontend"
 
 echo.
 echo  [+] Compiling Core Services to a Unified Backend Folder...
@@ -304,6 +326,41 @@ dotnet publish "%BACKEND_DIR%\BMS_BI_Service.csproj" -c Release -r !TARGET_ARCH!
 
 echo  - Building BI SaaS Manager API (BMS-BM.exe)...
 dotnet publish "%MANAGER_DIR%\BI_Portal_Manager.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\Backend" >nul
+
+echo.
+echo  [+] Cleaning up unnecessary compiler metadata...
+del /f /q "%PUB_DIR%\Backend\*.staticwebassets.endpoints.json" >nul 2>&1
+del /f /q "%PUB_DIR%\Backend\*.runtimeconfig.json" >nul 2>&1
+if exist "%PUB_DIR%\Backend\wwwroot" rmdir /s /q "%PUB_DIR%\Backend\wwwroot" >nul 2>&1
+
+echo.
+echo  [+] Generating Backend Production Launcher...
+(
+echo @echo off
+echo echo Starting BMS Core API...
+echo start "BMS-Core API" cmd /k "BMS-Core.exe"
+echo echo Starting BMS Web Manager...
+echo start "BMS SaaS Manager" cmd /k "BMS-BM.exe"
+) > "%PUB_DIR%\Backend\start_backend.bat"
+
+(
+echo @echo off
+echo echo ==================================================
+echo echo Running BMS Background Sync Job...
+echo echo ==================================================
+echo "BMS-Core.exe" --sync-all
+echo echo.
+echo echo Sync process completed.
+echo timeout /t 10
+) > "%PUB_DIR%\Backend\run_scheduled_sync.bat"
+
+:CHECK_FRONTEND
+if "%COMPILE_FRONTEND%"=="1" goto DO_COMPILE_FRONTEND
+goto FINISH_COMPILE
+
+:DO_COMPILE_FRONTEND
+if exist "%PUB_DIR%\Frontend" rmdir /s /q "%PUB_DIR%\Frontend"
+mkdir "%PUB_DIR%\Frontend"
 
 echo.
 echo  [+] Compiling Frontend Vue Assets (Hash-free)...
@@ -318,21 +375,14 @@ copy /Y "%FRONTEND_DIR%\server.js" "%PUB_DIR%\Frontend\" >nul
 copy /Y "%FRONTEND_DIR%\package.json" "%PUB_DIR%\Frontend\" >nul
 
 echo.
-echo  [+] Generating Production Launchers...
-(
-echo @echo off
-echo echo Starting BMS Core API...
-echo start "BMS-Core API" cmd /k "BMS-Core.exe"
-echo echo Starting BMS Web Manager...
-echo start "BMS SaaS Manager" cmd /k "BMS-BM.exe"
-) > "%PUB_DIR%\Backend\start_backend.bat"
-
+echo  [+] Generating Frontend Production Launcher...
 (
 echo @echo off
 echo echo Starting Frontend Proxy Server...
 echo start "BMS Frontend Proxy" cmd /k "node server.js"
 ) > "%PUB_DIR%\Frontend\start_frontend.bat"
 
+:FINISH_COMPILE
 echo.
 echo  ============================================================
 echo   BUILD SUCCESSFUL! 

@@ -118,7 +118,12 @@ namespace BiPortal.FinancialReports.Backend.Engines
                 .ToUpperInvariant();
 
             string assetsDir = GetAssetsDirectory();
-            string dirPath = Path.GetFullPath(Path.Combine(assetsDir, safeId));
+            string tenantsDir = Path.Combine(assetsDir, "Tenants");
+            if (!Directory.Exists(tenantsDir))
+            {
+                Directory.CreateDirectory(tenantsDir);
+            }
+            string dirPath = Path.GetFullPath(Path.Combine(tenantsDir, safeId));
             
             if (!Directory.Exists(dirPath))
             {
