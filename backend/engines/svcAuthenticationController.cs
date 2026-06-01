@@ -51,6 +51,18 @@ namespace BiPortal.FinancialReports.Backend.Engines
             try
             {
                 string companyId = loginRequest.CompanyId.ToUpperInvariant();
+
+                // Gatekeeper check: Ensure company is active in Central DB
+                string centralDbPath = svcDbUtils.GetCentralDbPath();
+                using (var centralDb = new CentralDbContext(centralDbPath))
+                {
+                    var centralCompany = await centralDb.Companies.FirstOrDefaultAsync(c => c.CompanyId == companyId);
+                    if (centralCompany == null || !centralCompany.IsActive)
+                    {
+                        return Unauthorized(new { detail = "Company is inactive or does not exist." });
+                    }
+                }
+
                 string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
                 using (var dbContext = new TenantDbContext(databasePath))

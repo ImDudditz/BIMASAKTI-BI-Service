@@ -52,9 +52,8 @@ namespace BiPortal.FinancialReports.Backend
                 Environment.Exit(1);
             }
 
-            // Dynamically resolve an available port from appsettings.json or automatic scanning
             string host = "0.0.0.0";
-            int startingPort = 8001;
+            int port = 8001;
             string appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
 
             if (File.Exists(appSettingsPath))
@@ -71,7 +70,7 @@ namespace BiPortal.FinancialReports.Backend
                             host = serverNode["Host"]?.ToString() ?? "0.0.0.0";
                             if (int.TryParse(serverNode["Port"]?.ToString(), out var parsedPort))
                             {
-                                startingPort = parsedPort;
+                                port = parsedPort;
                             }
                         }
                     }
@@ -82,37 +81,7 @@ namespace BiPortal.FinancialReports.Backend
                 }
             }
 
-            int port = GetAvailablePort(host, startingPort);
-            Console.WriteLine($"[Server Startup] Binding to host {host} on auto-detected available port {port}");
-
-            // Overwrite selected port in appsettings.json so frontend Vite can dynamically read it
-            if (File.Exists(appSettingsPath))
-            {
-                try
-                {
-                    string jsonString = File.ReadAllText(appSettingsPath);
-                    var rootNode = System.Text.Json.Nodes.JsonNode.Parse(jsonString);
-                    if (rootNode != null)
-                    {
-                        var serverObj = rootNode["Server"] as System.Text.Json.Nodes.JsonObject;
-                        if (serverObj == null)
-                        {
-                            serverObj = new System.Text.Json.Nodes.JsonObject();
-                            rootNode["Server"] = serverObj;
-                        }
-                        serverObj["Host"] = host;
-                        serverObj["Port"] = port;
-
-                        var writeOptions = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
-                        string updatedJson = rootNode.ToJsonString(writeOptions);
-                        File.WriteAllText(appSettingsPath, updatedJson);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[Server Startup] Warning: Failed to write selected port to appsettings.json: {ex.Message}");
-                }
-            }
+            Console.WriteLine($"[Server Startup] Binding to host {host} on port {port}");
 
             var builder = WebApplication.CreateBuilder(args);
 
@@ -191,6 +160,18 @@ namespace BiPortal.FinancialReports.Backend
                                         if (claimMap.TryGetValue(System.Security.Claims.ClaimTypes.Name, out var username) &&
                                             claimMap.TryGetValue("company_id", out var userCompanyId))
                                         {
+                                            // Gatekeeper Check: Ensure company is active in Central DB
+                                            string centralDbPath = svcDbUtils.GetCentralDbPath();
+                                            using (var centralDb = new CentralDbContext(centralDbPath))
+                                            {
+                                                var centralCompany = await centralDb.Companies.FirstOrDefaultAsync(c => c.CompanyId == userCompanyId);
+                                                if (centralCompany == null || !centralCompany.IsActive)
+                                                {
+                                                    context.Fail("Company is deactivated.");
+                                                    return;
+                                                }
+                                            }
+
                                             string userDbPath = svcDbUtils.GetSafeDbPath(userCompanyId);
                                             using (var dbContext = new TenantDbContext(userDbPath))
                                             {
@@ -326,35 +307,7 @@ namespace BiPortal.FinancialReports.Backend
             app.Run($"http://{host}:{port}");
         }
 
-        private static int GetAvailablePort(string host, int startingPort)
-        {
-            int port = startingPort;
-            while (port < 65535)
-            {
-                if (IsPortAvailable(host, port))
-                {
-                    return port;
-                }
-                port++;
-            }
-            throw new Exception("No available port found.");
-        }
-
-        private static bool IsPortAvailable(string host, int port)
-        {
-            try
-            {
-                var ipAddress = host == "0.0.0.0" ? System.Net.IPAddress.Any : System.Net.IPAddress.Parse(host);
-                var listener = new System.Net.Sockets.TcpListener(ipAddress, port);
-                listener.Start();
-                listener.Stop();
-                return true;
-            }
-            catch (System.Net.Sockets.SocketException)
-            {
-                return false;
-            }
-        }
+        // Dynamic port functions removed
 
         private static void EnsureJwtSecret()
         {

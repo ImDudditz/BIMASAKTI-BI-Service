@@ -52,22 +52,52 @@ echo.
 echo  ────────────────────────────────────────────────────────────
 echo   [ Actions ]
 echo.
-echo    [1] Launch the Web Control Panel
-echo    [2] Clean the Cache
-echo    [3] Free the Port
-echo    [4] Check .NET Availability
-echo    [5] Exit (Auto-Close, Free Port ^& Clean Cache)
+echo    [1] Launch Full Local Development Environment (All Services)
+echo    [2] Launch Web Control Panel Only
+echo    [3] Clean the Cache
+echo    [4] Free the Ports
+echo    [5] Check .NET Availability
+echo    [6] Exit (Auto-Close, Free Port ^& Clean Cache)
 echo.
 echo  ────────────────────────────────────────────────────────────
 set "choice="
-set /p choice="Select an action [1-5]: "
+set /p choice="Select an action [1-6]: "
 
-if "%choice%"=="1" goto LAUNCH_WEB
-if "%choice%"=="2" goto CLEAN_CACHE
-if "%choice%"=="3" goto FREE_PORTS
-if "%choice%"=="4" goto CHECK_DOTNET
-if "%choice%"=="5" goto FORCE_EXIT
+if "%choice%"=="1" goto LAUNCH_ALL
+if "%choice%"=="2" goto LAUNCH_WEB
+if "%choice%"=="3" goto CLEAN_CACHE
+if "%choice%"=="4" goto FREE_PORTS
+if "%choice%"=="5" goto CHECK_DOTNET
+if "%choice%"=="6" goto FORCE_EXIT
 goto MENU
+
+:LAUNCH_ALL
+cls
+echo.
+echo  ============================================================
+echo   LAUNCHING FULL LOCAL DEVELOPMENT ENVIRONMENT
+echo  ============================================================
+echo.
+
+:: 1. Start Main Backend API
+netstat -ano | findstr LISTENING | findstr :%BACKEND_PORT% >nul
+if not errorlevel 1 (
+    echo  Backend Port %BACKEND_PORT% is already active. Stopping...
+    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :%BACKEND_PORT%') do ( taskkill /F /T /PID %%a >nul 2>&1 )
+)
+echo  Starting Main Backend API on Port %BACKEND_PORT%...
+start "BI Portal Backend Core" /D "%BACKEND_DIR%" cmd /c "dotnet run"
+
+:: 2. Start Frontend Dev Server
+netstat -ano | findstr LISTENING | findstr :%FRONTEND_PORT% >nul
+if not errorlevel 1 (
+    echo  Frontend Port %FRONTEND_PORT% is already active. Stopping...
+    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :%FRONTEND_PORT%') do ( taskkill /F /T /PID %%a >nul 2>&1 )
+)
+echo  Starting Vue Frontend Dev Server on Port %FRONTEND_PORT%...
+start "BI Portal Frontend" /D "%FRONTEND_DIR%" cmd /c "npm run dev"
+
+goto LAUNCH_WEB
 
 :LAUNCH_WEB
 cls
@@ -114,8 +144,54 @@ if !BOOT_SUCCESS!==0 (
     pause
 ) else (
     echo  [+] Web Control Panel is online.
-    echo  [+] Redirecting your browser to http://localhost:%MANAGER_PORT% ...
+
+    :: Extract and display the generated password if it exists
+    findstr /C:"A secure random password has been generated:" "%MANAGER_DIR%\manager_startup.log" >nul 2>&1
+    if not errorlevel 1 (
+        echo.
+        echo  ============================================================
+        echo   [!] NEW TEMPORARY SUPERADMIN PASSWORD [!]
+        for /f "tokens=*" %%p in ('findstr /C:"A secure random password has been generated:" "%MANAGER_DIR%\manager_startup.log"') do (
+            set "line=%%p"
+            set "pwd=!line:*A secure random password has been generated: =!"
+            echo   Password: !pwd!
+        )
+        echo  ============================================================
+        echo  Please copy this password. You will need it to log in.
+        echo.
+        pause
+    )
+
+    echo  [+] Redirecting your browser to http://localhost:%MANAGER_PORT% in Incognito/Private mode ...
+    
+    set "BrowserProgId="
+    for /f "tokens=2* skip=2" %%a in ('reg query HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice /v ProgId 2^>nul') do set "BrowserProgId=%%b"
+    
+    echo !BrowserProgId! | findstr /i "Chrome" >nul
+    if not errorlevel 1 (
+        start chrome -incognito "http://localhost:%MANAGER_PORT%"
+        goto BROWSER_DONE
+    )
+    echo !BrowserProgId! | findstr /i "Edge" >nul
+    if not errorlevel 1 (
+        start msedge -inprivate "http://localhost:%MANAGER_PORT%"
+        goto BROWSER_DONE
+    )
+    echo !BrowserProgId! | findstr /i "Firefox" >nul
+    if not errorlevel 1 (
+        start firefox -private-window "http://localhost:%MANAGER_PORT%"
+        goto BROWSER_DONE
+    )
+    echo !BrowserProgId! | findstr /i "Brave" >nul
+    if not errorlevel 1 (
+        start brave -incognito "http://localhost:%MANAGER_PORT%"
+        goto BROWSER_DONE
+    )
+    
+    :: Fallback if unknown browser
     start "" "http://localhost:%MANAGER_PORT%"
+    
+    :BROWSER_DONE
     timeout /t 2 >nul
 )
 goto MENU

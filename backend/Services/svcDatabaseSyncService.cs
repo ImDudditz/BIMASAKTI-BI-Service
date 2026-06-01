@@ -23,12 +23,22 @@ namespace BiPortal.FinancialReports.Backend.Services
         {
             string dbPath = svcDbUtils.GetSafeDbPath(companyId);
             string companyDir = Path.GetDirectoryName(dbPath) ?? "";
-            string configPath = Path.Combine(companyDir, $"{companyId.ToUpperInvariant()}_config.json");
+            string centralDbPath = svcDbUtils.GetCentralDbPath();
             string logPath = Path.Combine(companyDir, $"{companyId.ToUpperInvariant()}_history.log");
+            string syncConfigJson = "";
 
-            if (!File.Exists(configPath))
+            using (var centralDb = new CentralDbContext(centralDbPath))
             {
-                return (false, $"Configuration file not found: {configPath}");
+                var centralCompany = centralDb.Companies.FirstOrDefault(c => c.CompanyId == companyId);
+                if (centralCompany == null)
+                {
+                    return (false, $"Company {companyId} not found in Central Database.");
+                }
+                if (!centralCompany.IsActive)
+                {
+                    return (false, $"Company {companyId} is inactive. Sync aborted.");
+                }
+                syncConfigJson = centralCompany.SyncConfigJson;
             }
 
             var logLines = new List<string>();
@@ -42,8 +52,7 @@ namespace BiPortal.FinancialReports.Backend.Services
 
             try
             {
-                string configContent = await File.ReadAllTextAsync(configPath);
-                using var configDoc = JsonDocument.Parse(configContent);
+                using var configDoc = JsonDocument.Parse(syncConfigJson);
                 if (!configDoc.RootElement.TryGetProperty("sync_urls", out var syncUrlsProp) || syncUrlsProp.ValueKind != JsonValueKind.Object)
                 {
                     logMessage("WARNING", "No 'sync_urls' found in config file. Nothing to sync.");

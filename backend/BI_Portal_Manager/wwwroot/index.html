@@ -3,921 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BI Portal Service Manager - System Console</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-base: #f0f6fc; /* Ice-blue classic background */
-            --bg-surface: #ffffff; /* Crisp white surface cards */
-            --bg-surface-hover: #eaf2fc;
-            --text-primary: #102a50; /* Deep blue-gray text */
-            --text-secondary: #576d8b; /* Slate secondary text */
-            --accent: #1964d4; /* Classic Windows XP Royale Blue */
-            --accent-hover: #104ba3;
-            --xp-orange: #ff8500; /* Windows XP Royale Accent Orange */
-            --xp-orange-hover: #e07400;
-            --border-color: #a8cbf3; /* Royale Blue borders */
-            --success: #ff8500;
-            --success-color: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --glow: rgba(25, 100, 212, 0.15);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        
-        body {
-            background-color: var(--bg-base);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        /* Moving Bliss-inspired Sky Blue Background Blobs */
-        .bg-blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(140px);
-            z-index: -1;
-            opacity: 0.6;
-            animation: float 25s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .bg-blob.b1 { top: -10%; left: -10%; width: 550px; height: 550px; background: rgba(59, 130, 246, 0.15); }
-        .bg-blob.b2 { bottom: -20%; right: -10%; width: 650px; height: 650px; background: rgba(14, 165, 233, 0.15); animation-delay: -7s; }
-        
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(120px, 60px) scale(1.15); }
-        }
-
-        /* Authentic Windows XP Royale Gradient Title Bar Header */
-        header {
-            padding: 1rem 3rem;
-            background: linear-gradient(to bottom, #729cf7, #3667eb 12%, #194ad1 50%, #103ba8 50%, #2053f0 88%, #4679fa);
-            border-bottom: 2px solid #0f308a;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .brand h1 {
-            font-size: 1.65rem;
-            font-weight: 900;
-            color: #ffffff;
-            letter-spacing: 1.5px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .brand h1::before {
-            content: '💻';
-            font-size: 1.35rem;
-            filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.4));
-        }
-        
-        .brand p { 
-            font-size: 0.72rem; 
-            color: #ffca80; 
-            font-weight: 700; 
-            letter-spacing: 2px; 
-            text-transform: uppercase; 
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.4); 
-            margin-left: 2.2rem;
-            margin-top: -0.2rem;
-        }
-
-        .nav-tabs { 
-            display: flex; 
-            gap: 0.5rem; 
-            background: rgba(0,0,0,0.18); 
-            padding: 0.25rem; 
-            border-radius: 8px; 
-            border: 1px solid rgba(0,0,0,0.12); 
-        }
-        
-        .tab-btn {
-            background: transparent; border: none; color: #eaf2fc;
-            padding: 0.5rem 1.25rem; font-size: 0.9rem; font-weight: 800;
-            border-radius: 6px; cursor: pointer; transition: 0.2s;
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-        .tab-btn:hover { color: #ffffff; background: rgba(255,255,255,0.1); }
-        
-        /* Royale Orange active tab indicator */
-        .tab-btn.active {
-            background: linear-gradient(to bottom, #ffbe4d, #ff941a 50%, #e67a00 50%, #ff9c1a);
-            color: #ffffff;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.2);
-            border: 1px solid #c85a00;
-        }
-
-        main { flex: 1; padding: 2.5rem; max-width: 1400px; width: 100%; margin: 0 auto; }
-        .tab-content { display: none; animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-        .tab-content.active { display: block; }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Glass / Glossy XP Panels */
-        .glass-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.75rem;
-            box-shadow: 0 8px 30px rgba(25, 100, 212, 0.08);
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
-        }
-        .glass-card:hover { border-color: #729cf7; box-shadow: 0 8px 35px rgba(25, 100, 212, 0.14); }
-        
-        .glass-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-            opacity: 0; transition: 0.4s;
-        }
-        .glass-card:hover::before { opacity: 1; }
-
-        .card-header { 
-            margin-bottom: 1.5rem; 
-            font-size: 1.15rem; 
-            font-weight: 900; 
-            color: var(--accent); 
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #ebf3fd;
-            padding-bottom: 0.5rem;
-            text-transform: uppercase;
-        }
-
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
-
-        /* Server Status Badge */
-        .status-row {
-            display: flex; justify-content: space-between; align-items: center;
-            background: #f5f9fe; padding: 1.25rem; border-radius: 10px; margin-bottom: 1rem;
-            border: 1px solid #d5e6f9;
-        }
-        .server-info h3 { font-size: 1.05rem; margin-bottom: 0.2rem; font-weight: 800; color: var(--text-primary); }
-        .server-info p { font-size: 0.8rem; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; }
-        
-        .badge {
-            padding: 0.4rem 0.85rem; border-radius: 50px; font-size: 0.72rem; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 0.4rem;
-        }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
-        
-        .status-running { background: rgba(16, 185, 129, 0.08); color: var(--success-color); border: 1px solid var(--success-color); }
-        .status-running .dot { background: var(--success-color); box-shadow: 0 0 8px var(--success-color); animation: pulse 1.5s infinite; }
-        .status-stopped { background: rgba(87, 109, 139, 0.08); color: var(--text-secondary); border: 1px solid var(--text-secondary); }
-        .status-stopped .dot { background: var(--text-secondary); }
-        .status-error { background: rgba(239, 68, 68, 0.08); color: var(--danger); border: 1px solid var(--danger); }
-        .status-error .dot { background: var(--danger); box-shadow: 0 0 8px var(--danger); animation: pulse 1.5s infinite; }
-
-        @keyframes pulse {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.25); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.8; }
-        }
-
-        /* Glossy XP Buttons */
-        .btn {
-            background: linear-gradient(to bottom, #ffffff, #f1f3f6); 
-            color: var(--text-primary); 
-            border: 1px solid #b1c3d9;
-            padding: 0.85rem 1.25rem; border-radius: 8px; font-size: 0.85rem; font-weight: 800;
-            cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
-            width: 100%; margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .btn:hover { 
-            transform: translateY(-2px); 
-            background: linear-gradient(to bottom, #ffffff, #e6ebf2);
-            border-color: #729cf7;
-            box-shadow: 0 4px 8px rgba(25, 100, 212, 0.1); 
-        }
-        .btn:active { transform: translateY(0); }
-        
-        .btn-primary { 
-            background: linear-gradient(to bottom, #7ce698, #35b058 50%, #1d8c3c 50%, #2fa34f); 
-            color: #fff; border: 1px solid #146128; 
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
-        }
-        .btn-primary:hover { 
-            background: linear-gradient(to bottom, #8df0a7, #3fc465 50%, #219c43 50%, #34b55b);
-            box-shadow: 0 4px 12px rgba(29, 140, 60, 0.25); 
-            border-color: #104f20;
-        }
-        
-        .btn-danger { 
-            background: linear-gradient(to bottom, #ff9485, #e04b38 50%, #bd2513 50%, #d63723); 
-            color: #fff; border: 1px solid #7c1206; 
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
-        }
-        .btn-danger:hover { 
-            background: linear-gradient(to bottom, #ffa396, #ee5642 50%, #cc2916 50%, #e6422d);
-            box-shadow: 0 4px 12px rgba(189, 37, 19, 0.25); 
-            border-color: #640d04;
-        }
-        
-        .btn-accent { 
-            background: linear-gradient(to bottom, #ffbe4d, #ff941a 50%, #e67a00 50%, #ff9c1a); 
-            color: #fff; border: 1px solid #ab5b00; 
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
-        }
-        .btn-accent:hover { 
-            background: linear-gradient(to bottom, #ffc966, #ff9f2e 50%, #f58400 50%, #ffa733);
-            box-shadow: 0 4px 12px rgba(230, 122, 0, 0.25); 
-            border-color: #8c4b00;
-        }
-
-        /* Metallic Blue Portal Redirect Button */
-        .btn-portal {
-            background: linear-gradient(to bottom, #7fc8ff, #3fa5ff 50%, #007bf0 50%, #0088ff);
-            color: #fff; border: 1px solid #0050c0;
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
-        }
-        .btn-portal:hover {
-            background: linear-gradient(to bottom, #94d4ff, #54b2ff 50%, #0c86ff 50%, #1ea0ff);
-            box-shadow: 0 4px 12px rgba(0, 123, 240, 0.25);
-            border-color: #00409c;
-        }
-
-        /* Terminal styling */
-        .terminal {
-            background: #09090b; border-radius: 10px; border: 1px solid #cbdff8;
-            height: 550px; display: flex; flex-direction: column; overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-        }
-        .term-header { background: #1f2937; padding: 0.75rem 1.25rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #9ca3af; display: flex; justify-content: space-between; border-bottom: 1px solid #374151; }
-        .term-body { flex: 1; padding: 1.25rem; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.5; color: #f3f4f6; }
-        
-        .log { margin-bottom: 0.2rem; word-break: break-all; }
-        .log-backend { color: #60a5fa; }
-        .log-vite { color: #c084fc; }
-        .log-sync { color: #34d399; }
-        .log-err { color: #f87171; font-weight: bold; }
-
-        /* Forms & Inputs */
-        .input-group { margin-bottom: 1.25rem; }
-        .input-group label { display: block; font-size: 0.78rem; font-weight: 800; color: var(--text-secondary); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .input-field {
-            width: 100%; background: #ffffff; border: 1px solid var(--border-color);
-            color: var(--text-primary); padding: 0.85rem; border-radius: 8px; font-size: 0.95rem; transition: 0.2s;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .input-field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 8px rgba(25, 100, 212, 0.25); background: #ffffff; }
-        .input-field.mono { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
-        textarea.input-field { min-height: 120px; resize: vertical; }
-        
-        select.input-field {
-            cursor: pointer;
-            padding-right: 2rem;
-            appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg fill='%231964d4' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 1.5rem;
-        }
-
-        /* Checkbox lists */
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            cursor: pointer;
-            font-weight: 600;
-            color: var(--text-primary);
-            padding: 0.5rem;
-            border-radius: 8px;
-            transition: 0.2s;
-            border: 1px solid transparent;
-            font-size: 0.9rem;
-            user-select: none;
-        }
-        .checkbox-container:hover {
-            background: #eaf2fc;
-            border-color: #cbdff8;
-        }
-        .checkbox-container input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--accent);
-            cursor: pointer;
-        }
-        
-        /* Grid Layouts for Companies */
-        .company-grid { display: grid; grid-template-columns: 320px 1fr; gap: 2rem; }
-        .list-container { max-height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; padding-right: 0.5rem; }
-        
-        .list-item {
-            background: #f8fbfe; border: 1px solid var(--border-color); padding: 0.85rem 1.25rem;
-            border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: 700; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            color: var(--text-primary);
-        }
-        .list-item:hover { background: #e6effc; border-color: #729cf7; transform: translateX(3px); }
-        .list-item.selected { background: #d0e2fc; border-color: var(--accent); color: var(--accent); }
-
-        /* Toasts */
-        .toast-container { position: fixed; bottom: 2rem; right: 2rem; display: flex; flex-direction: column; gap: 1rem; z-index: 100; }
-        .toast {
-            background: #ffffff; border-left: 4px solid var(--accent); padding: 0.9rem 1.4rem; border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(25, 100, 212, 0.16); font-weight: 700; font-size: 0.88rem;
-            animation: toastIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-            border: 1px solid #d5e6f9;
-            border-left-width: 5px;
-            color: var(--text-primary);
-        }
-        @keyframes toastIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f0f4f9; }
-        ::-webkit-scrollbar-thumb { background: #c2d7ef; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-        .godmode-toggle {
-            display: flex; justify-content: space-between; align-items: center;
-            background: #fbf8ff; padding: 1.25rem; border-radius: 10px;
-            border: 1px solid #ecdffd; margin-top: 1rem;
-        }
-        .switch { position: relative; display: inline-block; width: 48px; height: 24px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
-        input:checked + .slider { background-color: #8b5cf6; }
-        input:checked + .slider:before { transform: translateX(24px); }
-
-    </style>
+    <title>SaaS Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
-<body>
-    <div id="app">
-        <div class="bg-blob b1"></div>
-        <div class="bg-blob b2"></div>
+<body class="bg-gray-50 text-gray-800 font-sans">
+<div id="app" class="min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="bg-blue-600 text-white shadow-md p-4 flex justify-between items-center" v-if="isAuthenticated">
+        <h1 class="text-xl font-bold">BI SaaS Manager</h1>
+        <div>
+            <button @click="tab = 'companies'" :class="{'font-bold underline': tab==='companies'}" class="mr-4 hover:text-blue-200">Companies</button>
+            <button @click="tab = 'permissions'" :class="{'font-bold underline': tab==='permissions'}" class="mr-4 hover:text-blue-200">Permissions</button>
+            <button @click="logout" class="bg-blue-700 px-3 py-1 rounded hover:bg-blue-800">Logout</button>
+        </div>
+    </nav>
 
-        <header>
-            <div class="brand">
-                <h1>BI_PORTAL_MANAGER</h1>
-                <p>System Console</p>
+    <!-- Main Content -->
+    <div class="flex-grow p-8 max-w-6xl mx-auto w-full">
+        <!-- Login Screen -->
+        <div v-if="!isAuthenticated" class="max-w-sm mx-auto mt-20 bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+            <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">SuperAdmin Login</h2>
+            <form @submit.prevent="login">
+                <input type="password" v-model="password" placeholder="Enter Password" class="w-full border p-3 rounded mb-4 focus:outline-none focus:border-blue-500" required>
+                <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700">Login</button>
+            </form>
+            <p v-if="loginError" class="text-red-500 text-sm mt-3 text-center">{{ loginError }}</p>
+        </div>
+
+        <div v-else>
+            <!-- Companies Tab -->
+            <div v-if="tab === 'companies'" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- List -->
+                <div class="col-span-1 bg-white p-4 rounded-lg shadow border">
+                    <h3 class="font-bold text-lg mb-4 border-b pb-2">Tenants</h3>
+                    <div class="space-y-2 max-h-96 overflow-y-auto pr-2">
+                        <button v-for="c in companies" :key="c.companyId" @click="selectCompany(c.companyId)" 
+                                :class="{'bg-blue-100 border-blue-500': selectedCompanyId === c.companyId, 'hover:bg-gray-50': selectedCompanyId !== c.companyId}"
+                                class="w-full text-left p-3 border rounded transition flex justify-between items-center">
+                            <span class="font-bold">{{ c.companyId }}</span>
+                            <span :class="c.isActive ? 'text-green-500' : 'text-red-500'" class="text-sm font-bold">{{ c.isActive ? 'Active' : 'Inactive' }}</span>
+                        </button>
+                    </div>
+                    <button @click="clearForm" class="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded font-bold">+ New Company</button>
+                </div>
+
+                <!-- Form -->
+                <div class="col-span-2 bg-white p-6 rounded-lg shadow border">
+                    <h3 class="font-bold text-lg mb-4 border-b pb-2">{{ isEditing ? 'Edit: ' + selectedCompanyId : 'Register New Company' }}</h3>
+                    <form @submit.prevent="saveCompany">
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-1">Company ID (5 chars)</label>
+                            <input v-model="form.companyId" :disabled="isEditing" maxlength="5" required class="w-full border p-2 rounded bg-gray-50 uppercase font-mono" placeholder="e.g. ALPHA">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-1 flex items-center">
+                                <input type="checkbox" v-model="form.isActive" class="mr-2 w-4 h-4 text-blue-600"> Active Tenant
+                            </label>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-bold mb-1">Sync URLs (One per line)</label>
+                            <textarea v-model="form.syncUrls" rows="5" class="w-full border p-2 rounded font-mono text-sm" placeholder="https://api.example.com/sync_table"></textarea>
+                        </div>
+                        <div class="flex gap-4">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">Save Configuration</button>
+                            <button v-if="isEditing" type="button" @click="syncData" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded flex-1">Trigger Sync Now</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <nav class="nav-tabs">
-                <button :class="['tab-btn', activeTab === 'dashboard' ? 'active' : '']" @click="switchTab('dashboard')">📊 Service Status</button>
-                <button :class="['tab-btn', activeTab === 'company' ? 'active' : '']" @click="switchTab('company')">🏢 Company Registry</button>
-                <button :class="['tab-btn', activeTab === 'widget-access' ? 'active' : '']" @click="switchTab('widget-access')">🔒 Access Controls</button>
-                <button :class="['tab-btn', activeTab === 'terminal' ? 'active' : '']" @click="switchTab('terminal')">💻 System stdout</button>
-            </nav>
-        </header>
 
-        <main>
-            <!-- SERVICE RUNTIME STATUS -->
-            <div v-if="activeTab === 'dashboard'" class="tab-content active">
-                <div class="grid-2">
-                    <div class="glass-card">
-                        <div class="card-header">SERVICE RUNTIME STATUS</div>
-                        
-                        <div class="status-row">
-                            <div class="server-info">
-                                <h3>Backend API Node</h3>
-                                <p>Port: {{ backendPort }}</p>
-                            </div>
-                            <div :class="['badge', 'status-' + backendStatus.toLowerCase()]">
-                                <div class="dot"></div> <span>{{ backendStatus }}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="status-row">
-                            <div class="server-info">
-                                <h3>Frontend Web Node</h3>
-                                <p>Port: {{ frontendPort }}</p>
-                            </div>
-                            <div :class="['badge', 'status-' + frontendStatus.toLowerCase()]">
-                                <div class="dot"></div> <span>{{ frontendStatus }}</span>
-                            </div>
-                        </div>
+            <!-- Permissions Tab -->
+            <div v-if="tab === 'permissions'" class="bg-white p-6 rounded-lg shadow border max-w-4xl mx-auto">
+                <h3 class="font-bold text-lg mb-6 border-b pb-2">Access Control</h3>
+                
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Company</label>
+                        <select v-model="permSelectedCompany" @change="loadUsers" class="w-full border p-2 rounded bg-gray-50">
+                            <option value="">-- Select Company --</option>
+                            <option v-for="c in companies" :key="c.companyId" :value="c.companyId">{{ c.companyId }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1">User</label>
+                        <select v-model="permSelectedUser" @change="loadPermissions" :disabled="!permSelectedCompany" class="w-full border p-2 rounded bg-gray-50">
+                            <option value="">-- Select User --</option>
+                            <option v-for="u in users" :key="u.id" :value="u.id">{{ u.username }}</option>
+                        </select>
+                    </div>
+                </div>
 
-                        <div class="status-row" style="margin-top: 1rem; border-top: 1.5px solid #ebf3fd; padding-top: 0.85rem; font-size: 0.76rem; color: var(--text-secondary); display: flex; justify-content: space-between; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 0; background: none; border: none; padding-left: 0; padding-right: 0;">
-                            <span>Local Address: <span style="font-family: 'JetBrains Mono', monospace; color: var(--accent); text-transform: none;">{{ localIp }}</span></span>
-                            <span>Host Domain: <span style="font-family: 'JetBrains Mono', monospace; color: var(--accent); text-transform: none;">{{ coolAlias }}</span></span>
-                        </div>
-
-                        <div class="godmode-toggle">
-                            <div>
-                                <h3 style="color: #6d28d9; margin-bottom: 0.15rem; font-weight: 800;">Bypass Security Restrictions</h3>
-                                <p style="font-size: 0.8rem; color: #7c3aed; font-weight: 600;">Bypass standard authorization checks.</p>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" :checked="godMode" @change="toggleGodMode">
-                                <span class="slider"></span>
+                <div v-if="permSelectedUser" class="space-y-6">
+                    <div>
+                        <h4 class="font-bold text-gray-700 mb-3 bg-gray-100 p-2 rounded">Widget Access</h4>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label v-for="w in availableWidgets" :key="w.key" class="flex items-center space-x-2 cursor-pointer p-2 hover:bg-blue-50 rounded border border-transparent hover:border-blue-200">
+                                <input type="checkbox" v-model="permissions.widgets[w.key]" class="w-4 h-4 text-blue-600 rounded">
+                                <span class="text-sm font-medium">{{ w.label }}</span>
                             </label>
                         </div>
                     </div>
-
-                    <div class="glass-card">
-                        <div class="card-header">PROCESS CONTROL OPERATIONS</div>
-                        <button class="btn btn-primary" @click="startServices">▶ Start System Services</button>
-                        <button class="btn btn-danger" @click="stopServices">⏹ Stop System Services</button>
-                        <button class="btn btn-accent" @click="restartServices">🔄 Restart System Services</button>
-                        <button class="btn btn-portal" @click="openFrontendPortal">🌐 Launch Client Portal</button>
+                    <div>
+                        <h4 class="font-bold text-gray-700 mb-3 bg-gray-100 p-2 rounded">Report Access</h4>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label v-for="r in availableReports" :key="r.key" class="flex items-center space-x-2 cursor-pointer p-2 hover:bg-blue-50 rounded border border-transparent hover:border-blue-200">
+                                <input type="checkbox" v-model="permissions.reports[r.key]" class="w-4 h-4 text-blue-600 rounded">
+                                <span class="text-sm font-medium">{{ r.label }}</span>
+                            </label>
+                        </div>
                     </div>
+                    <button @click="savePermissions" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded mt-4">Save Permissions</button>
                 </div>
-            </div>
-
-            <!-- COMPANY REGISTRY -->
-            <div v-if="activeTab === 'company'" class="tab-content active">
-                <div class="glass-card">
-                    <div class="card-header">COMPANY CONFIGURATION PANEL {{ isEditingCompany ? '- EDIT: ' + companyId : '- REGISTER' }}</div>
-                    <div class="company-grid">
-                        <div class="list-container">
-                            <div v-for="c in companies" :key="c" :class="['list-item', companyId === c ? 'selected' : '']" @click="selectCompany(c)">
-                                <span>🏢 {{ c }}</span>
-                                <span style="font-size: 0.72rem; color: var(--accent); font-weight: 800;">EDIT</span>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div class="input-group">
-                                <label>Company ID (5 Characters)</label>
-                                <input type="text" v-model="companyId" class="input-field" maxlength="5" :disabled="isEditingCompany" placeholder="e.g. ALPHA">
-                            </div>
-                            <div class="input-group">
-                                <label>Synchronization Endpoints</label>
-                                <textarea v-model="companyUrls" class="input-field mono" placeholder="https://api.example.com/sync"></textarea>
-                            </div>
-                            
-                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                                <button class="btn btn-primary" style="flex: 2; margin-bottom: 0;" @click="saveCompany">💾 Save Company Profile</button>
-                                <button class="btn btn-accent" style="flex: 2; margin-bottom: 0;" @click="syncCompany">🔄 Synchronize Database Now</button>
-                                <button class="btn" style="flex: 1; margin-bottom: 0; font-weight: 800;" @click="clearCompanyForm">➕ Add New</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- FEATURE ACCESS SECURITY POLICIES -->
-            <div v-if="activeTab === 'widget-access'" class="tab-content active">
-                <div class="glass-card">
-                    <div class="card-header">FEATURE ACCESS SECURITY POLICIES</div>
-                    
-                    <div class="grid-2" style="margin-bottom: 1.5rem;">
-                        <div class="input-group">
-                            <label>Select Company</label>
-                            <select v-model="selectedAccessCompany" class="input-field" @change="handleAccessCompanyChange">
-                                <option value="">-- Select Company --</option>
-                                <option v-for="c in accessCompanies" :key="c" :value="c">🏢 {{ c }}</option>
-                            </select>
-                        </div>
-                        
-                        <div v-if="accessUsers.length > 0" class="input-group">
-                            <label>Select User</label>
-                            <select v-model="selectedAccessUser" class="input-field" @change="handleAccessUserChange">
-                                <option value="">-- Select User --</option>
-                                <option v-for="u in accessUsers" :key="u.id" :value="u.id">👤 {{ u.username }} ({{ u.role }})</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div v-if="showPermissionsPanel" style="border-top: 2px solid #ebf3fd; padding-top: 1.5rem;">
-                        <h3 style="margin-bottom: 1.25rem; color: var(--accent); font-weight: 800; font-size: 1.1rem; text-transform: uppercase;">USER PERMISSIONS: {{ getSelectedUsername() }}</h3>
-                        
-                        <div class="grid-2">
-                            <!-- Widget Permissions -->
-                            <div class="glass-card" style="padding: 1.5rem; background: #fafcff; border-color: #cbdff8;">
-                                <h4 style="margin-bottom: 1rem; border-bottom: 1.5px solid #cbdff8; padding-bottom: 0.35rem; color: var(--text-primary); font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px;">WIDGET PERMISSIONS</h4>
-                                <div class="checkbox-list" style="display: flex; flex-direction: column; gap: 0.4rem;">
-                                    <label class="checkbox-container">
-                                        <input type="checkbox" v-model="userPermissions.widgets.kpi_cards">
-                                        <span>📊 Financial KPI Summary Cards</span>
-                                    </label>
-                                    <label class="checkbox-container">
-                                        <input type="checkbox" v-model="userPermissions.widgets.capital_growth">
-                                        <span>📈 Capital Growth Trend</span>
-                                    </label>
-                                    <label class="checkbox-container">
-                                        <input type="checkbox" v-model="userPermissions.widgets.operating_cash_flow">
-                                        <span>💸 Operating Cash Flow Stream</span>
-                                    </label>
-                                    <label class="checkbox-container">
-                                        <input type="checkbox" v-model="userPermissions.widgets.revenue_budget">
-                                        <span>📥 Revenue Budget vs Actual</span>
-                                    </label>
-                                    <label class="checkbox-container">
-                                        <input type="checkbox" v-model="userPermissions.widgets.expense_budget">
-                                        <span>📤 Expense Budget vs Actual</span>
-                                    </label>
-                                    <label class="checkbox-container">
-                                        <input type="checkbox" v-model="userPermissions.widgets.operation_metrics">
-                                        <span>🔑 Property Operations Metrics</span>
-                                    </label>
-                                    <label class="checkbox-container">
-                                        <input type="checkbox" v-model="userPermissions.widgets.lease_expirations">
-                                        <span>📅 Upcoming Lease Expirations</span>
-                                    </label>
-                                    <label class="checkbox-container">
-                                        <input type="checkbox" v-model="userPermissions.widgets.tickets_kpi">
-                                        <span>🛠️ Tenant Helpdesk KPI Status</span>
-                                    </label>
-                                    <label class="checkbox-container">
-                                        <input type="checkbox" v-model="userPermissions.widgets.maintenance_status">
-                                        <span>📋 Maintenance Orders Log</span>
-                                    </label>
-                                    <label class="checkbox-container">
-                                        <input type="checkbox" v-model="userPermissions.widgets.tickets_by_category">
-                                        <span>🏷️ Tickets Distribution Chart</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Report Permissions & Save Button -->
-                            <div class="glass-card" style="padding: 1.5rem; background: #fafcff; border-color: #cbdff8; display: flex; flex-direction: column; justify-content: space-between;">
-                                <div>
-                                    <h4 style="margin-bottom: 1rem; border-bottom: 1.5px solid #cbdff8; padding-bottom: 0.35rem; color: var(--text-primary); font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px;">REPORT PERMISSIONS</h4>
-                                    <div class="checkbox-list" style="display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 2rem;">
-                                        <label class="checkbox-container">
-                                            <input type="checkbox" v-model="userPermissions.reports.balance_sheet">
-                                            <span>📝 Balance Sheet Statement</span>
-                                        </label>
-                                        <label class="checkbox-container">
-                                            <input type="checkbox" v-model="userPermissions.reports.income_statement">
-                                            <span>📉 Income Statement Statement</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <button class="btn btn-primary" style="margin-bottom: 0;" @click="saveAccessPermissions">💾 Update Access Policies</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SYSTEM STDOUT -->
-            <div v-if="activeTab === 'terminal'" class="tab-content active">
-                <div class="terminal">
-                    <div class="term-header">
-                        <span>> system_stdout.log</span>
-                        <button style="background:none; border:none; color:#9ca3af; cursor:pointer; font-weight: bold;" @click="clearLogs">[ CLEAR STDOUT ]</button>
-                    </div>
-                    <div class="term-body" id="term-body">
-                        <div v-for="(l, index) in logs" :key="index" :class="['log', getLogClass(l)]">
-                            {{ l }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <div class="toast-container">
-            <div v-for="t in toasts" :key="t.id" class="toast" :style="{ borderLeftColor: getToastColor(t.type) }">
-                {{ t.message }}
             </div>
         </div>
     </div>
+    
+    <!-- Toasts -->
+    <div class="fixed bottom-4 right-4 space-y-2 z-50">
+        <div v-for="t in toasts" :key="t.id" class="px-6 py-3 rounded shadow-lg font-bold text-white transition-opacity duration-300" 
+             :class="{'bg-green-500': t.type==='success', 'bg-red-500': t.type==='error', 'bg-blue-500': t.type==='info'}">
+            {{ t.msg }}
+        </div>
+    </div>
+</div>
 
-    <!-- Load Vue 3 global library -->
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script>
-        const { createApp, ref, onMounted, onUnmounted, nextTick } = Vue;
+<script>
+const { createApp, ref, reactive, onMounted } = Vue;
 
-        createApp({
-            setup() {
-                const API = window.location.origin;
-                const activeTab = ref('dashboard');
-                const isPolling = ref(false);
-                const frontendPort = ref(8002);
-                let failedPolls = 0;
-                
-                // Status states
-                const backendStatus = ref('OFFLINE');
-                const backendPort = ref(8001);
-                const frontendStatus = ref('OFFLINE');
-                const localIp = ref('127.0.0.1');
-                const coolAlias = ref('localhost');
-                const godMode = ref(false);
-                
-                // Logs
-                const logs = ref([]);
-                
-                // Company state
-                const companies = ref([]);
-                const companyId = ref('');
-                const companyUrls = ref('');
-                const isEditingCompany = ref(false);
+createApp({
+    setup() {
+        const isAuthenticated = ref(false);
+        const password = ref('');
+        const loginError = ref('');
+        const tab = ref('companies');
+        
+        const companies = ref([]);
+        const selectedCompanyId = ref('');
+        const isEditing = ref(false);
+        const form = reactive({ companyId: '', isActive: true, syncUrls: '' });
+        
+        const users = ref([]);
+        const permSelectedCompany = ref('');
+        const permSelectedUser = ref('');
+        const permissions = reactive({ widgets: {}, reports: {} });
+        
+        const toasts = ref([]);
+        const showToast = (msg, type='info') => {
+            const id = Date.now() + Math.random();
+            toasts.value.push({ id, msg, type });
+            setTimeout(() => { toasts.value = toasts.value.filter(t => t.id !== id); }, 3000);
+        };
 
-                // Widget Access state
-                const accessCompanies = ref([]);
-                const selectedAccessCompany = ref('');
-                const accessUsers = ref([]);
-                const selectedAccessUser = ref('');
-                const userPermissions = ref({ widgets: {}, reports: {} });
-                const showPermissionsPanel = ref(false);
-
-                // Toasts list
-                const toasts = ref([]);
-
-                const showToast = (message, type = 'info') => {
-                    const id = Date.now() + Math.random();
-                    toasts.value.push({ id, message, type });
-                    setTimeout(() => {
-                        toasts.value = toasts.value.filter(t => t.id !== id);
-                    }, 3000);
-                };
-
-                const getToastColor = (type) => {
-                    if (type === 'error') return 'var(--danger)';
-                    if (type === 'success') return 'var(--success-color)';
-                    return 'var(--xp-orange)';
-                };
-
-                const req = async (endpoint, method = 'POST', body = null) => {
-                    try {
-                        const opt = { method, headers: { 'Content-Type': 'application/json' } };
-                        if (body) opt.body = JSON.stringify(body);
-                        const res = await fetch(API + endpoint, opt);
-                        if (method === 'POST') {
-                            const data = await res.json();
-                            showToast(data.message || data.error || 'Operation Executed', res.ok ? 'success' : 'error');
-                        }
-                        return res.ok ? await res.json() : null;
-                    } catch (e) {
-                        if (method === 'POST') showToast('Network connection failed', 'error');
-                        return null;
-                    }
-                };
-
-                const closeTab = () => {
-                    window.open('', '_self', '');
-                    window.close();
-                };
-
-                const pollStatus = async () => {
-                    if (isPolling.value) return;
-                    isPolling.value = true;
-                    
-                    const res = await req('/api/status', 'GET');
-                    if (res) {
-                        failedPolls = 0;
-                        backendStatus.value = res.backendStatus.toUpperCase();
-                        backendPort.value = res.backendPort;
-                        frontendStatus.value = res.frontendStatus.toUpperCase();
-                        frontendPort.value = res.frontendPort;
-                        localIp.value = res.localIp;
-                        coolAlias.value = res.coolAlias;
-                        godMode.value = res.godMode;
-                    } else {
-                        failedPolls++;
-                        if (failedPolls >= 3) {
-                            closeTab();
-                        }
-                    }
-
-                    const logData = await req('/api/logs', 'GET');
-                    if (logData) {
-                        logs.value = logData;
-                        // Auto scroll terminal if active
-                        if (activeTab.value === 'terminal') {
-                            nextTick(() => {
-                                const tb = document.getElementById('term-body');
-                                if (tb) tb.scrollTop = tb.scrollHeight;
-                            });
-                        }
-                    }
-
-                    isPolling.value = false;
-                };
-
-                const switchTab = (tab) => {
-                    activeTab.value = tab;
-                    if (tab === 'company') {
-                        loadCompanies();
-                    } else if (tab === 'widget-access') {
-                        loadAccessCompanies();
-                    }
-                };
-
-                // Actions
-                const startServices = () => req('/api/start');
-                const stopServices = () => req('/api/stop');
-                const restartServices = () => req('/api/restart');
-                const toggleGodMode = () => req('/api/godmode');
-                const openFrontendPortal = () => {
-                    window.open(`https://localhost:${frontendPort.value}`, '_blank');
-                };
-                const clearLogs = () => {
-                    req('/api/logs/clear');
-                    logs.value = [];
-                };
-
-                // Company operations
-                const loadCompanies = async () => {
-                    const res = await req('/api/companies', 'GET');
-                    if (res) companies.value = res;
-                };
-
-                const selectCompany = async (id) => {
-                    companyId.value = id;
-                    isEditingCompany.value = true;
-                    const res = await req(`/api/companies/${id}`, 'GET');
-                    if (res) {
-                        companyUrls.value = (res.urls || []).join('\n');
-                    }
-                };
-
-                const clearCompanyForm = () => {
-                    companyId.value = '';
-                    companyUrls.value = '';
-                    isEditingCompany.value = false;
-                };
-
-                const saveCompany = async () => {
-                    const id = companyId.value.trim().toUpperCase();
-                    if (id.length !== 5) return showToast('Company ID must be exactly 5 characters', 'error');
-                    
-                    const mode = companies.value.includes(id) ? 'Update' : 'New';
-                    
-                    if (mode === 'New') {
-                        const urls = companyUrls.value.split('\n')
-                            .map(u => u.trim())
-                            .filter(u => u.length > 0);
-                        if (urls.length === 0) {
-                            return showToast('At least one synchronization URL is required for a new company', 'error');
-                        }
-                    }
-                    
-                    showToast(`Saving configuration for ${id}...`, 'info');
-                    
-                    const res = await req('/api/companies', 'POST', { CompanyId: id, Mode: mode, SyncUrls: companyUrls.value });
-                    if (res) {
-                        clearCompanyForm();
-                        loadCompanies();
-                    }
-                };
-
-                const syncCompany = async () => {
-                    const id = companyId.value.trim().toUpperCase();
-                    if (id.length !== 5) return showToast('Please select or specify a valid 5-char Company ID', 'error');
-                    await req(`/api/companies/${id}/sync`, 'POST');
-                    switchTab('terminal');
-                };
-
-                // Widget access operations
-                const loadAccessCompanies = async () => {
-                    selectedAccessCompany.value = '';
-                    selectedAccessUser.value = '';
-                    accessUsers.value = [];
-                    showPermissionsPanel.value = false;
-                    
-                    const res = await req('/api/companies', 'GET');
-                    if (res) accessCompanies.value = res;
-                };
-
-                const handleAccessCompanyChange = async () => {
-                    selectedAccessUser.value = '';
-                    accessUsers.value = [];
-                    showPermissionsPanel.value = false;
-                    
-                    if (!selectedAccessCompany.value) return;
-                    
-                    const res = await req(`/api/manager/companies/${selectedAccessCompany.value}/users`, 'GET');
-                    if (res) accessUsers.value = res;
-                };
-
-                const handleAccessUserChange = async () => {
-                    if (!selectedAccessCompany.value || !selectedAccessUser.value) {
-                        showPermissionsPanel.value = false;
-                        return;
-                    }
-                    
-                    showPermissionsPanel.value = true;
-                    showToast("Loading access rules...", 'info');
-                    
-                    const res = await req(`/api/manager/companies/${selectedAccessCompany.value}/users/${selectedAccessUser.value}/permissions`, 'GET');
-                    if (res) {
-                        const widgetKeys = [
-                            'kpi_cards', 'capital_growth', 'operating_cash_flow', 'revenue_budget', 'expense_budget',
-                            'operation_metrics', 'lease_expirations',
-                            'tickets_kpi', 'maintenance_status', 'tickets_by_category'
-                        ];
-                        const reportKeys = ['balance_sheet', 'income_statement'];
-                        const defaultFinancials = ['kpi_cards', 'capital_growth', 'operating_cash_flow', 'revenue_budget', 'expense_budget'];
-                        
-                        const widgets = {};
-                        widgetKeys.forEach(k => {
-                            if (res.widgets && res.widgets.hasOwnProperty(k)) {
-                                widgets[k] = res.widgets[k] === true;
-                            } else {
-                                widgets[k] = defaultFinancials.includes(k);
-                            }
-                        });
-
-                        const reports = {};
-                        reportKeys.forEach(k => {
-                            if (res.reports && res.reports.hasOwnProperty(k)) {
-                                reports[k] = res.reports[k] === true;
-                            } else {
-                                reports[k] = true;
-                            }
-                        });
-
-                        userPermissions.value = { widgets, reports };
-                        showToast("Access rules loaded", 'success');
-                    }
-                };
-
-                const saveAccessPermissions = async () => {
-                    if (!selectedAccessCompany.value || !selectedAccessUser.value) return;
-                    
-                    showToast("Saving security policies...", 'info');
-                    const res = await req(`/api/manager/companies/${selectedAccessCompany.value}/users/${selectedAccessUser.value}/permissions`, 'POST', userPermissions.value);
-                    if (res) {
-                        showToast("Access policies updated successfully!", 'success');
-                    }
-                };
-
-                const getSelectedUsername = () => {
-                    const user = accessUsers.value.find(u => u.id == selectedAccessUser.value);
-                    return user ? user.username : '';
-                };
-
-                const getLogClass = (line) => {
-                    if (line.includes('[Backend]')) return 'log-backend';
-                    if (line.includes('[Vite]')) return 'log-vite';
-                    if (line.includes('[Sync]')) return 'log-sync';
-                    if (line.includes('Error') || line.includes('Exception') || line.includes('fail:')) return 'log-err';
-                    return '';
-                };
-
-                let pollInterval = null;
-                onMounted(() => {
-                    pollStatus();
-                    pollInterval = setInterval(pollStatus, 1500);
-                });
-
-                onUnmounted(() => {
-                    if (pollInterval) clearInterval(pollInterval);
-                });
-
-                return {
-                    activeTab,
-                    frontendPort,
-                    backendStatus,
-                    backendPort,
-                    frontendStatus,
-                    localIp,
-                    coolAlias,
-                    godMode,
-                    logs,
-                    companies,
-                    companyId,
-                    companyUrls,
-                    isEditingCompany,
-                    accessCompanies,
-                    selectedAccessCompany,
-                    accessUsers,
-                    selectedAccessUser,
-                    userPermissions,
-                    showPermissionsPanel,
-                    toasts,
-                    getToastColor,
-                    switchTab,
-                    startServices,
-                    stopServices,
-                    restartServices,
-                    toggleGodMode,
-                    openFrontendPortal,
-                    clearLogs,
-                    selectCompany,
-                    clearCompanyForm,
-                    saveCompany,
-                    syncCompany,
-                    handleAccessCompanyChange,
-                    handleAccessUserChange,
-                    saveAccessPermissions,
-                    getSelectedUsername,
-                    getLogClass
-                };
+        const api = async (url, options = {}) => {
+            options.credentials = 'include';
+            if (options.body) {
+                options.headers = { ...options.headers, 'Content-Type': 'application/json' };
+                options.body = JSON.stringify(options.body);
             }
-        }).mount('#app');
-    </script>
+            const res = await fetch('/api' + url, options);
+            if (res.status === 401) {
+                isAuthenticated.value = false;
+                throw new Error('Unauthorized');
+            }
+            return res.ok ? await res.json() : Promise.reject(await res.json().catch(()=>({})));
+        };
+
+        const checkAuth = async () => {
+            try {
+                await api('/me');
+                isAuthenticated.value = true;
+                loadCompanies();
+            } catch (e) { isAuthenticated.value = false; }
+        };
+
+        const login = async () => {
+            try {
+                await api('/login', { method: 'POST', body: { password: password.value } });
+                isAuthenticated.value = true;
+                loginError.value = '';
+                loadCompanies();
+            } catch (e) { loginError.value = 'Invalid password'; }
+        };
+        
+        const logout = async () => {
+            await api('/logout', { method: 'POST' });
+            isAuthenticated.value = false;
+            password.value = '';
+        };
+
+        const loadCompanies = async () => {
+            try {
+                companies.value = await api('/companies/details');
+            } catch (e) { showToast('Failed to load companies', 'error'); }
+        };
+
+        const clearForm = () => {
+            selectedCompanyId.value = '';
+            isEditing.value = false;
+            form.companyId = '';
+            form.isActive = true;
+            form.syncUrls = '';
+        };
+
+        const selectCompany = async (id) => {
+            try {
+                const data = await api(`/companies/${id}`);
+                selectedCompanyId.value = id;
+                isEditing.value = true;
+                form.companyId = id;
+                form.isActive = data.isActive;
+                form.syncUrls = (data.urls || []).join('\n');
+            } catch (e) { showToast('Failed to load company details', 'error'); }
+        };
+
+        const saveCompany = async () => {
+            if (form.companyId.length !== 5) {
+                return showToast('Company ID must be 5 characters', 'error');
+            }
+            try {
+                await api('/companies', {
+                    method: 'POST',
+                    body: { 
+                        CompanyId: form.companyId.toUpperCase(), 
+                        Mode: isEditing.value ? 'Update' : 'New',
+                        IsActive: form.isActive,
+                        SyncUrls: form.syncUrls 
+                    }
+                });
+                showToast('Company saved successfully', 'success');
+                await loadCompanies();
+                if (!isEditing.value) selectCompany(form.companyId.toUpperCase());
+            } catch (e) { showToast(e.message || 'Failed to save', 'error'); }
+        };
+
+        const syncData = async () => {
+            try {
+                await api(`/companies/${selectedCompanyId.value}/sync`, { method: 'POST' });
+                showToast('Sync triggered in background', 'success');
+            } catch (e) { showToast('Sync failed to start', 'error'); }
+        };
+
+        // Permissions
+        const loadUsers = async () => {
+            permSelectedUser.value = '';
+            permissions.widgets = {};
+            permissions.reports = {};
+            if (!permSelectedCompany.value) return users.value = [];
+            try {
+                users.value = await api(`/manager/companies/${permSelectedCompany.value}/users`);
+            } catch (e) { showToast('Failed to load users', 'error'); }
+        };
+
+        const loadPermissions = async () => {
+            if (!permSelectedUser.value) return;
+            try {
+                const data = await api(`/manager/companies/${permSelectedCompany.value}/users/${permSelectedUser.value}/permissions`);
+                availableWidgets.forEach(w => permissions.widgets[w.key] = !!data.widgets[w.key]);
+                availableReports.forEach(r => permissions.reports[r.key] = !!data.reports[r.key]);
+            } catch (e) { showToast('Failed to load permissions', 'error'); }
+        };
+
+        const savePermissions = async () => {
+            try {
+                await api(`/manager/companies/${permSelectedCompany.value}/users/${permSelectedUser.value}/permissions`, {
+                    method: 'POST',
+                    body: { widgets: permissions.widgets, reports: permissions.reports }
+                });
+                showToast('Permissions saved', 'success');
+            } catch (e) { showToast('Failed to save permissions', 'error'); }
+        };
+
+        const availableWidgets = [
+            { key: 'kpi_cards', label: 'Financial KPI Summary Cards' },
+            { key: 'capital_growth', label: 'Capital Growth Trend' },
+            { key: 'operating_cash_flow', label: 'Operating Cash Flow Stream' },
+            { key: 'revenue_budget', label: 'Revenue Budget vs Actual' },
+            { key: 'expense_budget', label: 'Expense Budget vs Actual' },
+            { key: 'operation_metrics', label: 'Property Operations Metrics' },
+            { key: 'lease_expirations', label: 'Upcoming Lease Expirations' },
+            { key: 'tickets_kpi', label: 'Tenant Helpdesk KPI Status' },
+            { key: 'maintenance_status', label: 'Maintenance Orders Log' },
+            { key: 'tickets_by_category', label: 'Tickets Distribution Chart' }
+        ];
+
+        const availableReports = [
+            { key: 'balance_sheet', label: 'Balance Sheet Statement' },
+            { key: 'income_statement', label: 'Income Statement Statement' }
+        ];
+
+        onMounted(checkAuth);
+
+        return {
+            isAuthenticated, password, loginError, login, logout, tab,
+            companies, selectedCompanyId, isEditing, form, clearForm, selectCompany, saveCompany, syncData,
+            users, permSelectedCompany, permSelectedUser, permissions, loadUsers, loadPermissions, savePermissions,
+            availableWidgets, availableReports, toasts
+        };
+    }
+}).mount('#app');
+</script>
 </body>
 </html>

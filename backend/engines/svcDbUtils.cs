@@ -29,15 +29,8 @@ namespace BiPortal.FinancialReports.Backend.Engines
             }
         }
 
-        public static string GetSafeDbPath(string companyId, string suffix = "")
+        public static string GetAssetsDirectory()
         {
-            // safe_id = "".join(c for c in company_id if c.isalnum() or c in ('-', '_')).upper()
-            string safeId = new string(companyId
-                .Where(c => char.IsLetterOrDigit(c) || c == '-' || c == '_')
-                .ToArray())
-                .ToUpperInvariant();
-
-            // Find backend directory robustly by walking up from BaseDir or Directory.GetCurrentDirectory()
             string? backendDir = null;
             string current = BaseDir;
             while (!string.IsNullOrEmpty(current))
@@ -80,13 +73,52 @@ namespace BiPortal.FinancialReports.Backend.Engines
                 }
             }
 
-            // Ultimate fallback to AppContext.BaseDirectory if backend directory is not found
             if (backendDir == null)
             {
                 backendDir = BaseDir;
             }
 
-            string dirPath = Path.GetFullPath(Path.Combine(backendDir, "assets", safeId));
+            string assetsDir = Path.GetFullPath(Path.Combine(backendDir, "assets"));
+            if (!Directory.Exists(assetsDir))
+            {
+                Directory.CreateDirectory(assetsDir);
+            }
+            return assetsDir;
+        }
+
+        public static string GetCentralDbPath()
+        {
+            string assetsDir = GetAssetsDirectory();
+            string dbPath = Path.Combine(assetsDir, "BMS_BI_Central.db");
+            
+            if (!SchemaInitializedDbs.ContainsKey(dbPath))
+            {
+                try
+                {
+                    using (var dbContext = new CentralDbContext(dbPath))
+                    {
+                        dbContext.Database.EnsureCreated();
+                    }
+                    SchemaInitializedDbs.TryAdd(dbPath, true);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[DB] Warning: Failed to initialize schema for Central DB: {ex.Message}");
+                }
+            }
+            return dbPath;
+        }
+
+        public static string GetSafeDbPath(string companyId, string suffix = "")
+        {
+            // safe_id = "".join(c for c in company_id if c.isalnum() or c in ('-', '_')).upper()
+            string safeId = new string(companyId
+                .Where(c => char.IsLetterOrDigit(c) || c == '-' || c == '_')
+                .ToArray())
+                .ToUpperInvariant();
+
+            string assetsDir = GetAssetsDirectory();
+            string dirPath = Path.GetFullPath(Path.Combine(assetsDir, safeId));
             
             if (!Directory.Exists(dirPath))
             {
