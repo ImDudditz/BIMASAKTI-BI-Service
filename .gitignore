@@ -1,42 +1,60 @@
-# C# / dotnet build folders
+# ==========================================
+# C# / .NET ARTIFACTS
+# ==========================================
 [Bb]in/
 [Oo]bj/
 out/
 publish/
+Publish/
 
-# Node/Vite frontend folders
+# ==========================================
+# NODE / VITE FRONTEND ARTIFACTS
+# ==========================================
 node_modules/
 dist/
 dist-ssr/
 *.local
 .eslintcache
+*.tsbuildinfo
+*.timestamp-*-*.mjs
 
-# Environment and Secrets
+# ==========================================
+# ENVIRONMENT & SECRETS
+# ==========================================
 .env
 .env.*
 *.env
 *.env.local
-!*_config.json
 
-# Logs and Databases
+# ==========================================
+# LOGS & DATABASES
+# ==========================================
 *.log
 logs/
 *.db
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Python compilation (in case Python engines are run)
-__pycache__/
-*.py[cod]
-*$py.class
-.venv/
-venv/
-env/
+# ==========================================
+# TESTING ARTIFACTS
+# ==========================================
+/cypress/videos/
+/cypress/screenshots/
+__screenshots__/
+coverage/
 
-# IDEs and OS metadata
+# ==========================================
+# SYSTEM & EDITOR METADATA
+# ==========================================
 .vs/
 .vscode/
+!.vscode/extensions.json
 .idea/
 *.user
 *.suo
 .DS_Store
 Thumbs.db
-
+*.sw?
+*.sln

@@ -58,10 +58,11 @@ echo    [3] Clean the Cache
 echo    [4] Free the Ports
 echo    [5] Check .NET Availability
 echo    [6] Exit (Auto-Close, Free Port ^& Clean Cache)
+echo    [7] Compile Production Publish Build
 echo.
 echo  ────────────────────────────────────────────────────────────
 set "choice="
-set /p choice="Select an action [1-6]: "
+set /p choice="Select an action [1-7]: "
 
 if "%choice%"=="1" goto LAUNCH_ALL
 if "%choice%"=="2" goto LAUNCH_WEB
@@ -69,6 +70,7 @@ if "%choice%"=="3" goto CLEAN_CACHE
 if "%choice%"=="4" goto FREE_PORTS
 if "%choice%"=="5" goto CHECK_DOTNET
 if "%choice%"=="6" goto FORCE_EXIT
+if "%choice%"=="7" goto COMPILE_PUBLISH
 goto MENU
 
 :LAUNCH_ALL
@@ -263,6 +265,64 @@ if !freed! GTR 0 (
 ) else (
     echo  [+] All ports are already free and inactive.
 )
+echo.
+pause
+goto MENU
+
+:COMPILE_PUBLISH
+cls
+echo.
+echo  ============================================================
+echo   COMPILE PRODUCTION PUBLISH BUILD
+echo  ============================================================
+echo.
+echo  Select Target Architecture:
+echo   [1] Windows x64 (Standard 64-bit)
+echo   [2] Windows x86 (Standard 32-bit)
+echo   [3] Cancel
+echo.
+set "arch_choice="
+set /p arch_choice="Select an option [1-3]: "
+
+if "%arch_choice%"=="1" set "TARGET_ARCH=win-x64"
+if "%arch_choice%"=="2" set "TARGET_ARCH=win-x86"
+if "%arch_choice%"=="3" goto MENU
+if "%TARGET_ARCH%"=="" goto COMPILE_PUBLISH
+
+echo.
+echo  [+] Target Architecture: !TARGET_ARCH!
+echo  [+] Preparing output directory...
+set "PUB_DIR=%ROOT_DIR%Publish"
+if exist "%PUB_DIR%" rmdir /s /q "%PUB_DIR%"
+mkdir "%PUB_DIR%\Backend"
+mkdir "%PUB_DIR%\Manager"
+mkdir "%PUB_DIR%\Frontend"
+
+echo.
+echo  [+] Compiling Backend API (Single File Executable)...
+dotnet publish "%BACKEND_DIR%\BiPortal.FinancialReports.Backend.csproj" -c Release -r !TARGET_ARCH! -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -o "%PUB_DIR%\Backend" >nul
+
+echo.
+echo  [+] Compiling Manager API (Single File Executable)...
+dotnet publish "%MANAGER_DIR%\BI_Portal_Manager.csproj" -c Release -r !TARGET_ARCH! -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -o "%PUB_DIR%\Manager" >nul
+
+echo.
+echo  [+] Compiling Frontend Vue Assets (Hash-free)...
+pushd "%FRONTEND_DIR%"
+call npm install >nul 2>&1
+call npm run build >nul 2>&1
+popd
+
+echo  [+] Copying Frontend Production Proxy...
+xcopy /E /I /Q "%FRONTEND_DIR%\dist" "%PUB_DIR%\Frontend\dist" >nul
+copy /Y "%FRONTEND_DIR%\server.js" "%PUB_DIR%\Frontend\" >nul
+copy /Y "%FRONTEND_DIR%\package.json" "%PUB_DIR%\Frontend\" >nul
+
+echo.
+echo  ============================================================
+echo   BUILD SUCCESSFUL! 
+echo   All output is cleanly organized in the /Publish directory.
+echo  ============================================================
 echo.
 pause
 goto MENU

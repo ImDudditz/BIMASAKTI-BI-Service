@@ -250,34 +250,6 @@ adminGroup.MapPost("/manager/companies/{companyId}/users/{userId:int}/permission
     } catch { return Results.StatusCode(500); }
 });
 
-// Auto-migrate legacy companies on boot
-try {
-    string centralDbPath = svcDbUtils.GetCentralDbPath();
-    using var db = new CentralDbContext(centralDbPath);
-    db.Database.EnsureCreated();
-    string assetsDir = svcDbUtils.GetAssetsDirectory();
-    if (Directory.Exists(assetsDir)) {
-        foreach (var dir in Directory.GetDirectories(assetsDir)) {
-            string cid = Path.GetFileName(dir).ToUpperInvariant();
-            if (cid.Length == 5) {
-                string configPath = Path.Combine(dir, $"{cid}_config.json");
-                if (File.Exists(configPath) && !db.Companies.Any(c => c.CompanyId == cid)) {
-                    string configJson = File.ReadAllText(configPath);
-                    db.Companies.Add(new Company {
-                        CompanyId = cid,
-                        IsActive = true,
-                        SyncConfigJson = configJson
-                    });
-                    Console.WriteLine($"[Auto-Migrate] Registered legacy company: {cid} into Central Database");
-                }
-            }
-        }
-        db.SaveChanges();
-    }
-} catch (Exception ex) {
-    Console.WriteLine($"[Auto-Migrate] Error: {ex.Message}");
-}
-
 app.Run(url);
 
 public class PortalCompanySaveRequest {
