@@ -33,9 +33,22 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        entryFileNames: `assets/[name].js`,
-        chunkFileNames: `assets/[name].js`,
-        assetFileNames: `assets/[name].[ext]`
+        entryFileNames: `js/[name].js`,
+        chunkFileNames: `js/[name].js`,
+        assetFileNames: (assetInfo) => {
+          const name = assetInfo?.name || (assetInfo?.names && assetInfo.names[0]) || 'asset.unknown';
+          let extType = name.split('.').pop();
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+            extType = 'img';
+          } else if (/woff|woff2|eot|ttf|otf/i.test(extType)) {
+            extType = 'fonts';
+          } else if (/css/i.test(extType)) {
+            extType = 'css';
+          } else {
+            extType = 'assets';
+          }
+          return `${extType}/[name].[ext]`;
+        }
       }
     }
   },

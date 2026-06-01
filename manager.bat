@@ -295,16 +295,15 @@ echo  [+] Preparing output directory...
 set "PUB_DIR=%ROOT_DIR%Publish"
 if exist "%PUB_DIR%" rmdir /s /q "%PUB_DIR%"
 mkdir "%PUB_DIR%\Backend"
-mkdir "%PUB_DIR%\Manager"
 mkdir "%PUB_DIR%\Frontend"
 
 echo.
-echo  [+] Compiling Backend API (Single File Executable)...
-dotnet publish "%BACKEND_DIR%\BiPortal.FinancialReports.Backend.csproj" -c Release -r !TARGET_ARCH! -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -o "%PUB_DIR%\Backend" >nul
+echo  [+] Compiling Core Services to a Unified Backend Folder...
+echo  - Building Main Backend API (BMS-Core.exe)...
+dotnet publish "%BACKEND_DIR%\BMS_BI_Service.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\Backend" >nul
 
-echo.
-echo  [+] Compiling Manager API (Single File Executable)...
-dotnet publish "%MANAGER_DIR%\BI_Portal_Manager.csproj" -c Release -r !TARGET_ARCH! -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -o "%PUB_DIR%\Manager" >nul
+echo  - Building BI SaaS Manager API (BMS-BM.exe)...
+dotnet publish "%MANAGER_DIR%\BI_Portal_Manager.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\Backend" >nul
 
 echo.
 echo  [+] Compiling Frontend Vue Assets (Hash-free)...
@@ -317,6 +316,22 @@ echo  [+] Copying Frontend Production Proxy...
 xcopy /E /I /Q "%FRONTEND_DIR%\dist" "%PUB_DIR%\Frontend\dist" >nul
 copy /Y "%FRONTEND_DIR%\server.js" "%PUB_DIR%\Frontend\" >nul
 copy /Y "%FRONTEND_DIR%\package.json" "%PUB_DIR%\Frontend\" >nul
+
+echo.
+echo  [+] Generating Production Launchers...
+(
+echo @echo off
+echo echo Starting BMS Core API...
+echo start "BMS-Core API" cmd /k "BMS-Core.exe"
+echo echo Starting BMS Web Manager...
+echo start "BMS SaaS Manager" cmd /k "BMS-BM.exe"
+) > "%PUB_DIR%\Backend\start_backend.bat"
+
+(
+echo @echo off
+echo echo Starting Frontend Proxy Server...
+echo start "BMS Frontend Proxy" cmd /k "node server.js"
+) > "%PUB_DIR%\Frontend\start_frontend.bat"
 
 echo.
 echo  ============================================================

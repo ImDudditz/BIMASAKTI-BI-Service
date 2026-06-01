@@ -5,11 +5,11 @@
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>BiPortal.FinancialReports.Manager</RootNamespace>
-    <AssemblyName>BiPortalWebManager</AssemblyName>
+    <AssemblyName>BMS-BM</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../BiPortal.csproj" />
+    <ProjectReference Include="..\BMS_BI_Service.csproj" />
   </ItemGroup>
 
 </Project>
