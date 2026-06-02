@@ -295,17 +295,50 @@ if "%comp_choice%"=="2" ( set "COMPILE_BACKEND=1" )
 if "%comp_choice%"=="3" ( set "COMPILE_FRONTEND=1" )
 
 set "TARGET_ARCH=win-x64"
-if "%COMPILE_BACKEND%"=="1" (
-    echo.
-    echo  Select Target Architecture:
-    echo   [1] Windows x64 (Standard 64-bit)
-    echo   [2] Windows x86 (Standard 32-bit)
-    echo.
-    set "arch_choice="
-    set /p arch_choice="Select an option [1-2]: "
-    if "!arch_choice!"=="1" set "TARGET_ARCH=win-x64"
-    if "!arch_choice!"=="2" set "TARGET_ARCH=win-x86"
+set "BACKEND_DEPLOY_TYPE=STANDALONE"
+
+if "%COMPILE_BACKEND%"=="0" goto SKIP_BACKEND_PROMPT
+
+echo.
+echo  Select Backend Deployment Target:
+echo   [1] Standalone Executable (Self-Contained)
+echo   [2] IIS Web Server (Framework-Dependent)
+echo.
+set "deploy_choice="
+set /p deploy_choice="Select an option [1-2]: "
+if "!deploy_choice!"=="2" (
+    set "BACKEND_DEPLOY_TYPE=IIS"
+    goto SKIP_BACKEND_PROMPT
 )
+
+echo.
+echo  Select Target Architecture for Standalone:
+echo   [1] Windows x64 (Standard 64-bit)
+echo   [2] Windows x86 (Standard 32-bit)
+echo.
+set "arch_choice="
+set /p arch_choice="Select an option [1-2]: "
+if "!arch_choice!"=="1" set "TARGET_ARCH=win-x64"
+if "!arch_choice!"=="2" set "TARGET_ARCH=win-x86"
+
+:SKIP_BACKEND_PROMPT
+
+set "FRONTEND_DEPLOY_TYPE=PROXY"
+
+if "%COMPILE_FRONTEND%"=="0" goto SKIP_FRONTEND_PROMPT
+
+echo.
+echo  Select Frontend Deployment Target:
+echo   [1] Node.js Proxy Server (Default, Server-Side Rendered / Proxy)
+echo   [2] Standard Static SaaS (HTML/JS/CSS only, perfect for NGINX/IIS/CDN)
+echo.
+set "front_deploy_choice="
+set /p front_deploy_choice="Select an option [1-2]: "
+if "!front_deploy_choice!"=="2" (
+    set "FRONTEND_DEPLOY_TYPE=STATIC"
+)
+
+:SKIP_FRONTEND_PROMPT
 
 echo.
 echo  [+] Preparing output directory...
@@ -319,8 +352,42 @@ goto CHECK_FRONTEND
 if exist "%PUB_DIR%\Backend" rmdir /s /q "%PUB_DIR%\Backend"
 mkdir "%PUB_DIR%\Backend"
 
+if "!BACKEND_DEPLOY_TYPE!"=="IIS" goto COMPILE_IIS
+goto COMPILE_STANDALONE
+
+:COMPILE_IIS
 echo.
-echo  [+] Compiling Core Services to a Unified Backend Folder...
+echo  [+] Compiling Core Services for IIS Deployment...
+echo  - Building Main Backend API (IIS)...
+dotnet publish "%BACKEND_DIR%\BMS_BI_Service.csproj" -c Release -o "%PUB_DIR%\Backend\BMS_Core_IIS" >nul
+
+echo  - Building BI SaaS Manager API (IIS)...
+dotnet publish "%MANAGER_DIR%\BI_Portal_Manager.csproj" -c Release -o "%PUB_DIR%\Backend\BMS_Manager_IIS" >nul
+
+echo.
+echo  [+] Generating Sync Job Script for IIS...
+(
+echo @echo off
+echo echo ==================================================
+echo echo Running BMS Background Sync Job...
+echo echo ==================================================
+echo cd /d "%%~dp0BMS_Core_IIS"
+echo dotnet BMS_BI_Service.dll --sync-all
+echo echo.
+echo echo Sync process completed.
+echo timeout /t 10
+) > "%PUB_DIR%\Backend\run_scheduled_sync_iis.bat"
+
+echo.
+echo  [+] IIS Build Complete!
+echo      Please map your IIS site paths to the respective folders:
+echo      - Core API: %PUB_DIR%\Backend\BMS_Core_IIS
+echo      - Manager : %PUB_DIR%\Backend\BMS_Manager_IIS
+goto CHECK_FRONTEND
+
+:COMPILE_STANDALONE
+echo.
+echo  [+] Compiling Core Services to a Unified Backend Folder (Standalone)...
 echo  - Building Main Backend API (BMS-Core.exe)...
 dotnet publish "%BACKEND_DIR%\BMS_BI_Service.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\Backend" >nul
 
@@ -369,18 +436,25 @@ call npm install >nul 2>&1
 call npm run build >nul 2>&1
 popd
 
-echo  [+] Copying Frontend Production Proxy...
-xcopy /E /I /Q "%FRONTEND_DIR%\dist" "%PUB_DIR%\Frontend\dist" >nul
-copy /Y "%FRONTEND_DIR%\server.js" "%PUB_DIR%\Frontend\" >nul
-copy /Y "%FRONTEND_DIR%\package.json" "%PUB_DIR%\Frontend\" >nul
+if "!FRONTEND_DEPLOY_TYPE!"=="STATIC" (
+    echo  [+] Copying Frontend Static Assets...
+    xcopy /E /I /Q "%FRONTEND_DIR%\dist\*" "%PUB_DIR%\Frontend\" >nul
+    echo.
+    echo  [+] Static build complete! Provide the contents of \Publish\Frontend to your Web Server ^(IIS/Nginx/CDN^).
+) else (
+    echo  [+] Copying Frontend Production Proxy...
+    xcopy /E /I /Q "%FRONTEND_DIR%\dist" "%PUB_DIR%\Frontend\dist" >nul
+    copy /Y "%FRONTEND_DIR%\server.js" "%PUB_DIR%\Frontend\" >nul
+    copy /Y "%FRONTEND_DIR%\package.json" "%PUB_DIR%\Frontend\" >nul
 
-echo.
-echo  [+] Generating Frontend Production Launcher...
-(
-echo @echo off
-echo echo Starting Frontend Proxy Server...
-echo start "BMS Frontend Proxy" cmd /k "node server.js"
-) > "%PUB_DIR%\Frontend\start_frontend.bat"
+    echo.
+    echo  [+] Generating Frontend Production Launcher...
+    (
+    echo @echo off
+    echo echo Starting Frontend Proxy Server...
+    echo start "BMS Frontend Proxy" cmd /k "node server.js"
+    ) > "%PUB_DIR%\Frontend\start_frontend.bat"
+)
 
 :FINISH_COMPILE
 echo.
