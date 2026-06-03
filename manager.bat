@@ -80,6 +80,9 @@ echo  ============================================================
 echo   LAUNCHING FULL LOCAL DEVELOPMENT ENVIRONMENT
 echo  ============================================================
 echo.
+echo  Building solution sequentially to prevent file lock collisions...
+dotnet build "%ROOT_DIR%BMS_BI_SERVICE.slnx" >nul
+echo.
 
 :: 1. Start Main Backend API
 netstat -ano | findstr LISTENING | findstr :%BACKEND_PORT% >nul
@@ -88,7 +91,7 @@ if not errorlevel 1 (
     for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :%BACKEND_PORT%') do ( taskkill /F /T /PID %%a >nul 2>&1 )
 )
 echo  Starting Main Backend API on Port %BACKEND_PORT%...
-start "BI Portal Backend Core" /D "%BACKEND_DIR%" cmd /c "dotnet run"
+start "BI Portal Backend Core" /D "%BACKEND_DIR%" cmd /c "dotnet run --no-build"
 
 :: 2. Start Frontend Dev Server
 netstat -ano | findstr LISTENING | findstr :%FRONTEND_PORT% >nul
@@ -108,6 +111,9 @@ echo  ============================================================
 echo   LAUNCHING WEB CONTROL PANEL
 echo  ============================================================
 echo.
+echo  Building Web Manager...
+dotnet build "%MANAGER_DIR%\BMS_BI_Manager.csproj" >nul
+echo.
 :: Check if already running, free it first
 netstat -ano | findstr LISTENING | findstr :%MANAGER_PORT% >nul
 if not errorlevel 1 (
@@ -116,7 +122,7 @@ if not errorlevel 1 (
 )
 
 echo  Starting Web Manager Service on Port %MANAGER_PORT%...
-start "BI Portal Manager Core" /D "%MANAGER_DIR%" cmd /c "dotnet run > manager_startup.log 2>&1"
+start "BI Portal Manager Core" /D "%MANAGER_DIR%" cmd /c "dotnet run --no-build > manager_startup.log 2>&1"
 
 echo  Waiting for service initialization...
 set "BOOT_SUCCESS=0"
