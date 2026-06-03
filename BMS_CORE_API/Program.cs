@@ -132,10 +132,16 @@ namespace BMS_BI_SERVICE.Core
                 }
             }
 
-            Console.WriteLine($"[Server Startup] Binding to host {host} on port {port}");
-
             var builder = WebApplication.CreateBuilder(args);
-            builder.WebHost.UseUrls($"http://{host}:{port}");
+            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APP_POOL_ID")))
+            {
+                Console.WriteLine($"[Server Startup] Binding to host {host} on port {port}");
+                builder.WebHost.UseUrls($"http://{host}:{port}");
+            }
+            else
+            {
+                Console.WriteLine("[Server Startup] Running under IIS.");
+            }
 
             // 1. Add Controllers with standard JSON camelCase formatting
             builder.Services.AddControllers()

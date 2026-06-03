@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../BMS_CORE_API.csproj" />
+    <ProjectReference Include="../BiPortal.csproj" />
   </ItemGroup>
 
 </Project>

@@ -129,6 +129,15 @@
 </div>
 
 <script>
+// ==========================================
+// ENVIRONMENT CONFIGURATION
+// ==========================================
+window.CONFIG = {
+    // Leave blank ("") to automatically detect the base URL (useful for IIS Virtual Directories).
+    // Set to a specific URL (e.g., "http://localhost:5000") if your API is hosted elsewhere.
+    API_BASE_URL: "" 
+};
+
 const { createApp, ref, reactive, onMounted } = Vue;
 
 createApp({
@@ -161,7 +170,16 @@ createApp({
                 options.headers = { ...options.headers, 'Content-Type': 'application/json' };
                 options.body = JSON.stringify(options.body);
             }
-            const res = await fetch('/api' + url, options);
+            
+            // Dynamically resolve base URL to support IIS Virtual Directories
+            let baseUrl = window.CONFIG.API_BASE_URL;
+            if (!baseUrl) {
+                baseUrl = window.location.pathname;
+                if (baseUrl.endsWith('.html')) baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/'));
+                if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+            }
+
+            const res = await fetch(baseUrl + '/api' + url, options);
             if (res.status === 401) {
                 isAuthenticated.value = false;
                 throw new Error('Unauthorized');

@@ -4,8 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <RootNamespace>BMS_BI_SERVICE.Core</RootNamespace>
-    <AssemblyName>BMS_Core</AssemblyName>
+    <RootNamespace>BiPortal.FinancialReports.Backend</RootNamespace>
+    <AssemblyName>BMS-Core</AssemblyName>
     <UseAppHost>true</UseAppHost>
   </PropertyGroup>
 
@@ -24,16 +24,22 @@
 
   <ItemGroup>
     <Compile Remove="tests\**" />
-    <Compile Remove="BMS_CORE_API.Tests\**" />
+    <Compile Remove="BiPortal.Tests\**" />
     <Compile Remove="BimasaktiReports.Tests\**" />
+    <Compile Remove="manager\**" />
+    <Compile Remove="BI_Portal_Manager\**" />
     <Compile Remove="assets\**" />
     <None Remove="tests\**" />
-    <None Remove="BMS_CORE_API.Tests\**" />
+    <None Remove="BiPortal.Tests\**" />
     <None Remove="BimasaktiReports.Tests\**" />
+    <None Remove="manager\**" />
+    <None Remove="BI_Portal_Manager\**" />
     <None Remove="assets\**" />
     <Content Remove="tests\**" />
-    <Content Remove="BMS_CORE_API.Tests\**" />
+    <Content Remove="BiPortal.Tests\**" />
     <Content Remove="BimasaktiReports.Tests\**" />
+    <Content Remove="manager\**" />
+    <Content Remove="BI_Portal_Manager\**" />
     <Content Remove="assets\**" />
   </ItemGroup>
 

@@ -25,7 +25,7 @@ try {
 }
 
 export default defineConfig({
-  base: '/BI-SERVICE/Frontend/',
+  base: './',
   plugins: [
     vue(),
     tailwindcss(),

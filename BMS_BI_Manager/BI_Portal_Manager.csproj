@@ -4,12 +4,12 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>BMS_BI_SERVICE.Manager</RootNamespace>
-    <AssemblyName>BMS_BM</AssemblyName>
+    <RootNamespace>BiPortal.FinancialReports.Manager</RootNamespace>
+    <AssemblyName>BMS-BM</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BMS_CORE_API\BMS_CORE_API.csproj" />
+    <ProjectReference Include="..\BMS_BI_Service.csproj" />
   </ItemGroup>
 
 </Project>

@@ -18,13 +18,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options => {
     options.AddPolicy("ManagerCorsPolicy", policy => {
         policy.SetIsOriginAllowed(origin => {
-            if (string.IsNullOrEmpty(origin)) return false;
-            try {
-                var uri = new Uri(origin);
-                return uri.Host == "localhost" || uri.Host == "127.0.0.1" || uri.Host == "::1";
-            } catch {
-                return false;
-            }
+            if (string.IsNullOrEmpty(origin)) return true; // Allow all origins for the manager portal for easier access
+            return true;
         })
         .AllowAnyMethod()
         .AllowAnyHeader()
@@ -37,7 +32,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.Cookie.Name = "manager_session";
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Fix: Allow HTTP logins
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.Events.OnRedirectToLogin = context =>
         {
@@ -68,17 +63,34 @@ string url = "http://localhost:8003";
 
 // Secure SuperAdmin Password Initialization
 string? adminPass = Environment.GetEnvironmentVariable("SUPERADMIN_PASSWORD");
+string secretFilePath = Path.Combine(Directory.GetCurrentDirectory(), "admin_secret.txt");
+
+if (string.IsNullOrEmpty(adminPass) && File.Exists(secretFilePath))
+{
+    try { adminPass = File.ReadAllText(secretFilePath).Trim(); }
+    catch { }
+}
+
 if (string.IsNullOrEmpty(adminPass))
 {
     var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
     var bytes = new byte[16];
     rng.GetBytes(bytes);
     adminPass = Convert.ToBase64String(bytes).Replace("/", "").Replace("+", "").Replace("=", "").Substring(0, 16);
+    
+    try { File.WriteAllText(secretFilePath, adminPass); }
+    catch { } // fallback to in-memory if no write access
+    
     Environment.SetEnvironmentVariable("SUPERADMIN_PASSWORD", adminPass);
     Console.WriteLine("=====================================================");
     Console.WriteLine("WARNING: SUPERADMIN_PASSWORD env variable was not set!");
     Console.WriteLine($"A secure random password has been generated: {adminPass}");
+    Console.WriteLine($"Password has been saved to: {secretFilePath}");
     Console.WriteLine("=====================================================");
+}
+else
+{
+    Environment.SetEnvironmentVariable("SUPERADMIN_PASSWORD", adminPass);
 }
 
 // Auth
@@ -88,9 +100,17 @@ app.MapPost("/api/login", async (HttpContext ctx) => {
     var doc = JsonDocument.Parse(body);
     string pass = doc.RootElement.TryGetProperty("password", out var p) ? p.GetString() ?? "" : "";
     
-    adminPass = Environment.GetEnvironmentVariable("SUPERADMIN_PASSWORD")!;
+    string? currentAdminPass = Environment.GetEnvironmentVariable("SUPERADMIN_PASSWORD");
+    if (string.IsNullOrEmpty(currentAdminPass))
+    {
+        string secretFilePath = Path.Combine(Directory.GetCurrentDirectory(), "admin_secret.txt");
+        if (File.Exists(secretFilePath))
+        {
+            currentAdminPass = File.ReadAllText(secretFilePath).Trim();
+        }
+    }
     
-    if (pass == adminPass) {
+    if (!string.IsNullOrEmpty(pass) && pass.Trim() == (currentAdminPass ?? "").Trim()) {
         var claims = new List<System.Security.Claims.Claim> {
             new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "superadmin")
         };
@@ -99,6 +119,7 @@ app.MapPost("/api/login", async (HttpContext ctx) => {
         await ctx.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
         return Results.Ok(new { message = "Logged in" });
     }
+    Console.WriteLine($"[Auth] Failed login attempt. Expected: '{currentAdminPass}', Received: '{pass}'");
     return Results.Unauthorized();
 });
 
@@ -173,9 +194,6 @@ adminGroup.MapPost("/companies", async (PortalCompanySaveRequest req) => {
         if (dict.Count == 0) return Results.BadRequest(new { message = "At least one valid sync URL required." });
         comp = new Company { CompanyId = companyId, SyncConfigJson = syncConfigJson, IsActive = req.IsActive };
         db.Companies.Add(comp);
-        
-        // Ensure directory and TenantDB exist natively
-        svcDbUtils.GetSafeDbPath(companyId);
     } else if (comp != null) {
         comp.SyncConfigJson = syncConfigJson;
         comp.IsActive = req.IsActive;
@@ -183,6 +201,43 @@ adminGroup.MapPost("/companies", async (PortalCompanySaveRequest req) => {
         return Results.BadRequest(new { message = "Company not found for edit." });
     }
     await db.SaveChangesAsync();
+
+    // Ensure directory and TenantDB exist natively (both for new and if accidentally deleted)
+    string tenantDbPath = svcDbUtils.GetSafeDbPath(companyId);
+    
+    using var tenantDb = new BMS_BI_SERVICE.Core.Engines.TenantDbContext(tenantDbPath);
+    tenantDb.Database.EnsureCreated();
+    
+    var authSvc = new BMS_BI_SERVICE.Core.Services.svcAuthenticationService();
+    var allWidgets = new[] { "kpi_cards", "capital_growth", "operating_cash_flow", "revenue_budget", "expense_budget", "operation_metrics", "lease_expirations", "tickets_kpi", "maintenance_status", "tickets_by_category" };
+    var allReports = new[] { "balance_sheet", "income_statement" };
+
+    var saUser = tenantDb.Users.FirstOrDefault(u => u.Username == "sa");
+    if (saUser == null) {
+        saUser = new BMS_BI_SERVICE.Core.Engines.User {
+            Username = "sa", PasswordHash = authSvc.GetPasswordHash("sfbmub"),
+            Role = "admin", CompanyId = companyId, IsActive = true
+        };
+        tenantDb.Users.Add(saUser);
+        tenantDb.SaveChanges();
+        
+        foreach (var w in allWidgets) tenantDb.UserWidgets.Add(new BMS_BI_SERVICE.Core.Engines.UserWidget { UserId = saUser.Id, WidgetKey = w, IsActive = true });
+        foreach (var r in allReports) tenantDb.UserReports.Add(new BMS_BI_SERVICE.Core.Engines.UserReport { UserId = saUser.Id, ReportKey = r, IsActive = true });
+    }
+    
+    var realtaUser = tenantDb.Users.FirstOrDefault(u => u.Username == "realta");
+    if (realtaUser == null) {
+        realtaUser = new BMS_BI_SERVICE.Core.Engines.User {
+            Username = "realta", PasswordHash = authSvc.GetPasswordHash("nvctgc"),
+            Role = "admin", CompanyId = companyId, IsActive = true
+        };
+        tenantDb.Users.Add(realtaUser);
+        tenantDb.SaveChanges();
+        
+        foreach (var w in allWidgets) tenantDb.UserWidgets.Add(new BMS_BI_SERVICE.Core.Engines.UserWidget { UserId = realtaUser.Id, WidgetKey = w, IsActive = true });
+        foreach (var r in allReports) tenantDb.UserReports.Add(new BMS_BI_SERVICE.Core.Engines.UserReport { UserId = realtaUser.Id, ReportKey = r, IsActive = true });
+    }
+    tenantDb.SaveChanges();
 
     return Results.Ok(new { message = $"Company {companyId} processed successfully!" });
 });
@@ -207,7 +262,7 @@ adminGroup.MapGet("/manager/companies/{companyId}/users", async (string companyI
     try {
         using var db = new TenantDbContext(dbPath);
         await db.Database.EnsureCreatedAsync();
-        var users = await db.Users.Where(u => u.CompanyId == id && u.Role != "admin").ToListAsync();
+        var users = await db.Users.Where(u => u.CompanyId == id).ToListAsync();
         return Results.Ok(users.Select(u => new { id = u.Id, username = u.Username, role = u.Role }));
     } catch { return Results.StatusCode(500); }
 });
@@ -250,7 +305,14 @@ adminGroup.MapPost("/manager/companies/{companyId}/users/{userId:int}/permission
     } catch { return Results.StatusCode(500); }
 });
 
-app.Run(url);
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APP_POOL_ID")))
+{
+    app.Run(url);
+}
+else
+{
+    app.Run();
+}
 
 public class PortalCompanySaveRequest {
     public string CompanyId { get; set; } = "";

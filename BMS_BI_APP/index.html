@@ -13,6 +13,18 @@
   <body>
     <div id="app"></div>
 
+    <script>
+      // ==========================================
+      // ENVIRONMENT CONFIGURATION
+      // ==========================================
+      window.CONFIG = {
+          // IMPORTANT: If your Backend API is hosted under a virtual directory (e.g. IIS),
+          // specify the full base URL here so the frontend knows where to send requests.
+          // Example: "http://localhost:8888/BMS_Core_IIS"
+          API_BASE_URL: "" 
+      };
+    </script>
+
     <!-- CRITICAL: ECharts CDN must be loaded here for window.echarts to work -->
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     
