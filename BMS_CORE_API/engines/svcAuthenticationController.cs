@@ -132,7 +132,7 @@ namespace BMS_BI_SERVICE.Core.Engines
                     Response.Cookies.Append("access_token", jsonWebToken, new CookieOptions
                     {
                         HttpOnly = true,
-                        Secure = true,
+                        Secure = Request.IsHttps,
                         SameSite = SameSiteMode.Lax,
                         MaxAge = TimeSpan.FromHours(CookieExpireHours),
                         Path = "/"
@@ -166,7 +166,7 @@ namespace BMS_BI_SERVICE.Core.Engines
             Response.Cookies.Append("access_token", "", new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
+                Secure = Request.IsHttps,
                 SameSite = SameSiteMode.Lax,
                 MaxAge = TimeSpan.Zero,
                 Expires = DateTimeOffset.UnixEpoch,

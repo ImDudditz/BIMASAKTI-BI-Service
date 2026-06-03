@@ -363,8 +363,10 @@ if "%COMPILE_BACKEND%"=="1" goto DO_COMPILE_BACKEND
 goto CHECK_FRONTEND
 
 :DO_COMPILE_BACKEND
-if exist "%PUB_DIR%\Backend" rmdir /s /q "%PUB_DIR%\Backend"
-mkdir "%PUB_DIR%\Backend"
+if exist "%PUB_DIR%\BMS_Core_IIS" rmdir /s /q "%PUB_DIR%\BMS_Core_IIS"
+if exist "%PUB_DIR%\BMS_Manager_IIS" rmdir /s /q "%PUB_DIR%\BMS_Manager_IIS"
+if exist "%PUB_DIR%\BMS_Core_Standalone" rmdir /s /q "%PUB_DIR%\BMS_Core_Standalone"
+if exist "%PUB_DIR%\BMS_Manager_Standalone" rmdir /s /q "%PUB_DIR%\BMS_Manager_Standalone"
 
 echo.
 echo  [+] Cleaning source binaries before publish...
@@ -378,17 +380,17 @@ goto COMPILE_STANDALONE
 echo.
 echo  [+] Compiling Core Services for IIS Deployment (Optimized)...
 echo  - Building Main Backend API (IIS)...
-dotnet publish "%BACKEND_DIR%\BMS_CORE_API.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\Backend\BMS_Core_IIS" >nul
+dotnet publish "%BACKEND_DIR%\BMS_CORE_API.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\BMS_Core_IIS" >nul
 
 echo  - Building BI SaaS Manager API (IIS)...
-dotnet publish "%MANAGER_DIR%\BMS_BI_Manager.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\Backend\BMS_Manager_IIS" >nul
+dotnet publish "%MANAGER_DIR%\BMS_BI_Manager.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\BMS_Manager_IIS" >nul
 
 echo.
 echo  [+] Cleaning up unnecessary compiler metadata and dev configs...
-del /f /q "%PUB_DIR%\Backend\BMS_Core_IIS\appsettings.Development.json" >nul 2>&1
-del /f /q "%PUB_DIR%\Backend\BMS_Manager_IIS\appsettings.Development.json" >nul 2>&1
-del /f /q "%PUB_DIR%\Backend\BMS_Core_IIS\*.staticwebassets.endpoints.json" >nul 2>&1
-del /f /q "%PUB_DIR%\Backend\BMS_Manager_IIS\*.staticwebassets.endpoints.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BMS_Core_IIS\appsettings.Development.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BMS_Manager_IIS\appsettings.Development.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BMS_Core_IIS\*.staticwebassets.endpoints.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BMS_Manager_IIS\*.staticwebassets.endpoints.json" >nul 2>&1
 
 echo.
 echo  [+] Generating Sync Job Script for IIS...
@@ -402,59 +404,65 @@ echo dotnet BMS_Core.dll --sync-all
 echo echo.
 echo echo Sync process completed.
 echo timeout /t 10
-) > "%PUB_DIR%\Backend\run_scheduled_sync_iis.bat"
+) > "%PUB_DIR%\run_scheduled_sync_iis.bat"
 
 echo.
 echo  [+] IIS Build Complete!
 echo      Please map your IIS site paths to the respective folders:
-echo      - Core API: %PUB_DIR%\Backend\BMS_Core_IIS
-echo      - Manager : %PUB_DIR%\Backend\BMS_Manager_IIS
+echo      - Core API: %PUB_DIR%\BMS_Core_IIS
+echo      - Manager : %PUB_DIR%\BMS_Manager_IIS
 goto CHECK_FRONTEND
 
 :COMPILE_STANDALONE
 echo.
-echo  [+] Compiling Core Services to a Unified Backend Folder (Standalone)...
+echo  [+] Compiling Core Services (Standalone)...
 echo  - Building Main Backend API (BMS_Core.exe)...
-dotnet publish "%BACKEND_DIR%\BMS_CORE_API.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\Backend" >nul
+dotnet publish "%BACKEND_DIR%\BMS_CORE_API.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\BMS_Core_Standalone" >nul
 
 echo  - Building BI SaaS Manager API (BMS_BM.exe)...
-dotnet publish "%MANAGER_DIR%\BMS_BI_Manager.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\Backend" >nul
+dotnet publish "%MANAGER_DIR%\BMS_BI_Manager.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\BMS_Manager_Standalone" >nul
 
 echo.
 echo  [+] Cleaning up unnecessary compiler metadata and dev configs...
-del /f /q "%PUB_DIR%\Backend\*.staticwebassets.endpoints.json" >nul 2>&1
-del /f /q "%PUB_DIR%\Backend\*.runtimeconfig.json" >nul 2>&1
-del /f /q "%PUB_DIR%\Backend\appsettings.Development.json" >nul 2>&1
-if exist "%PUB_DIR%\Backend\wwwroot" rmdir /s /q "%PUB_DIR%\Backend\wwwroot" >nul 2>&1
+del /f /q "%PUB_DIR%\BMS_Core_Standalone\*.staticwebassets.endpoints.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BMS_Core_Standalone\*.runtimeconfig.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BMS_Core_Standalone\appsettings.Development.json" >nul 2>&1
+if exist "%PUB_DIR%\BMS_Core_Standalone\wwwroot" rmdir /s /q "%PUB_DIR%\BMS_Core_Standalone\wwwroot" >nul 2>&1
+
+del /f /q "%PUB_DIR%\BMS_Manager_Standalone\*.staticwebassets.endpoints.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BMS_Manager_Standalone\*.runtimeconfig.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BMS_Manager_Standalone\appsettings.Development.json" >nul 2>&1
+if exist "%PUB_DIR%\BMS_Manager_Standalone\wwwroot" rmdir /s /q "%PUB_DIR%\BMS_Manager_Standalone\wwwroot" >nul 2>&1
 
 echo.
 echo  [+] Generating Backend Production Launcher...
 (
 echo @echo off
 echo echo Starting BMS Core API...
-echo start "BMS_Core API" cmd /k "BMS_Core.exe"
+echo start "BMS_Core API" cmd /c "cd /d BMS_Core_Standalone ^&^& BMS_Core.exe"
 echo echo Starting BMS Web Manager...
-echo start "BMS SaaS Manager" cmd /k "BMS_BM.exe"
-) > "%PUB_DIR%\Backend\start_backend.bat"
+echo start "BMS SaaS Manager" cmd /c "cd /d BMS_Manager_Standalone ^&^& BMS_BM.exe"
+) > "%PUB_DIR%\start_backend.bat"
 
 (
 echo @echo off
 echo echo ==================================================
 echo echo Running BMS Background Sync Job...
 echo echo ==================================================
-echo "BMS_Core.exe" --sync-all
+echo cd /d "%%~dp0BMS_Core_Standalone"
+echo BMS_Core.exe --sync-all
 echo echo.
 echo echo Sync process completed.
 echo timeout /t 10
-) > "%PUB_DIR%\Backend\run_scheduled_sync.bat"
+) > "%PUB_DIR%\run_scheduled_sync.bat"
 
 :CHECK_FRONTEND
 if "%COMPILE_FRONTEND%"=="1" goto DO_COMPILE_FRONTEND
 goto FINISH_COMPILE
 
 :DO_COMPILE_FRONTEND
-if exist "%PUB_DIR%\Frontend" rmdir /s /q "%PUB_DIR%\Frontend"
-mkdir "%PUB_DIR%\Frontend"
+if exist "%PUB_DIR%\BMS_BI_APP" rmdir /s /q "%PUB_DIR%\BMS_BI_APP"
+mkdir "%PUB_DIR%\BMS_BI_APP"
 
 echo.
 echo  [+] Compiling Frontend Vue Assets (Hash-free)...
@@ -465,14 +473,14 @@ popd
 
 if "!FRONTEND_DEPLOY_TYPE!"=="STATIC" (
     echo  [+] Copying Frontend Static Assets...
-    xcopy /E /I /Q "%FRONTEND_DIR%\dist\*" "%PUB_DIR%\Frontend\" >nul
+    xcopy /E /I /Q "%FRONTEND_DIR%\dist\*" "%PUB_DIR%\BMS_BI_APP\" >nul
     echo.
-    echo  [+] Static build complete! Provide the contents of \Publish\Frontend to your Web Server ^(IIS/Nginx/CDN^).
+    echo  [+] Static build complete! Provide the contents of \Publish\BMS_BI_APP to your Web Server ^(IIS/Nginx/CDN^).
 ) else (
     echo  [+] Copying Frontend Production Proxy...
-    xcopy /E /I /Q "%FRONTEND_DIR%\dist" "%PUB_DIR%\Frontend\dist" >nul
-    copy /Y "%FRONTEND_DIR%\server.js" "%PUB_DIR%\Frontend\" >nul
-    copy /Y "%FRONTEND_DIR%\package.json" "%PUB_DIR%\Frontend\" >nul
+    xcopy /E /I /Q "%FRONTEND_DIR%\dist" "%PUB_DIR%\BMS_BI_APP\dist" >nul
+    copy /Y "%FRONTEND_DIR%\server.js" "%PUB_DIR%\BMS_BI_APP\" >nul
+    copy /Y "%FRONTEND_DIR%\package.json" "%PUB_DIR%\BMS_BI_APP\" >nul
 
     echo.
     echo  [+] Generating Frontend Production Launcher...
@@ -480,7 +488,7 @@ if "!FRONTEND_DEPLOY_TYPE!"=="STATIC" (
     echo @echo off
     echo echo Starting Frontend Proxy Server...
     echo start "BMS Frontend Proxy" cmd /k "node server.js"
-    ) > "%PUB_DIR%\Frontend\start_frontend.bat"
+    ) > "%PUB_DIR%\BMS_BI_APP\start_frontend.bat"
 )
 
 :FINISH_COMPILE

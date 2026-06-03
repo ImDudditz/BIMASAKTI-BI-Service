@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BMS_BI_Service.csproj" />
+    <ProjectReference Include="..\BMS_CORE_API\BMS_CORE_API.csproj" />
   </ItemGroup>
 
 </Project>

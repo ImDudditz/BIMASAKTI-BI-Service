@@ -249,7 +249,7 @@ namespace BMS_BI_SERVICE.Core
                                         context.Response.Cookies.Append("access_token", newJsonWebToken, new CookieOptions
                                         {
                                             HttpOnly = true,
-                                            Secure = true,
+                                            Secure = context.HttpContext.Request.IsHttps,
                                             SameSite = SameSiteMode.Lax,
                                             MaxAge = TimeSpan.FromHours(cookieExpireHours),
                                             Path = "/"
