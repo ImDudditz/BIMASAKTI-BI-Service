@@ -7,6 +7,7 @@
     <RootNamespace>BiPortal.FinancialReports.Backend</RootNamespace>
     <AssemblyName>BMS-Core</AssemblyName>
     <UseAppHost>true</UseAppHost>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
   </PropertyGroup>
 
   <ItemGroup>

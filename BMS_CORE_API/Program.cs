@@ -28,19 +28,22 @@ namespace BMS_BI_SERVICE.Core
         // ==========================================
         // OS-LEVEL FILE LOCK (Protects DB from accidental overwrite)
         // ==========================================
-        private static FileStream _centralDbLock;
+        private static FileStream? _centralDbLock;
         public static void LockDatabase()
         {
-            try {
+            try
+            {
                 string dbPath = svcDbUtils.GetCentralDbPath();
-                if (!File.Exists(dbPath)) {
+                if (!File.Exists(dbPath))
+                {
                     using var db = new CentralDbContext(dbPath);
                     db.Database.EnsureCreated();
                 }
                 // Holds the file open at the OS level so Windows Explorer cannot overwrite/delete it
                 // FileShare.ReadWrite allows EF Core and the Manager API to still function normally.
                 _centralDbLock = new FileStream(dbPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            } catch { /* Ignore if it fails to lock */ }
+            }
+            catch { /* Ignore if it fails to lock */ }
         }
 
         public static async Task Main(string[] args)
@@ -51,17 +54,19 @@ namespace BMS_BI_SERVICE.Core
                 Console.WriteLine("==================================================");
                 Console.WriteLine("[BMS-Core] Scheduled Background Sync Triggered");
                 Console.WriteLine("==================================================");
-                try {
+                try
+                {
                     string centralDbPath = svcDbUtils.GetCentralDbPath();
                     using var db = new CentralDbContext(centralDbPath);
                     var syncService = new BMS_BI_SERVICE.Core.Services.svcDatabaseSyncService();
                     var activeCompanies = db.Companies.Where(c => c.IsActive).ToList();
-                    
-                    if (activeCompanies.Count == 0) {
+
+                    if (activeCompanies.Count == 0)
+                    {
                         Console.WriteLine("[Sync] No active companies found in Central DB.");
                     }
 
-                    foreach(var c in activeCompanies)
+                    foreach (var c in activeCompanies)
                     {
                         Console.WriteLine($"\n[Sync] Starting synchronization for company: {c.CompanyId}");
                         var result = await syncService.SyncCompanyDatabaseAsync(c.CompanyId);
@@ -70,10 +75,12 @@ namespace BMS_BI_SERVICE.Core
                         else
                             Console.WriteLine($"[Sync] FAILED: {c.CompanyId} - {result.Message}");
                     }
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     Console.WriteLine($"[Sync] FATAL ERROR: {ex.Message}");
                 }
-                
+
                 Console.WriteLine("\n[BMS-Core] Global sync execution completed. Exiting.");
                 Environment.Exit(0);
             }
@@ -175,7 +182,7 @@ namespace BMS_BI_SERVICE.Core
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 };
-                
+
                 // Extract token from HttpOnly cookie and renew if mathematically valid but expired
                 options.Events = new JwtBearerEvents
                 {
@@ -296,17 +303,17 @@ namespace BMS_BI_SERVICE.Core
                     policy.SetIsOriginAllowed(origin =>
                     {
                         if (string.IsNullOrEmpty(origin)) return false;
-                        
+
                         // Trust standard configured origins
                         if (allowedOrigins.Contains(origin)) return true;
-                        
+
                         try
                         {
                             var uri = new Uri(origin);
                             // Dynamically trust any loopback/local developer origin on any port
-                            return uri.Host == "localhost" || 
-                                   uri.Host == "127.0.0.1" || 
-                                   uri.Host == "0.0.0.0" || 
+                            return uri.Host == "localhost" ||
+                                   uri.Host == "127.0.0.1" ||
+                                   uri.Host == "0.0.0.0" ||
                                    uri.Host.StartsWith("192.168.");
                         }
                         catch
@@ -457,7 +464,7 @@ namespace BMS_BI_SERVICE.Core
             try
             {
                 string newSecret = GenerateSecureSecret(48); // 48 bytes is 64 base64 characters
-                
+
                 // Read existing lines if any, or create a new file
                 List<string> fileLines = new();
                 if (File.Exists(targetEnvPath))

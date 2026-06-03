@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using BMS_BI_SERVICE.Core.Services;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BMS_BI_SERVICE.Core.Engines
 {
@@ -18,6 +19,7 @@ namespace BMS_BI_SERVICE.Core.Engines
 
     [ApiController]
     [Route("api/auth")]
+    [AllowAnonymous]
     public class svcAuthenticationController : ControllerBase
     {
         private readonly IsvcAuthenticationService _authenticationService;
@@ -112,7 +114,7 @@ namespace BMS_BI_SERVICE.Core.Engines
                         {
                             await dbContext.Database.CloseConnectionAsync();
                         }
-                        catch {}
+                        catch { }
                     }
 
                     var claimMap = new Dictionary<string, string>
@@ -152,10 +154,11 @@ namespace BMS_BI_SERVICE.Core.Engines
                     });
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Securely log the exception internally here in a real production system
-                return StatusCode(500, new { detail = "An unexpected system error occurred." });
+                // Temporarily expose the error for debugging in the production environment
+                return StatusCode(500, new { detail = $"An unexpected system error occurred: {ex.Message} \n {ex.StackTrace}" });
             }
         }
 
@@ -205,7 +208,7 @@ namespace BMS_BI_SERVICE.Core.Engines
                     current = parent;
                 }
             }
-            catch {}
+            catch { }
 
             return Ok(new { backendPort, frontendPort });
         }

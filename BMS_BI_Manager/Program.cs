@@ -62,7 +62,7 @@ app.UseStaticFiles(new StaticFileOptions
 string url = "http://localhost:8003";
 
 // Secure SuperAdmin Password Initialization
-string? adminPass = Environment.GetEnvironmentVariable("SUPERADMIN_PASSWORD");
+string adminPass = Environment.GetEnvironmentVariable("SUPERADMIN_PASSWORD");
 string secretFilePath = Path.Combine(Directory.GetCurrentDirectory(), "admin_secret.txt");
 
 if (string.IsNullOrEmpty(adminPass) && File.Exists(secretFilePath))
@@ -100,7 +100,7 @@ app.MapPost("/api/login", async (HttpContext ctx) => {
     var doc = JsonDocument.Parse(body);
     string pass = doc.RootElement.TryGetProperty("password", out var p) ? p.GetString() ?? "" : "";
     
-    string? currentAdminPass = Environment.GetEnvironmentVariable("SUPERADMIN_PASSWORD");
+    string currentAdminPass = Environment.GetEnvironmentVariable("SUPERADMIN_PASSWORD");
     if (string.IsNullOrEmpty(currentAdminPass))
     {
         string secretFilePath = Path.Combine(Directory.GetCurrentDirectory(), "admin_secret.txt");

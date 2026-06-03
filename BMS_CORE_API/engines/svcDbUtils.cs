@@ -36,7 +36,9 @@ namespace BMS_BI_SERVICE.Core.Engines
             while (!string.IsNullOrEmpty(current))
             {
                 string dirName = Path.GetFileName(current);
-                if (dirName.Equals("BMS_CORE_API", StringComparison.OrdinalIgnoreCase))
+                if (dirName.Equals("BMS_CORE_API", StringComparison.OrdinalIgnoreCase) ||
+                    dirName.Equals("BMS_Core_IIS", StringComparison.OrdinalIgnoreCase) ||
+                    dirName.Equals("BMS_Core_Standalone", StringComparison.OrdinalIgnoreCase))
                 {
                     backendDir = current;
                     break;
@@ -46,6 +48,18 @@ namespace BMS_BI_SERVICE.Core.Engines
                     backendDir = Path.Combine(current, "BMS_CORE_API");
                     break;
                 }
+                // Support production Publish directories where Manager and Core are side-by-side
+                if (Directory.Exists(Path.Combine(current, "BMS_Core_IIS")))
+                {
+                    backendDir = Path.Combine(current, "BMS_Core_IIS");
+                    break;
+                }
+                if (Directory.Exists(Path.Combine(current, "BMS_Core_Standalone")))
+                {
+                    backendDir = Path.Combine(current, "BMS_Core_Standalone");
+                    break;
+                }
+
                 string? parent = Path.GetDirectoryName(current);
                 if (parent == current || string.IsNullOrEmpty(parent)) break;
                 current = parent;
@@ -57,7 +71,9 @@ namespace BMS_BI_SERVICE.Core.Engines
                 while (!string.IsNullOrEmpty(current))
                 {
                     string dirName = Path.GetFileName(current);
-                    if (dirName.Equals("BMS_CORE_API", StringComparison.OrdinalIgnoreCase))
+                    if (dirName.Equals("BMS_CORE_API", StringComparison.OrdinalIgnoreCase) ||
+                        dirName.Equals("BMS_Core_IIS", StringComparison.OrdinalIgnoreCase) ||
+                        dirName.Equals("BMS_Core_Standalone", StringComparison.OrdinalIgnoreCase))
                     {
                         backendDir = current;
                         break;
@@ -67,6 +83,18 @@ namespace BMS_BI_SERVICE.Core.Engines
                         backendDir = Path.Combine(current, "BMS_CORE_API");
                         break;
                     }
+                    // Support production Publish directories
+                    if (Directory.Exists(Path.Combine(current, "BMS_Core_IIS")))
+                    {
+                        backendDir = Path.Combine(current, "BMS_Core_IIS");
+                        break;
+                    }
+                    if (Directory.Exists(Path.Combine(current, "BMS_Core_Standalone")))
+                    {
+                        backendDir = Path.Combine(current, "BMS_Core_Standalone");
+                        break;
+                    }
+
                     string? parent = Path.GetDirectoryName(current);
                     if (parent == current || string.IsNullOrEmpty(parent)) break;
                     current = parent;
