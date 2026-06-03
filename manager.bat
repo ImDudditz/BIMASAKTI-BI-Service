@@ -7,21 +7,21 @@ setlocal enabledelayedexpansion
 powershell -Command "`$q = [char]34; `$code = 'using System; using System.Runtime.InteropServices; public class WindowHelper { [DllImport(' + `$q + 'kernel32.dll' + `$q + ')] public static extern IntPtr GetConsoleWindow(); [DllImport(' + `$q + 'user32.dll' + `$q + ')] public static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert); [DllImport(' + `$q + 'user32.dll' + `$q + ')] public static extern bool DeleteMenu(IntPtr hMenu, uint uPosition, uint uFlags); }'; Add-Type -TypeDefinition `$code; `$hWnd = [WindowHelper]::GetConsoleWindow(); `$hMenu = [WindowHelper]::GetSystemMenu(`$hWnd, `$false); [void][WindowHelper]::DeleteMenu(`$hMenu, 0xF060, 0x00000000)" >nul 2>&1
 
 set "ROOT_DIR=%~dp0"
-set "BACKEND_DIR=%ROOT_DIR%backend"
-set "FRONTEND_DIR=%ROOT_DIR%frontend"
-set "MANAGER_DIR=%BACKEND_DIR%\BI_Portal_Manager"
+set "BACKEND_DIR=%ROOT_DIR%BMS_CORE_API"
+set "FRONTEND_DIR=%ROOT_DIR%BMS_BI_APP"
+set "MANAGER_DIR=%ROOT_DIR%BMS_BI_Manager"
 
 :: Read dynamically from appsettings.json
 set "MANAGER_PORT="
-for /f %%a in ('powershell -Command "(Get-Content '%ROOT_DIR%backend\appsettings.json' | ConvertFrom-Json).Manager.Port" 2^>nul') do set "MANAGER_PORT=%%a"
+for /f %%a in ('powershell -Command "(Get-Content '%ROOT_DIR%BMS_CORE_API\appsettings.json' | ConvertFrom-Json).Manager.Port" 2^>nul') do set "MANAGER_PORT=%%a"
 if "%MANAGER_PORT%"=="" set "MANAGER_PORT=8003"
 
 set "BACKEND_PORT="
-for /f %%a in ('powershell -Command "(Get-Content '%ROOT_DIR%backend\appsettings.json' | ConvertFrom-Json).Server.Port" 2^>nul') do set "BACKEND_PORT=%%a"
+for /f %%a in ('powershell -Command "(Get-Content '%ROOT_DIR%BMS_CORE_API\appsettings.json' | ConvertFrom-Json).Server.Port" 2^>nul') do set "BACKEND_PORT=%%a"
 if "%BACKEND_PORT%"=="" set "BACKEND_PORT=8001"
 
 set "FRONTEND_PORT="
-for /f %%a in ('powershell -Command "(Select-String -Path '%ROOT_DIR%frontend\vite.config.js' -Pattern 'port:\s*(\d+)').Matches.Groups[1].Value" 2^>nul') do set "FRONTEND_PORT=%%a"
+for /f %%a in ('powershell -Command "(Select-String -Path '%ROOT_DIR%BMS_BI_APP\vite.config.js' -Pattern 'port:\s*(\d+)').Matches.Groups[1].Value" 2^>nul') do set "FRONTEND_PORT=%%a"
 if "%FRONTEND_PORT%"=="" set "FRONTEND_PORT=8002"
 
 color 07
@@ -30,7 +30,7 @@ color 07
 cls
 echo.
 echo  ┌──────────────────────────────────────────────────────────┐
-echo  │             BIMASAKTI BI SERVICE LAUNCHER              │
+echo  │                 BMS_BI_SERVICE LAUNCHER                  │
 echo  └──────────────────────────────────────────────────────────┘
 echo.
 echo   [ System Status ]
@@ -219,6 +219,14 @@ for /d /r "%BACKEND_DIR%" %%d in (bin obj) do (
     )
 )
 
+for /d /r "%MANAGER_DIR%" %%d in (bin obj) do (
+    if exist "%%d" (
+        rmdir /s /q "%%d" >nul 2>&1
+        echo   - Cleared: %%d
+        set /a cleaned+=1
+    )
+)
+
 if exist "%FRONTEND_DIR%\node_modules\.vite" (
     rmdir /s /q "%FRONTEND_DIR%\node_modules\.vite" >nul 2>&1
     echo   - Cleared: %FRONTEND_DIR%\node_modules\.vite
@@ -352,17 +360,29 @@ goto CHECK_FRONTEND
 if exist "%PUB_DIR%\Backend" rmdir /s /q "%PUB_DIR%\Backend"
 mkdir "%PUB_DIR%\Backend"
 
+echo.
+echo  [+] Cleaning source binaries before publish...
+dotnet clean "%BACKEND_DIR%\BMS_CORE_API.csproj" -c Release >nul 2>&1
+dotnet clean "%MANAGER_DIR%\BMS_BI_Manager.csproj" -c Release >nul 2>&1
+
 if "!BACKEND_DEPLOY_TYPE!"=="IIS" goto COMPILE_IIS
 goto COMPILE_STANDALONE
 
 :COMPILE_IIS
 echo.
-echo  [+] Compiling Core Services for IIS Deployment...
+echo  [+] Compiling Core Services for IIS Deployment (Optimized)...
 echo  - Building Main Backend API (IIS)...
-dotnet publish "%BACKEND_DIR%\BMS_BI_Service.csproj" -c Release -o "%PUB_DIR%\Backend\BMS_Core_IIS" >nul
+dotnet publish "%BACKEND_DIR%\BMS_CORE_API.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\Backend\BMS_Core_IIS" >nul
 
 echo  - Building BI SaaS Manager API (IIS)...
-dotnet publish "%MANAGER_DIR%\BI_Portal_Manager.csproj" -c Release -o "%PUB_DIR%\Backend\BMS_Manager_IIS" >nul
+dotnet publish "%MANAGER_DIR%\BMS_BI_Manager.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\Backend\BMS_Manager_IIS" >nul
+
+echo.
+echo  [+] Cleaning up unnecessary compiler metadata and dev configs...
+del /f /q "%PUB_DIR%\Backend\BMS_Core_IIS\appsettings.Development.json" >nul 2>&1
+del /f /q "%PUB_DIR%\Backend\BMS_Manager_IIS\appsettings.Development.json" >nul 2>&1
+del /f /q "%PUB_DIR%\Backend\BMS_Core_IIS\*.staticwebassets.endpoints.json" >nul 2>&1
+del /f /q "%PUB_DIR%\Backend\BMS_Manager_IIS\*.staticwebassets.endpoints.json" >nul 2>&1
 
 echo.
 echo  [+] Generating Sync Job Script for IIS...
@@ -372,7 +392,7 @@ echo echo ==================================================
 echo echo Running BMS Background Sync Job...
 echo echo ==================================================
 echo cd /d "%%~dp0BMS_Core_IIS"
-echo dotnet BMS_BI_Service.dll --sync-all
+echo dotnet BMS_Core.dll --sync-all
 echo echo.
 echo echo Sync process completed.
 echo timeout /t 10
@@ -388,16 +408,17 @@ goto CHECK_FRONTEND
 :COMPILE_STANDALONE
 echo.
 echo  [+] Compiling Core Services to a Unified Backend Folder (Standalone)...
-echo  - Building Main Backend API (BMS-Core.exe)...
-dotnet publish "%BACKEND_DIR%\BMS_BI_Service.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\Backend" >nul
+echo  - Building Main Backend API (BMS_Core.exe)...
+dotnet publish "%BACKEND_DIR%\BMS_CORE_API.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\Backend" >nul
 
-echo  - Building BI SaaS Manager API (BMS-BM.exe)...
-dotnet publish "%MANAGER_DIR%\BI_Portal_Manager.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\Backend" >nul
+echo  - Building BI SaaS Manager API (BMS_BM.exe)...
+dotnet publish "%MANAGER_DIR%\BMS_BI_Manager.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\Backend" >nul
 
 echo.
-echo  [+] Cleaning up unnecessary compiler metadata...
+echo  [+] Cleaning up unnecessary compiler metadata and dev configs...
 del /f /q "%PUB_DIR%\Backend\*.staticwebassets.endpoints.json" >nul 2>&1
 del /f /q "%PUB_DIR%\Backend\*.runtimeconfig.json" >nul 2>&1
+del /f /q "%PUB_DIR%\Backend\appsettings.Development.json" >nul 2>&1
 if exist "%PUB_DIR%\Backend\wwwroot" rmdir /s /q "%PUB_DIR%\Backend\wwwroot" >nul 2>&1
 
 echo.
@@ -405,9 +426,9 @@ echo  [+] Generating Backend Production Launcher...
 (
 echo @echo off
 echo echo Starting BMS Core API...
-echo start "BMS-Core API" cmd /k "BMS-Core.exe"
+echo start "BMS_Core API" cmd /k "BMS_Core.exe"
 echo echo Starting BMS Web Manager...
-echo start "BMS SaaS Manager" cmd /k "BMS-BM.exe"
+echo start "BMS SaaS Manager" cmd /k "BMS_BM.exe"
 ) > "%PUB_DIR%\Backend\start_backend.bat"
 
 (
@@ -415,7 +436,7 @@ echo @echo off
 echo echo ==================================================
 echo echo Running BMS Background Sync Job...
 echo echo ==================================================
-echo "BMS-Core.exe" --sync-all
+echo "BMS_Core.exe" --sync-all
 echo echo.
 echo echo Sync process completed.
 echo timeout /t 10
@@ -500,9 +521,9 @@ if errorlevel 1 (
     )
     echo.
     echo  [+] Checking Manager Project Health...
-    if exist "%MANAGER_DIR%\BI_Portal_Manager.csproj" (
+    if exist "%MANAGER_DIR%\BMS_BI_Manager.csproj" (
         echo      Manager Project file found. Building dry-run test...
-        dotnet build "%MANAGER_DIR%\BI_Portal_Manager.csproj" --no-restore >nul 2>&1
+        dotnet build "%MANAGER_DIR%\BMS_BI_Manager.csproj" --no-restore >nul 2>&1
         if errorlevel 1 (
             echo  [x] Project Build Health: FAILED. Run option [2] to clean cache and try again.
         ) else (
@@ -543,6 +564,9 @@ for %%p in (%MANAGER_PORT% %BACKEND_PORT% %FRONTEND_PORT%) do (
 
 :: 2. Clean cache
 for /d /r "%BACKEND_DIR%" %%d in (bin obj) do (
+    if exist "%%d" rmdir /s /q "%%d" >nul 2>&1
+)
+for /d /r "%MANAGER_DIR%" %%d in (bin obj) do (
     if exist "%%d" rmdir /s /q "%%d" >nul 2>&1
 )
 if exist "%FRONTEND_DIR%\node_modules\.vite" (

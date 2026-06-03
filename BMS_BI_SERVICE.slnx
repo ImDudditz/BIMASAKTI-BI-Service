@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/BMS_CORE_API/">
+    <Project Path="BMS_CORE_API/BMS_CORE_API.csproj" />
+    <Project Path="BMS_BI_Manager/BMS_BI_Manager.csproj" />
+    <Project Path="BMS_CORE_API/tests/BMS_CORE_API.Tests.csproj" />
+  </Folder>
+</Solution>
