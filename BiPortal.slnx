@@ -1,6 +1,6 @@
 <Solution>
   <Folder Name="/backend/">
-    <Project Path="backend/BiPortal.csproj" />
+    <Project Path="backend/BMS_BI_Service.csproj" />
     <Project Path="backend/BI_Portal_Manager/BI_Portal_Manager.csproj" />
     <Project Path="backend/tests/BiPortal.Tests.csproj" />
   </Folder>

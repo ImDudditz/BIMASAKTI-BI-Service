@@ -355,7 +355,7 @@ namespace BiPortal.FinancialReports.Backend
             });
 
             // 8. Launch C# backend dynamically on the resolved host and port
-            app.Run($"http://{host}:{port}");
+            app.Run();
         }
 
         // Dynamic port functions removed

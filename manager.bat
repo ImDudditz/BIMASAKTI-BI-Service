@@ -57,8 +57,8 @@ echo    [2] Launch Web Control Panel Only
 echo    [3] Clean the Cache
 echo    [4] Free the Ports
 echo    [5] Check .NET Availability
-echo    [6] Exit (Auto-Close, Free Port ^& Clean Cache)
-echo    [7] Compile Production Publish Build
+echo    [6] Compile Production Publish Build
+echo    [7] Exit (Auto-Close, Free Port ^& Clean Cache)
 echo.
 echo  ────────────────────────────────────────────────────────────
 set "choice="
@@ -69,8 +69,8 @@ if "%choice%"=="2" goto LAUNCH_WEB
 if "%choice%"=="3" goto CLEAN_CACHE
 if "%choice%"=="4" goto FREE_PORTS
 if "%choice%"=="5" goto CHECK_DOTNET
-if "%choice%"=="6" goto FORCE_EXIT
-if "%choice%"=="7" goto COMPILE_PUBLISH
+if "%choice%"=="6" goto COMPILE_PUBLISH
+if "%choice%"=="7" goto FORCE_EXIT
 goto MENU
 
 :LAUNCH_ALL
@@ -470,7 +470,7 @@ goto MENU
 cls
 echo.
 echo  ============================================================
-echo   CHECKING .NET AVAILABILITY & HEALTH
+echo   CHECKING .NET AVAILABILITY ^& HEALTH
 echo  ============================================================
 echo.
 
@@ -491,6 +491,14 @@ if errorlevel 1 (
     echo  [+] Checking Installed SDK Runtimes...
     dotnet --list-sdks
     echo.
+    echo  [+] Checking ASP.NET Core IIS Module...
+    reg query "HKLM\SOFTWARE\Microsoft\IIS Extensions\IIS AspNetCore Module V2" >nul 2>&1
+    if not errorlevel 1 (
+        echo      Status: INSTALLED
+    ) else (
+        echo      Status: NOT INSTALLED ^(Required if deploying to IIS^)
+    )
+    echo.
     echo  [+] Checking Manager Project Health...
     if exist "%MANAGER_DIR%\BI_Portal_Manager.csproj" (
         echo      Manager Project file found. Building dry-run test...
@@ -498,7 +506,7 @@ if errorlevel 1 (
         if errorlevel 1 (
             echo  [x] Project Build Health: FAILED. Run option [2] to clean cache and try again.
         ) else (
-            echo  [+] Project Build Health: STABLE (Ready to run)
+            echo  [+] Project Build Health: STABLE ^(Ready to run^)
         )
     ) else (
         echo  [x] Error: Manager project file not found at %MANAGER_DIR%.

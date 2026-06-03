@@ -42,10 +42,10 @@ namespace BiPortal.FinancialReports.Backend.Services
                     await connection.OpenAsync();
 
                     bool tableExists = false;
-                    using (var checkCmd = new SqliteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name='CBRX7000';", connection))
+                    using (var checkCommand = new SqliteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name='CBRX7000';", connection))
                     {
-                        var res = await checkCmd.ExecuteScalarAsync();
-                        if (res != null && res != DBNull.Value)
+                        var resultValue = await checkCommand.ExecuteScalarAsync();
+                        if (resultValue != null && resultValue != DBNull.Value)
                         {
                             tableExists = true;
                         }

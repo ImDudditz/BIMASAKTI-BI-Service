@@ -250,7 +250,7 @@ adminGroup.MapPost("/manager/companies/{companyId}/users/{userId:int}/permission
     } catch { return Results.StatusCode(500); }
 });
 
-app.Run(url);
+app.Run();
 
 public class PortalCompanySaveRequest {
     public string CompanyId { get; set; } = "";

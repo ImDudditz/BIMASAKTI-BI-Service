@@ -98,17 +98,17 @@ namespace BiPortal.FinancialReports.Backend.Services
                         {
                             foreach (var item in rawArray)
                             {
-                                if (item.TryGetValue("account_no", out var accNo) && !string.IsNullOrEmpty(accNo))
+                                if (item.TryGetValue("account_no", out var accountNumber) && !string.IsNullOrEmpty(accountNumber))
                                 {
-                                    string section = item.TryGetValue("account_cat", out var cat) ? cat : "Expenses";
-                                    string group = item.TryGetValue("group_name", out var grp) ? grp : "Uncategorized";
+                                    string section = item.TryGetValue("account_cat", out var categoryName) ? categoryName : "Expenses";
+                                    string group = item.TryGetValue("group_name", out var groupName) ? groupName : "Uncategorized";
                                     
                                     var mappingNode = new JsonObject
                                     {
                                         ["section"] = section,
                                         ["group"] = group
                                     };
-                                    activeMappings[accNo] = mappingNode;
+                                    activeMappings[accountNumber] = mappingNode;
                                 }
                             }
                         }
@@ -126,17 +126,17 @@ namespace BiPortal.FinancialReports.Backend.Services
                 string tableName = schema.TableName;
                 string yearCol = schema.YearColumn;
                 string periodCol = schema.PeriodColumn;
-                string endBsisCol = schema.EndBsisColumn;
-                string endBalanceCol = schema.EndBalanceColumn;
-                string endBudgetCol = schema.EndBudgetColumn;
+                string endingBsisColumn = schema.EndBsisColumn;
+                string endingBalanceColumn = schema.EndBalanceColumn;
+                string endingBudgetColumn = schema.EndBudgetColumn;
 
                 string ledgerQuery = $@"
                      SELECT 
                          account_no,
                          account_name,
-                         SUM({endBsisCol}) AS ending_bsis,
-                         SUM({endBalanceCol}) AS ending_balance,
-                         SUM({endBudgetCol}) AS ending_budget
+                         SUM({endingBsisColumn}) AS ending_bsis,
+                         SUM({endingBalanceColumn}) AS ending_balance,
+                         SUM({endingBudgetColumn}) AS ending_budget
                      FROM {tableName}";
 
                 var queryFilters = new List<string>();
@@ -280,8 +280,8 @@ namespace BiPortal.FinancialReports.Backend.Services
                     });
                 }
 
-                decimal revenueTotal = response.Data.TryGetValue("Revenue", out var revSec) ? revSec.Total : 0;
-                decimal expensesTotal = response.Data.TryGetValue("Expenses", out var expSec) ? expSec.Total : 0;
+                decimal revenueTotal = response.Data.TryGetValue("Revenue", out var retrievedRevenueSection) ? retrievedRevenueSection.Total : 0;
+                decimal expensesTotal = response.Data.TryGetValue("Expenses", out var retrievedExpensesSection) ? retrievedExpensesSection.Total : 0;
                 response.NetIncome = revenueTotal - expensesTotal;
 
                 decimal revenueBudgetTotal = 0;

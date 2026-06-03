@@ -17,7 +17,7 @@ Write-Log "INFO" "=== Windows Scheduler Sync Job Triggered ==="
 $CurrentDir = $PSScriptRoot
 $BackendDir = $null
 While ($CurrentDir) {
-    If (Test-Path (Join-Path $CurrentDir "BiPortal.csproj")) {
+    If (Test-Path (Join-Path $CurrentDir "BMS_BI_Service.csproj")) {
         $BackendDir = $CurrentDir
         Break
     }
@@ -33,7 +33,7 @@ If ($null -eq $BackendDir) {
 
 Write-Log "INFO" "Running standalone C# database sync via dotnet CLI..."
 Try {
-    $Output = dotnet run --project "$BackendDir\BiPortal.csproj" -- --sync $CompanyId 2>&1
+    $Output = dotnet run --project "$BackendDir\BMS_BI_Service.csproj" -- --sync $CompanyId 2>&1
     $ExitCode = $LASTEXITCODE
     
     If ($ExitCode -eq 0) {
