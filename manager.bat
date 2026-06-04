@@ -7,21 +7,21 @@ setlocal enabledelayedexpansion
 powershell -Command "`$q = [char]34; `$code = 'using System; using System.Runtime.InteropServices; public class WindowHelper { [DllImport(' + `$q + 'kernel32.dll' + `$q + ')] public static extern IntPtr GetConsoleWindow(); [DllImport(' + `$q + 'user32.dll' + `$q + ')] public static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert); [DllImport(' + `$q + 'user32.dll' + `$q + ')] public static extern bool DeleteMenu(IntPtr hMenu, uint uPosition, uint uFlags); }'; Add-Type -TypeDefinition `$code; `$hWnd = [WindowHelper]::GetConsoleWindow(); `$hMenu = [WindowHelper]::GetSystemMenu(`$hWnd, `$false); [void][WindowHelper]::DeleteMenu(`$hMenu, 0xF060, 0x00000000)" >nul 2>&1
 
 set "ROOT_DIR=%~dp0"
-set "BACKEND_DIR=%ROOT_DIR%BMS_CORE_API"
-set "FRONTEND_DIR=%ROOT_DIR%BMS_BI_APP"
-set "MANAGER_DIR=%ROOT_DIR%BMS_BI_Manager"
+set "BACKEND_DIR=%ROOT_DIR%BI-API"
+set "FRONTEND_DIR=%ROOT_DIR%BI-APP"
+set "MANAGER_DIR=%ROOT_DIR%BI-MGR"
 
 :: Read dynamically from appsettings.json
 set "MANAGER_PORT="
-for /f %%a in ('powershell -Command "(Get-Content '%ROOT_DIR%BMS_CORE_API\appsettings.json' | ConvertFrom-Json).Manager.Port" 2^>nul') do set "MANAGER_PORT=%%a"
+for /f %%a in ('powershell -Command "(Get-Content '%ROOT_DIR%BI-API\appsettings.json' | ConvertFrom-Json).Manager.Port" 2^>nul') do set "MANAGER_PORT=%%a"
 if "%MANAGER_PORT%"=="" set "MANAGER_PORT=8003"
 
 set "BACKEND_PORT="
-for /f %%a in ('powershell -Command "(Get-Content '%ROOT_DIR%BMS_CORE_API\appsettings.json' | ConvertFrom-Json).Server.Port" 2^>nul') do set "BACKEND_PORT=%%a"
+for /f %%a in ('powershell -Command "(Get-Content '%ROOT_DIR%BI-API\appsettings.json' | ConvertFrom-Json).Server.Port" 2^>nul') do set "BACKEND_PORT=%%a"
 if "%BACKEND_PORT%"=="" set "BACKEND_PORT=8001"
 
 set "FRONTEND_PORT="
-for /f %%a in ('powershell -Command "(Select-String -Path '%ROOT_DIR%BMS_BI_APP\vite.config.js' -Pattern 'port:\s*(\d+)').Matches.Groups[1].Value" 2^>nul') do set "FRONTEND_PORT=%%a"
+for /f %%a in ('powershell -Command "(Select-String -Path '%ROOT_DIR%BI-APP\vite.config.js' -Pattern 'port:\s*(\d+)').Matches.Groups[1].Value" 2^>nul') do set "FRONTEND_PORT=%%a"
 if "%FRONTEND_PORT%"=="" set "FRONTEND_PORT=8002"
 
 color 07

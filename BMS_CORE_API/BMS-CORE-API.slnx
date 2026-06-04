@@ -1,4 +1,0 @@
-<Solution>
-  <Project Path="BMS-CORE-API.csproj" />
-  <Project Path="../BMS-BI-Manager/BMS-BI-Manager.csproj" />
-</Solution>
