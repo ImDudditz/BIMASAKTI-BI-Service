@@ -45,7 +45,7 @@ namespace Bimasakti.BiService.Api.Core
                     using var doc = JsonDocument.Parse(File.ReadAllText(configPath));
                     if (doc.RootElement.TryGetProperty("Config", out var config) && config.TryGetProperty("ReferenceDir", out var refDir))
                     {
-                        string dir = refDir.GetString();
+                        string dir = refDir.GetString() ?? "";
                         if (!string.IsNullOrEmpty(dir))
                         {
                             string fullDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), dir));
