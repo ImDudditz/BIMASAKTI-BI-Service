@@ -37,7 +37,9 @@ export const useGlobalModalStore = defineStore('globalModal', () => {
     inputValue.value = ''
     confirmText.value = 'Got it'
     cancelText.value = ''
-    confirmColor.value = isError ? 'bg-rose-600 hover:bg-rose-700' : 'bg-emerald-600 hover:bg-emerald-700'
+    confirmColor.value = isError
+      ? 'bg-rose-600 hover:bg-rose-700'
+      : 'bg-emerald-600 hover:bg-emerald-700'
     icon.value = isError ? '❌' : '✅'
     onConfirmCallback.value = null
   }
@@ -50,7 +52,9 @@ export const useGlobalModalStore = defineStore('globalModal', () => {
     inputValue.value = ''
     confirmText.value = isDestructive ? 'Yes, Delete' : 'Confirm'
     cancelText.value = 'Cancel'
-    confirmColor.value = isDestructive ? 'bg-rose-600 hover:bg-rose-700' : 'bg-sky-600 hover:bg-sky-700'
+    confirmColor.value = isDestructive
+      ? 'bg-rose-600 hover:bg-rose-700'
+      : 'bg-sky-600 hover:bg-sky-700'
     icon.value = newIcon
     onConfirmCallback.value = onConfirm
   }
@@ -69,7 +73,19 @@ export const useGlobalModalStore = defineStore('globalModal', () => {
   }
 
   return {
-    isOpen, type, title, message, inputValue, confirmText, cancelText, confirmColor, icon,
-    closeModal, confirmModal, showAlert, showConfirm, showPrompt
+    isOpen,
+    type,
+    title,
+    message,
+    inputValue,
+    confirmText,
+    cancelText,
+    confirmColor,
+    icon,
+    closeModal,
+    confirmModal,
+    showAlert,
+    showConfirm,
+    showPrompt,
   }
 })

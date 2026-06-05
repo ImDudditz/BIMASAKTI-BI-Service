@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-namespace BMS_BI_SERVICE.Core.Services
+namespace Bimasakti.BiService.Api.Services
 {
     public class LedgerReportItem
     {
@@ -102,7 +102,7 @@ namespace BMS_BI_SERVICE.Core.Services
                                 {
                                     string section = item.TryGetValue("account_cat", out var categoryName) ? categoryName : "Expenses";
                                     string group = item.TryGetValue("group_name", out var groupName) ? groupName : "Uncategorized";
-                                    
+
                                     var mappingNode = new JsonObject
                                     {
                                         ["section"] = section,
@@ -122,7 +122,7 @@ namespace BMS_BI_SERVICE.Core.Services
                 using var connection = new SqliteConnection($"Data Source={databasePath};Mode=ReadOnly;");
                 await connection.OpenAsync();
 
-                var schema = BMS_BI_SERVICE.Core.Engines.svcDbUtils.GetGlrxSchema(databasePath);
+                var schema = Bimasakti.BiService.Api.Engines.svcDbUtils.GetGlrxSchema(databasePath);
                 string tableName = schema.TableName;
                 string yearCol = schema.YearColumn;
                 string periodCol = schema.PeriodColumn;

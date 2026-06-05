@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Xunit;
 using Moq;
 using Microsoft.Data.Sqlite;
-using BMS_BI_SERVICE.Core.Services;
-using BMS_BI_SERVICE.Core.Engines;
+using Bimasakti.BiService.Api.Services;
+using Bimasakti.BiService.Api.Engines;
 
-namespace BMS_BI_SERVICE.Core.Tests
+namespace Bimasakti.BiService.Api.Tests
 {
     // --- 1. AUTHENTICATION SERVICE TESTS ---
 

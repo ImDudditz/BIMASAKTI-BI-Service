@@ -5,7 +5,7 @@ using System.IO;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace BMS_BI_SERVICE.Core.Services
+namespace Bimasakti.BiService.Api.Services
 {
     public class CashFlowItem
     {

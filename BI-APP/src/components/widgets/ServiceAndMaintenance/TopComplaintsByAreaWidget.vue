@@ -1,10 +1,15 @@
 <template>
-  <div class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300">
-    
+  <div
+    class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300"
+  >
     <div class="flex items-center justify-between mb-3">
       <div>
-        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">Top 5 Complaint by Area</h4>
-        <p class="text-[10px] font-medium text-slate-400">Areas with the highest concentration of active complaints</p>
+        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">
+          Top 5 Complaint by Area
+        </h4>
+        <p class="text-[10px] font-medium text-slate-400">
+          Areas with the highest concentration of active complaints
+        </p>
       </div>
     </div>
 
@@ -30,8 +35,8 @@ const props = defineProps({
   complaintsData: {
     type: Array,
     required: true,
-    default: () => []
-  }
+    default: () => [],
+  },
 })
 
 const chartOption = ref({
@@ -45,7 +50,7 @@ const chartOption = ref({
     textStyle: { color: '#fff', fontSize: 12 },
     axisPointer: {
       type: 'shadow',
-      shadowStyle: { color: 'rgba(244, 63, 94, 0.04)' }
+      shadowStyle: { color: 'rgba(244, 63, 94, 0.04)' },
     },
     formatter: (params) => {
       const data = params[0]
@@ -57,19 +62,19 @@ const chartOption = ref({
           <span style="font-weight: 800; color: #fda4af;">${data.value} tickets</span>
         </div>
       `
-    }
+    },
   },
   xAxis: {
     type: 'value',
     splitLine: { lineStyle: { color: '#f1f5f9', type: 'dashed' } },
-    axisLabel: { color: '#64748b', fontSize: 10 }
+    axisLabel: { color: '#64748b', fontSize: 10 },
   },
   yAxis: {
     type: 'category',
     data: [],
     inverse: true, // keeps highest complaint count at the top
     axisLine: { lineStyle: { color: '#cbd5e1' } },
-    axisLabel: { color: '#475569', fontSize: 11, fontWeight: 600 }
+    axisLabel: { color: '#475569', fontSize: 11, fontWeight: 600 },
   },
   series: [
     {
@@ -81,8 +86,8 @@ const chartOption = ref({
         borderRadius: [0, 4, 4, 0], // rounded corners on right side
         color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
           { offset: 0, color: '#f43f5e' },
-          { offset: 1, color: '#fda4af' }
-        ])
+          { offset: 1, color: '#fda4af' },
+        ]),
       },
       label: {
         show: true,
@@ -90,20 +95,24 @@ const chartOption = ref({
         color: '#475569',
         fontSize: 10,
         fontWeight: 700,
-        formatter: '{c}'
-      }
-    }
-  ]
+        formatter: '{c}',
+      },
+    },
+  ],
 })
 
-watch(() => props.complaintsData, (newData) => {
-  if (newData) {
-    // Take top 5 and sort them for horizontal layout if inverse handles it
-    const sortedData = [...newData].slice(0, 5)
-    chartOption.value.yAxis.data = sortedData.map(item => item.area)
-    chartOption.value.series[0].data = sortedData.map(item => item.complaintCount)
-  }
-}, { immediate: true, deep: true })
+watch(
+  () => props.complaintsData,
+  (newData) => {
+    if (newData) {
+      // Take top 5 and sort them for horizontal layout if inverse handles it
+      const sortedData = [...newData].slice(0, 5)
+      chartOption.value.yAxis.data = sortedData.map((item) => item.area)
+      chartOption.value.series[0].data = sortedData.map((item) => item.complaintCount)
+    }
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <style scoped>

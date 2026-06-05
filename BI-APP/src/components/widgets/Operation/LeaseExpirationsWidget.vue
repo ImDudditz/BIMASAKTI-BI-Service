@@ -1,10 +1,15 @@
 <template>
-  <div class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300">
-    
+  <div
+    class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300"
+  >
     <div class="flex items-center justify-between mb-3">
       <div>
-        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">Lease Expirations Timeline</h4>
-        <p class="text-[10px] font-medium text-slate-400">Projected contract terminations over the next 6 months</p>
+        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">
+          Lease Expirations Timeline
+        </h4>
+        <p class="text-[10px] font-medium text-slate-400">
+          Projected contract terminations over the next 6 months
+        </p>
       </div>
     </div>
 
@@ -30,8 +35,8 @@ const props = defineProps({
   expirationsData: {
     type: Array,
     required: true,
-    default: () => []
-  }
+    default: () => [],
+  },
 })
 
 const chartOption = ref({
@@ -45,7 +50,7 @@ const chartOption = ref({
     textStyle: { color: '#fff', fontSize: 12 },
     axisPointer: {
       type: 'shadow',
-      shadowStyle: { color: 'rgba(249, 115, 22, 0.04)' }
+      shadowStyle: { color: 'rgba(249, 115, 22, 0.04)' },
     },
     formatter: (params) => {
       const data = params[0]
@@ -57,19 +62,19 @@ const chartOption = ref({
           <span style="font-weight: 800; color: #fdba74;">${data.value} leases</span>
         </div>
       `
-    }
+    },
   },
   xAxis: {
     type: 'category',
     data: [],
     axisLine: { lineStyle: { color: '#cbd5e1' } },
-    axisLabel: { color: '#64748b', fontSize: 10, fontWeight: 600 }
+    axisLabel: { color: '#64748b', fontSize: 10, fontWeight: 600 },
   },
   yAxis: {
     type: 'value',
     minInterval: 1,
     splitLine: { lineStyle: { color: '#f1f5f9', type: 'dashed' } },
-    axisLabel: { color: '#64748b', fontSize: 10 }
+    axisLabel: { color: '#64748b', fontSize: 10 },
   },
   series: [
     {
@@ -81,20 +86,24 @@ const chartOption = ref({
         borderRadius: [4, 4, 0, 0],
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
           { offset: 0, color: '#f97316' },
-          { offset: 1, color: '#eab308' }
-        ])
-      }
-    }
-  ]
+          { offset: 1, color: '#eab308' },
+        ]),
+      },
+    },
+  ],
 })
 
 // Sync property values reactively
-watch(() => props.expirationsData, (newData) => {
-  if (newData && newData.length > 0) {
-    chartOption.value.xAxis.data = newData.map(item => item.month)
-    chartOption.value.series[0].data = newData.map(item => item.count)
-  }
-}, { immediate: true, deep: true })
+watch(
+  () => props.expirationsData,
+  (newData) => {
+    if (newData && newData.length > 0) {
+      chartOption.value.xAxis.data = newData.map((item) => item.month)
+      chartOption.value.series[0].data = newData.map((item) => item.count)
+    }
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <style scoped>

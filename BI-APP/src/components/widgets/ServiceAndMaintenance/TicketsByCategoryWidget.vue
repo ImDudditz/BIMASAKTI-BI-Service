@@ -1,9 +1,12 @@
 <template>
-  <div class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300">
-    
+  <div
+    class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300"
+  >
     <div class="flex items-center justify-between mb-3">
       <div>
-        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">Tickets by Category</h4>
+        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">
+          Tickets by Category
+        </h4>
         <p class="text-[10px] font-medium text-slate-400">Total volume breakdown by department</p>
       </div>
     </div>
@@ -29,8 +32,8 @@ const props = defineProps({
   categoriesData: {
     type: Array,
     required: true,
-    default: () => []
-  }
+    default: () => [],
+  },
 })
 
 const colors = ['#f43f5e', '#3b82f6', '#fbbf24', '#8b5cf6', '#10b981', '#64748b']
@@ -53,7 +56,7 @@ const chartOption = ref({
           <span style="font-weight: 800; color: #f43f5e;">${params.value} tickets (${params.percent}%)</span>
         </div>
       `
-    }
+    },
   },
   legend: {
     orient: 'vertical',
@@ -63,7 +66,7 @@ const chartOption = ref({
     itemGap: 12,
     itemWidth: 8,
     itemHeight: 8,
-    textStyle: { color: '#475569', fontSize: 11, fontWeight: 500 }
+    textStyle: { color: '#475569', fontSize: 11, fontWeight: 500 },
   },
   series: [
     {
@@ -75,19 +78,23 @@ const chartOption = ref({
       itemStyle: {
         borderRadius: 4,
         borderColor: '#fff',
-        borderWidth: 2
+        borderWidth: 2,
       },
       label: { show: false },
-      data: []
-    }
-  ]
+      data: [],
+    },
+  ],
 })
 
-watch(() => props.categoriesData, (newData) => {
-  if (newData) {
-    chartOption.value.series[0].data = newData
-  }
-}, { immediate: true, deep: true })
+watch(
+  () => props.categoriesData,
+  (newData) => {
+    if (newData) {
+      chartOption.value.series[0].data = newData
+    }
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <style scoped>

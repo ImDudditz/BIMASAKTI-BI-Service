@@ -1,16 +1,23 @@
 <template>
-  <div class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300">
-    
+  <div
+    class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300"
+  >
     <div class="flex items-center justify-between mb-3">
       <div>
-        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">Operating Cash Inflow vs Outflow</h4>
-        <p class="text-[10px] font-medium text-slate-400">Monthly operating cash flow comparison for {{ props.selectedYear }}</p>
+        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">
+          Operating Cash Inflow vs Outflow
+        </h4>
+        <p class="text-[10px] font-medium text-slate-400">
+          Monthly operating cash flow comparison for {{ props.selectedYear }}
+        </p>
       </div>
     </div>
 
     <!-- Loading Indicator -->
     <div v-if="isLoading" class="grow flex flex-col items-center justify-center min-h-0 w-full">
-      <div class="w-8 h-8 border-3 border-emerald-100 border-t-emerald-600 rounded-full animate-spin"></div>
+      <div
+        class="w-8 h-8 border-3 border-emerald-100 border-t-emerald-600 rounded-full animate-spin"
+      ></div>
       <p class="text-slate-400 text-xs mt-2 animate-pulse">Loading cash flows...</p>
     </div>
 
@@ -38,14 +45,14 @@ const props = defineProps({
   selectedYear: { type: String, required: true },
   formatShortMoney: { type: Function, required: true },
   formatMoney: { type: Function, required: true },
-  baseEchartsOptions: { type: Object, required: true }
+  baseEchartsOptions: { type: Object, required: true },
 })
 
 const authStore = useAuthStore()
 const isLoading = ref(true)
 const rawCashFlowData = ref([])
 
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 const chartOption = ref({
   textStyle: { fontFamily: "'Inter', sans-serif" },
@@ -55,7 +62,7 @@ const chartOption = ref({
     top: '0%',
     right: '0%',
     icon: 'circle',
-    textStyle: { color: '#64748b', fontSize: 10, fontWeight: 600 }
+    textStyle: { color: '#64748b', fontSize: 10, fontWeight: 600 },
   },
   tooltip: {
     trigger: 'axis',
@@ -65,11 +72,11 @@ const chartOption = ref({
     textStyle: { color: '#fff', fontSize: 12 },
     axisPointer: {
       type: 'shadow',
-      shadowStyle: { color: 'rgba(16, 185, 129, 0.03)' }
+      shadowStyle: { color: 'rgba(16, 185, 129, 0.03)' },
     },
     formatter: (params) => {
       let result = `<div style="font-weight: bold; margin-bottom: 6px;">${params[0].name} ${props.selectedYear}</div>`
-      params.forEach(param => {
+      params.forEach((param) => {
         const formattedVal = props.formatMoney(param.value)
         const dotColor = param.seriesName.includes('Inflow') ? '#10b981' : '#f43f5e'
         const textColor = param.seriesName.includes('Inflow') ? '#a7f3d0' : '#fecdd3'
@@ -84,22 +91,22 @@ const chartOption = ref({
         `
       })
       return result
-    }
+    },
   },
   xAxis: {
     type: 'category',
     data: months,
     axisLine: { lineStyle: { color: '#cbd5e1' } },
-    axisLabel: { color: '#64748b', fontSize: 10, fontWeight: 600 }
+    axisLabel: { color: '#64748b', fontSize: 10, fontWeight: 600 },
   },
   yAxis: {
     type: 'value',
     splitLine: { lineStyle: { color: '#f1f5f9', type: 'dashed' } },
-    axisLabel: { 
-      color: '#64748b', 
+    axisLabel: {
+      color: '#64748b',
       fontSize: 10,
-      formatter: (value) => props.formatShortMoney(value)
-    }
+      formatter: (value) => props.formatShortMoney(value),
+    },
   },
   series: [
     {
@@ -110,10 +117,10 @@ const chartOption = ref({
         borderRadius: [4, 4, 0, 0],
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
           { offset: 0, color: '#10b981' },
-          { offset: 1, color: '#34d399' }
-        ])
+          { offset: 1, color: '#34d399' },
+        ]),
       },
-      data: []
+      data: [],
     },
     {
       name: 'Cash Outflow from Operating',
@@ -123,28 +130,28 @@ const chartOption = ref({
         borderRadius: [4, 4, 0, 0],
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
           { offset: 0, color: '#f43f5e' },
-          { offset: 1, color: '#fb7185' }
-        ])
+          { offset: 1, color: '#fb7185' },
+        ]),
       },
-      data: []
-    }
-  ]
+      data: [],
+    },
+  ],
 })
 
 const fetchCashFlow = async () => {
-  const company_id = authStore.user?.company_id;
-  if (!company_id || !props.selectedYear) return;
-  
-  isLoading.value = true;
+  const company_id = authStore.user?.company_id
+  if (!company_id || !props.selectedYear) return
+
+  isLoading.value = true
   try {
     const res = await api.get('/v1/dashboard/cashbook/cashflow', {
-      params: { company_id, year: props.selectedYear }
-    });
-    rawCashFlowData.value = res.data || [];
+      params: { company_id, year: props.selectedYear },
+    })
+    rawCashFlowData.value = res.data || []
   } catch (error) {
-    console.error("Failed to fetch cash flow data", error);
+    console.error('Failed to fetch cash flow data', error)
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
 
@@ -169,17 +176,17 @@ const syncChart = () => {
     }
 
     const periodStr = `${props.selectedYear}-${periodNum.toString().padStart(2, '0')}`
-    
+
     // Find matching items in raw data
-    const periodItems = rawCashFlowData.value.filter(item => {
-      const p = item.period ?? item.Period ?? '';
-      return p === periodStr;
+    const periodItems = rawCashFlowData.value.filter((item) => {
+      const p = item.period ?? item.Period ?? ''
+      return p === periodStr
     })
-    
-    periodItems.forEach(item => {
+
+    periodItems.forEach((item) => {
       const amt = Math.round(parseFloat(item.actual_amount ?? item.actualAmount) || 0)
       const subGrp = (item.sub_group ?? item.subGroup ?? '').toString()
-      
+
       // Match IO (Cash Inflow from Operating) and OO (Cash Outflow from Operating)
       if (subGrp.includes('Cash Inflow') || subGrp.includes('IO')) {
         inflows[i] += amt
@@ -195,7 +202,9 @@ const syncChart = () => {
 }
 
 // Watchers with robust fallback options
-watch([() => props.selectedYear, () => authStore.user?.company_id], fetchCashFlow, { immediate: true })
+watch([() => props.selectedYear, () => authStore.user?.company_id], fetchCashFlow, {
+  immediate: true,
+})
 watch(rawCashFlowData, syncChart, { deep: true, immediate: true })
 
 onMounted(fetchCashFlow)

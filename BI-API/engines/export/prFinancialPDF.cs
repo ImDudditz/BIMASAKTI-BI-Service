@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace BMS_BI_SERVICE.Core.Engines
+namespace Bimasakti.BiService.Api.Engines
 {
     public static class prFinancialPDF
     {

@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/BI-API/">
+    <Project Path="BI-API/BI-API.csproj" />
+    <Project Path="BI-MGR/BI-MGR.csproj" />
+    <Project Path="BI-API/tests/BI-API.Tests.csproj" />
+  </Folder>
+</Solution>

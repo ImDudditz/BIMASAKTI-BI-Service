@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BMS_BI_SERVICE.Core.Engines
+namespace Bimasakti.BiService.Api.Engines
 {
     [Authorize]
     [ApiController]

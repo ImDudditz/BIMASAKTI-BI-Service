@@ -1,10 +1,15 @@
 <template>
-  <div class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300">
-    
+  <div
+    class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300"
+  >
     <div class="flex items-center justify-between mb-3">
       <div>
-        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">Capital Growth</h4>
-        <p class="text-[10px] font-medium text-slate-400">Total Equity balance over periods of {{ props.selectedYear }}</p>
+        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">
+          Capital Growth
+        </h4>
+        <p class="text-[10px] font-medium text-slate-400">
+          Total Equity balance over periods of {{ props.selectedYear }}
+        </p>
       </div>
     </div>
 
@@ -31,10 +36,10 @@ const props = defineProps({
   selectedYear: { type: String, required: true },
   formatShortMoney: { type: Function, required: true },
   formatMoney: { type: Function, required: true },
-  baseEchartsOptions: { type: Object, required: true }
+  baseEchartsOptions: { type: Object, required: true },
 })
 
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 const chartOption = ref({
   textStyle: { fontFamily: "'Inter', sans-serif" },
@@ -47,7 +52,7 @@ const chartOption = ref({
     textStyle: { color: '#fff', fontSize: 12 },
     axisPointer: {
       type: 'line',
-      lineStyle: { color: 'rgba(99, 102, 241, 0.2)', width: 2, type: 'dashed' }
+      lineStyle: { color: 'rgba(99, 102, 241, 0.2)', width: 2, type: 'dashed' },
     },
     formatter: (params) => {
       const data = params[0]
@@ -60,22 +65,22 @@ const chartOption = ref({
           <span style="font-weight: 800; color: #a5b4fc;">Rp ${formattedVal}</span>
         </div>
       `
-    }
+    },
   },
   xAxis: {
     type: 'category',
     data: months,
     axisLine: { lineStyle: { color: '#cbd5e1' } },
-    axisLabel: { color: '#64748b', fontSize: 10, fontWeight: 600 }
+    axisLabel: { color: '#64748b', fontSize: 10, fontWeight: 600 },
   },
   yAxis: {
     type: 'value',
     splitLine: { lineStyle: { color: '#f1f5f9', type: 'dashed' } },
-    axisLabel: { 
-      color: '#64748b', 
+    axisLabel: {
+      color: '#64748b',
       fontSize: 10,
-      formatter: (value) => props.formatShortMoney(value)
-    }
+      formatter: (value) => props.formatShortMoney(value),
+    },
   },
   series: [
     {
@@ -87,12 +92,12 @@ const chartOption = ref({
       symbolSize: 7,
       lineStyle: {
         width: 3,
-        color: '#6366f1'
+        color: '#6366f1',
       },
       itemStyle: {
         color: '#6366f1',
         borderColor: '#fff',
-        borderWidth: 2
+        borderWidth: 2,
       },
       label: {
         show: true,
@@ -103,49 +108,53 @@ const chartOption = ref({
         formatter: (params) => {
           if (!params.value) return ''
           return props.formatShortMoney(params.value)
-        }
+        },
       },
       areaStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
           { offset: 0, color: 'rgba(99, 102, 241, 0.3)' },
-          { offset: 1, color: 'rgba(99, 102, 241, 0.0)' }
-        ])
+          { offset: 1, color: 'rgba(99, 102, 241, 0.0)' },
+        ]),
       },
-      data: []
-    }
-  ]
+      data: [],
+    },
+  ],
 })
 
 // Sync data reactively
-watch([() => props.rawLedgerData, () => props.selectedYear], () => {
-  const ledgerPayload = props.rawLedgerData?.yearlyData?.[props.selectedYear]
-  if (!ledgerPayload) {
-    chartOption.value.series[0].data = Array(12).fill(0)
-    return
-  }
-
-  const today = new Date()
-  const todayYear = today.getFullYear()
-  const todayMonth = today.getMonth() + 1 // 1-based
-
-  const yearNum = parseInt(props.selectedYear)
-
-  const dataValues = months.map((_, i) => {
-    const periodNum = i + 1
-    const isFuture = yearNum > todayYear || (yearNum === todayYear && periodNum > todayMonth)
-    
-    if (isFuture) {
-      return 0
+watch(
+  [() => props.rawLedgerData, () => props.selectedYear],
+  () => {
+    const ledgerPayload = props.rawLedgerData?.yearlyData?.[props.selectedYear]
+    if (!ledgerPayload) {
+      chartOption.value.series[0].data = Array(12).fill(0)
+      return
     }
 
-    const report = ledgerPayload[i]
-    const equityTotal = report?.data?.Equity?.Total || report?.data?.Equity?.total || 0
-    const netIncome = report?.netIncome || report?.net_income || 0
-    return Math.round((parseFloat(equityTotal) || 0) + (parseFloat(netIncome) || 0))
-  })
+    const today = new Date()
+    const todayYear = today.getFullYear()
+    const todayMonth = today.getMonth() + 1 // 1-based
 
-  chartOption.value.series[0].data = dataValues
-}, { immediate: true, deep: true })
+    const yearNum = parseInt(props.selectedYear)
+
+    const dataValues = months.map((_, i) => {
+      const periodNum = i + 1
+      const isFuture = yearNum > todayYear || (yearNum === todayYear && periodNum > todayMonth)
+
+      if (isFuture) {
+        return 0
+      }
+
+      const report = ledgerPayload[i]
+      const equityTotal = report?.data?.Equity?.Total || report?.data?.Equity?.total || 0
+      const netIncome = report?.netIncome || report?.net_income || 0
+      return Math.round((parseFloat(equityTotal) || 0) + (parseFloat(netIncome) || 0))
+    })
+
+    chartOption.value.series[0].data = dataValues
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <style scoped>

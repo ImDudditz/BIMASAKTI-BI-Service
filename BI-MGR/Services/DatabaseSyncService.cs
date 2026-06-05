@@ -6,10 +6,10 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
-using BMS_BI_SERVICE.Core.Engines;
-using BiPortal.FinancialReports.Manager.Models;
+using Bimasakti.BiService.Api.Engines;
+using Bimasakti.BiService.Mgr.Models;
 
-namespace BiPortal.FinancialReports.Manager.Services
+namespace Bimasakti.BiService.Mgr.Services
 {
     public class DatabaseSyncService
     {
@@ -85,13 +85,13 @@ namespace BiPortal.FinancialReports.Manager.Services
                         logMessage("ERROR", $"Insecure URL scheme rejected. Only HTTPS is allowed: {url}");
                         continue;
                     }
-                    
+
                     bool isPrivateOrLocal = parsedUri.IsLoopback || parsedUri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase) || parsedUri.Host.Equals("169.254.169.254");
                     if (parsedUri.HostNameType == UriHostNameType.IPv4 && System.Net.IPAddress.TryParse(parsedUri.Host, out var ipAddress))
                     {
                         var ipBytes = ipAddress.GetAddressBytes();
-                        if (ipBytes[0] == 10 || 
-                            (ipBytes[0] == 172 && ipBytes[1] >= 16 && ipBytes[1] <= 31) || 
+                        if (ipBytes[0] == 10 ||
+                            (ipBytes[0] == 172 && ipBytes[1] >= 16 && ipBytes[1] <= 31) ||
                             (ipBytes[0] == 192 && ipBytes[1] == 168))
                         {
                             isPrivateOrLocal = true;

@@ -1,10 +1,15 @@
 <template>
-  <div class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300">
-    
+  <div
+    class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300"
+  >
     <div class="flex items-center justify-between mb-3">
       <div>
-        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">Revenue vs Budget</h4>
-        <p class="text-[10px] font-medium text-slate-400">Monthly PTD revenue against budget for {{ props.selectedYear }}</p>
+        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">
+          Revenue vs Budget
+        </h4>
+        <p class="text-[10px] font-medium text-slate-400">
+          Monthly PTD revenue against budget for {{ props.selectedYear }}
+        </p>
       </div>
     </div>
 
@@ -31,10 +36,10 @@ const props = defineProps({
   selectedYear: { type: String, required: true },
   formatShortMoney: { type: Function, required: true },
   formatMoney: { type: Function, required: true },
-  baseEchartsOptions: { type: Object, required: true }
+  baseEchartsOptions: { type: Object, required: true },
 })
 
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 const chartOption = ref({
   textStyle: { fontFamily: "'Inter', sans-serif" },
@@ -44,7 +49,7 @@ const chartOption = ref({
     top: '0%',
     right: '0%',
     icon: 'circle',
-    textStyle: { color: '#64748b', fontSize: 10, fontWeight: 600 }
+    textStyle: { color: '#64748b', fontSize: 10, fontWeight: 600 },
   },
   tooltip: {
     trigger: 'axis',
@@ -54,11 +59,11 @@ const chartOption = ref({
     textStyle: { color: '#fff', fontSize: 12 },
     axisPointer: {
       type: 'shadow',
-      shadowStyle: { color: 'rgba(14, 165, 233, 0.03)' }
+      shadowStyle: { color: 'rgba(14, 165, 233, 0.03)' },
     },
     formatter: (params) => {
       let result = `<div style="font-weight: bold; margin-bottom: 6px;">${params[0].name} ${props.selectedYear}</div>`
-      params.forEach(param => {
+      params.forEach((param) => {
         const formattedVal = props.formatMoney(param.value)
         const isActual = param.seriesName === 'Actual Revenue'
         const dotColor = isActual ? '#0ea5e9' : '#94a3b8'
@@ -74,13 +79,13 @@ const chartOption = ref({
         `
       })
       return result
-    }
+    },
   },
   xAxis: {
     type: 'category',
     data: months,
     axisLine: { lineStyle: { color: '#cbd5e1' } },
-    axisLabel: { color: '#64748b', fontSize: 10, fontWeight: 600 }
+    axisLabel: { color: '#64748b', fontSize: 10, fontWeight: 600 },
   },
   yAxis: {
     type: 'value',
@@ -88,8 +93,8 @@ const chartOption = ref({
     axisLabel: {
       color: '#64748b',
       fontSize: 10,
-      formatter: (value) => props.formatShortMoney(value)
-    }
+      formatter: (value) => props.formatShortMoney(value),
+    },
   },
   series: [
     {
@@ -100,10 +105,10 @@ const chartOption = ref({
         borderRadius: [4, 4, 0, 0],
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
           { offset: 0, color: '#0ea5e9' },
-          { offset: 1, color: '#38bdf8' }
-        ])
+          { offset: 1, color: '#38bdf8' },
+        ]),
       },
-      data: []
+      data: [],
     },
     {
       name: 'Budget Revenue',
@@ -113,86 +118,90 @@ const chartOption = ref({
         borderRadius: [4, 4, 0, 0],
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
           { offset: 0, color: '#94a3b8' },
-          { offset: 1, color: '#cbd5e1' }
-        ])
+          { offset: 1, color: '#cbd5e1' },
+        ]),
       },
-      data: []
-    }
-  ]
+      data: [],
+    },
+  ],
 })
 
 // Sync chart data reactively from rawLedgerData.yearlyData
-watch([() => props.rawLedgerData, () => props.selectedYear], () => {
-  const ledgerPayload = props.rawLedgerData?.yearlyData?.[props.selectedYear]
-  if (!ledgerPayload) {
-    chartOption.value.series[0].data = Array(12).fill(0)
-    chartOption.value.series[1].data = Array(12).fill(0)
-    return
-  }
-
-  const today = new Date()
-  const todayYear = today.getFullYear()
-  const todayMonth = today.getMonth() + 1 // 1-based
-  const yearNum = parseInt(props.selectedYear)
-
-  // 1. Calculate accumulated actual values for all months
-  const accumActuals = months.map((_, i) => {
-    const periodNum = i + 1
-    const isFuture = yearNum > todayYear || (yearNum === todayYear && periodNum > todayMonth)
-    if (isFuture) return 0
-
-    const report = ledgerPayload[i]
-    // ptd_amount → Revenue section Total (sum of period actual balances)
-    const revenueTotal = report?.data?.Revenue?.Total || report?.data?.Revenue?.total || 0
-    return Math.abs(parseFloat(revenueTotal) || 0)
-  })
-
-  // 2. Subtract previous month's value to get per-period (non-accumulated) actual values
-  const actualData = accumActuals.map((val, i) => {
-    const periodNum = i + 1
-    const isFuture = yearNum > todayYear || (yearNum === todayYear && periodNum > todayMonth)
-    if (isFuture) return 0
-
-    if (i === 0) return Math.round(val)
-    const periodVal = val - accumActuals[i - 1]
-    return Math.round(Math.abs(periodVal))
-  })
-
-  // 3. Calculate accumulated budget values for all months
-  const accumBudgets = months.map((_, i) => {
-    const periodNum = i + 1
-    const isFuture = yearNum > todayYear || (yearNum === todayYear && periodNum > todayMonth)
-    if (isFuture) return 0
-
-    const report = ledgerPayload[i]
-    if (!report?.data?.Revenue?.Groups) return 0
-
-    // end_budget → Sum of all Revenue items' end_budget
-    let budgetTotal = 0
-    const groups = report.data.Revenue.Groups
-    for (const groupKey of Object.keys(groups)) {
-      const items = groups[groupKey]?.Items || groups[groupKey]?.items || []
-      for (const item of items) {
-        budgetTotal += Math.abs(parseFloat(item.end_budget ?? 0) || 0)
-      }
+watch(
+  [() => props.rawLedgerData, () => props.selectedYear],
+  () => {
+    const ledgerPayload = props.rawLedgerData?.yearlyData?.[props.selectedYear]
+    if (!ledgerPayload) {
+      chartOption.value.series[0].data = Array(12).fill(0)
+      chartOption.value.series[1].data = Array(12).fill(0)
+      return
     }
-    return budgetTotal
-  })
 
-  // 4. Subtract previous month's value to get per-period (non-accumulated) budget values
-  const budgetData = accumBudgets.map((val, i) => {
-    const periodNum = i + 1
-    const isFuture = yearNum > todayYear || (yearNum === todayYear && periodNum > todayMonth)
-    if (isFuture) return 0
+    const today = new Date()
+    const todayYear = today.getFullYear()
+    const todayMonth = today.getMonth() + 1 // 1-based
+    const yearNum = parseInt(props.selectedYear)
 
-    if (i === 0) return Math.round(val)
-    const periodVal = val - accumBudgets[i - 1]
-    return Math.round(Math.abs(periodVal))
-  })
+    // 1. Calculate accumulated actual values for all months
+    const accumActuals = months.map((_, i) => {
+      const periodNum = i + 1
+      const isFuture = yearNum > todayYear || (yearNum === todayYear && periodNum > todayMonth)
+      if (isFuture) return 0
 
-  chartOption.value.series[0].data = actualData
-  chartOption.value.series[1].data = budgetData
-}, { immediate: true, deep: true })
+      const report = ledgerPayload[i]
+      // ptd_amount → Revenue section Total (sum of period actual balances)
+      const revenueTotal = report?.data?.Revenue?.Total || report?.data?.Revenue?.total || 0
+      return Math.abs(parseFloat(revenueTotal) || 0)
+    })
+
+    // 2. Subtract previous month's value to get per-period (non-accumulated) actual values
+    const actualData = accumActuals.map((val, i) => {
+      const periodNum = i + 1
+      const isFuture = yearNum > todayYear || (yearNum === todayYear && periodNum > todayMonth)
+      if (isFuture) return 0
+
+      if (i === 0) return Math.round(val)
+      const periodVal = val - accumActuals[i - 1]
+      return Math.round(Math.abs(periodVal))
+    })
+
+    // 3. Calculate accumulated budget values for all months
+    const accumBudgets = months.map((_, i) => {
+      const periodNum = i + 1
+      const isFuture = yearNum > todayYear || (yearNum === todayYear && periodNum > todayMonth)
+      if (isFuture) return 0
+
+      const report = ledgerPayload[i]
+      if (!report?.data?.Revenue?.Groups) return 0
+
+      // end_budget → Sum of all Revenue items' end_budget
+      let budgetTotal = 0
+      const groups = report.data.Revenue.Groups
+      for (const groupKey of Object.keys(groups)) {
+        const items = groups[groupKey]?.Items || groups[groupKey]?.items || []
+        for (const item of items) {
+          budgetTotal += Math.abs(parseFloat(item.end_budget ?? 0) || 0)
+        }
+      }
+      return budgetTotal
+    })
+
+    // 4. Subtract previous month's value to get per-period (non-accumulated) budget values
+    const budgetData = accumBudgets.map((val, i) => {
+      const periodNum = i + 1
+      const isFuture = yearNum > todayYear || (yearNum === todayYear && periodNum > todayMonth)
+      if (isFuture) return 0
+
+      if (i === 0) return Math.round(val)
+      const periodVal = val - accumBudgets[i - 1]
+      return Math.round(Math.abs(periodVal))
+    })
+
+    chartOption.value.series[0].data = actualData
+    chartOption.value.series[1].data = budgetData
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <style scoped>

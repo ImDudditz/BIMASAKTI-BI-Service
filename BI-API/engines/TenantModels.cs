@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
-namespace BMS_BI_SERVICE.Core.Engines
+namespace Bimasakti.BiService.Api.Engines
 {
     public class User
     {

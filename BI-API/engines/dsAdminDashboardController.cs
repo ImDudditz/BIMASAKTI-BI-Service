@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
-namespace BMS_BI_SERVICE.Core.Engines
+namespace Bimasakti.BiService.Api.Engines
 {
     // --- SPECIFICATION CLASSES ---
 

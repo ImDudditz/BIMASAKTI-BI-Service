@@ -11,8 +11,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Azure passes the BMS-CORE-API endpoint via environment variables. If missing, it defaults to the old port.
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8001';
+// Backend endpoint via environment variables. Defaults to localhost 8001.
+const BACKEND_URL = process.env.VITE_BACKEND_URL || process.env.BACKEND_URL || 'http://localhost:8001';
 
 // Apply security headers
 app.use(helmet({
@@ -30,7 +30,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Proxy /api requests to the Biznet backend
+// Proxy /api requests to the backend
 app.use(
     '/api',
     createProxyMiddleware({
@@ -41,7 +41,7 @@ app.use(
     })
 );
 
-// Proxy /assets requests to the Biznet backend
+// Proxy /assets requests to the backend
 app.use(
     '/assets',
     createProxyMiddleware({
@@ -61,5 +61,5 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-    console.log(`Proxying /api and /assets to BMS-CORE-API at: ${BACKEND_URL}`);
+    console.log(`Proxying /api and /assets to backend at: ${BACKEND_URL}`);
 });

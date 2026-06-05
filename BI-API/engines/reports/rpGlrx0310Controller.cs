@@ -8,10 +8,10 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using BMS_BI_SERVICE.Core.Services;
+using Bimasakti.BiService.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BMS_BI_SERVICE.Core.Engines.Reports
+namespace Bimasakti.BiService.Api.Engines.Reports
 {
     // --- PAYLOAD DEFINITIONS ---
     public class MappingSpecification
@@ -184,13 +184,13 @@ namespace BMS_BI_SERVICE.Core.Engines.Reports
             string companyId = companyIdClaim.ToUpperInvariant();
 
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
-            
+
             try
             {
                 string configDirectory = Path.GetDirectoryName(databasePath)!;
                 string normalizedPreset = preset ?? "preset1";
-                if (!normalizedPreset.Equals("preset1", StringComparison.OrdinalIgnoreCase) && 
-                    !normalizedPreset.Equals("preset2", StringComparison.OrdinalIgnoreCase) && 
+                if (!normalizedPreset.Equals("preset1", StringComparison.OrdinalIgnoreCase) &&
+                    !normalizedPreset.Equals("preset2", StringComparison.OrdinalIgnoreCase) &&
                     !normalizedPreset.Equals("preset3", StringComparison.OrdinalIgnoreCase))
                 {
                     return BadRequest(new { status = "error", message = "Invalid preset specified. Must be preset1, preset2, or preset3." });
@@ -241,15 +241,15 @@ namespace BMS_BI_SERVICE.Core.Engines.Reports
             {
                 string configDirectory = Path.GetDirectoryName(databasePath)!;
                 string preset = mappingRequest.Preset;
-                
+
                 // Security: Prevent writing to arbitrary config files (DoS / Path Traversal)
-                if (preset == null || (!preset.Equals("preset1", StringComparison.OrdinalIgnoreCase) && 
-                                       !preset.Equals("preset2", StringComparison.OrdinalIgnoreCase) && 
+                if (preset == null || (!preset.Equals("preset1", StringComparison.OrdinalIgnoreCase) &&
+                                       !preset.Equals("preset2", StringComparison.OrdinalIgnoreCase) &&
                                        !preset.Equals("preset3", StringComparison.OrdinalIgnoreCase)))
                 {
                     return BadRequest(new { status = "error", message = "Invalid preset specified. Must be preset1, preset2, or preset3." });
                 }
-                
+
                 string normalizedPreset = preset;
                 if (preset.StartsWith("preset", StringComparison.OrdinalIgnoreCase) && preset.Length > 6)
                 {
@@ -257,7 +257,7 @@ namespace BMS_BI_SERVICE.Core.Engines.Reports
                 }
                 string presetJsonPath = Path.Combine(configDirectory, $"{companyId.ToUpperInvariant()}_{normalizedPreset}.json");
 
-                var incomingDict = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(mappingRequest.Data.ToJsonString()) 
+                var incomingDict = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(mappingRequest.Data.ToJsonString())
                                    ?? new Dictionary<string, Dictionary<string, string>>();
 
                 // Try to load existing mappings to preserve any mapping details that might not be in the incoming request (fallback database sync)
@@ -454,10 +454,10 @@ namespace BMS_BI_SERVICE.Core.Engines.Reports
             try
             {
                 string configDirectory = Path.GetDirectoryName(databasePath)!;
-                
+
                 // Security: Prevent arbitrary config deletion
-                if (preset == null || (!preset.Equals("preset1", StringComparison.OrdinalIgnoreCase) && 
-                                       !preset.Equals("preset2", StringComparison.OrdinalIgnoreCase) && 
+                if (preset == null || (!preset.Equals("preset1", StringComparison.OrdinalIgnoreCase) &&
+                                       !preset.Equals("preset2", StringComparison.OrdinalIgnoreCase) &&
                                        !preset.Equals("preset3", StringComparison.OrdinalIgnoreCase)))
                 {
                     return BadRequest(new { status = "error", message = "Invalid preset specified." });
@@ -673,15 +673,15 @@ namespace BMS_BI_SERVICE.Core.Engines.Reports
 
             string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
-            if (!preset.Equals("preset1", StringComparison.OrdinalIgnoreCase) && 
-                !preset.Equals("preset2", StringComparison.OrdinalIgnoreCase) && 
+            if (!preset.Equals("preset1", StringComparison.OrdinalIgnoreCase) &&
+                !preset.Equals("preset2", StringComparison.OrdinalIgnoreCase) &&
                 !preset.Equals("preset3", StringComparison.OrdinalIgnoreCase))
             {
                 return BadRequest(new { status = "error", message = "Invalid preset specified. Must be preset1, preset2, or preset3." });
             }
 
             var responseResult = await _ledgerService.GenerateLedgerReportAsync(databasePath, year, period, preset, companyId);
-            
+
             if (responseResult.Status == "error")
             {
                 return Ok(new { status = "error", message = responseResult.ErrorMessage });

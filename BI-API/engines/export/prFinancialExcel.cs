@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace BMS_BI_SERVICE.Core.Engines
+namespace Bimasakti.BiService.Api.Engines
 {
     public class ExcelReportPayload
     {
@@ -672,7 +672,7 @@ namespace BMS_BI_SERVICE.Core.Engines
                     backendDir = current;
                     break;
                 }
-                if (File.Exists(Path.Combine(current, "BMS_BI_SERVICE.slnx")))
+                if (File.Exists(Path.Combine(current, "BI_SERVICE.slnx")))
                 {
                     backendDir = Path.Combine(current, "BI-API");
                     break;
@@ -693,7 +693,7 @@ namespace BMS_BI_SERVICE.Core.Engines
                         backendDir = current;
                         break;
                     }
-                    if (File.Exists(Path.Combine(current, "BMS_BI_SERVICE.slnx")))
+                    if (File.Exists(Path.Combine(current, "BI_SERVICE.slnx")))
                     {
                         backendDir = Path.Combine(current, "BI-API");
                         break;

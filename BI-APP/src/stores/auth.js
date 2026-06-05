@@ -1,4 +1,3 @@
-
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api from '@/services/api'
@@ -59,11 +58,11 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const [widgetsResult, reportsResult] = await Promise.allSettled([
         api.get('/dashboard/my-widgets', { params: { company_id: companyId, username } }),
-        api.get('/dashboard/my-reports', { params: { company_id: companyId, username } })
+        api.get('/dashboard/my-reports', { params: { company_id: companyId, username } }),
       ])
 
       if (widgetsResult.status === 'fulfilled') {
-        userWidgets.value = (widgetsResult.value.data || []).map(w => w.widget_key)
+        userWidgets.value = (widgetsResult.value.data || []).map((w) => w.widget_key)
       } else {
         console.error('[Auth Store] Failed to fetch user widgets:', widgetsResult.reason)
         userWidgets.value = []
@@ -82,9 +81,9 @@ export const useAuthStore = defineStore('auth', () => {
 
   /**
    * Performs authentication login.
-   * @param {string} username 
-   * @param {string} password 
-   * @param {string|number} companyId 
+   * @param {string} username
+   * @param {string} password
+   * @param {string|number} companyId
    * @returns {Promise<{success: boolean, message?: string}>}
    */
   const login = async (username, password, companyId) => {
@@ -92,7 +91,7 @@ export const useAuthStore = defineStore('auth', () => {
       const payload = {
         username,
         password,
-        company_id: companyId
+        company_id: companyId,
       }
 
       // Post login request as application/json. Axios automatically accepts and manages the secure HttpOnly cookie
@@ -145,7 +144,10 @@ export const useAuthStore = defineStore('auth', () => {
       // 1. Terminate the HttpOnly cookie session in the backend
       await api.post('/auth/logout')
     } catch (error) {
-      console.error('[Auth Store] Backend session clear failed. Running frontend clear fallback:', error)
+      console.error(
+        '[Auth Store] Backend session clear failed. Running frontend clear fallback:',
+        error,
+      )
     } finally {
       // 2. Clear all local user states and purge cache in all circumstances
       user.value = null
@@ -156,5 +158,14 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, isAuthenticated, isAdmin, userWidgets, userReports, fetchPermissions, login, logout }
+  return {
+    user,
+    isAuthenticated,
+    isAdmin,
+    userWidgets,
+    userReports,
+    fetchPermissions,
+    login,
+    logout,
+  }
 })

@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BMS_BI_SERVICE.Core.Services
+namespace Bimasakti.BiService.Api.Services
 {
     public class DailyFootTrafficItem
     {
@@ -152,7 +152,7 @@ namespace BMS_BI_SERVICE.Core.Services
                             string dateOnlyPart = expirationRow.ExpirationDateString.Split('T')[0];
                             var parsedExpirationDate = DateTime.Parse(dateOnlyPart);
                             var shiftedExpirationDate = new DateTime(2026, parsedExpirationDate.Month, parsedExpirationDate.Day);
-                            
+
                             if (shiftedExpirationDate < baseTodayDate)
                             {
                                 shiftedExpirationDate = shiftedExpirationDate.AddYears(1);

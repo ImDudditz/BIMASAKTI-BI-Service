@@ -15,14 +15,15 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using BMS_BI_SERVICE.Core.Services;
-using BMS_BI_SERVICE.Core.Engines;
+using Bimasakti.BiService.Api.Services;
+using Bimasakti.BiService.Api.Engines;
 using Scalar.AspNetCore;
 
-namespace BMS_BI_SERVICE.Core
+namespace Bimasakti.BiService.Api
 {
     public class Program
     {
+        private static readonly System.Net.Http.HttpClient SharedHttpClient = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromSeconds(30) };
 
 
         public static async Task Main(string[] args)
@@ -37,7 +38,7 @@ namespace BMS_BI_SERVICE.Core
             var (host, port) = GetServerConfig();
 
             var builder = WebApplication.CreateBuilder(args);
-            
+
             if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APP_POOL_ID")))
             {
                 builder.WebHost.UseUrls($"http://{host}:{port}");
@@ -115,26 +116,28 @@ namespace BMS_BI_SERVICE.Core
                             {
                                 var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
                                 var valParams = options.TokenValidationParameters.Clone();
-                                valParams.ValidateLifetime = false; 
+                                valParams.ValidateLifetime = false;
 
                                 var principal = handler.ValidateToken(token, valParams, out var validated);
                                 if (validated is System.IdentityModel.Tokens.Jwt.JwtSecurityToken jwt && jwt.ValidTo < DateTime.UtcNow)
                                 {
                                     // Auto-renew expired token if cookie is still alive
                                     var claims = principal.Claims.ToDictionary(c => c.Type, c => c.Value);
-                                    
+
                                     if (claims.TryGetValue(System.Security.Claims.ClaimTypes.Name, out var user) &&
                                         claims.TryGetValue("company_id", out var compId))
                                     {
                                         bool isCompanyActive = false;
-                                        try {
-                                            using var hc = new System.Net.Http.HttpClient();
-                                            var response = await hc.GetAsync($"http://localhost:8003/api/internal/companies/{compId}/status");
-                                            if (response.IsSuccessStatusCode) {
+                                        try
+                                        {
+                                            var response = await SharedHttpClient.GetAsync($"http://localhost:8003/api/internal/companies/{compId}/status");
+                                            if (response.IsSuccessStatusCode)
+                                            {
                                                 var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
                                                 if (doc.RootElement.TryGetProperty("isActive", out var p) && p.GetBoolean()) isCompanyActive = true;
                                             }
-                                        } catch { }
+                                        }
+                                        catch { }
                                         if (!isCompanyActive) { context.Fail("Inactive company."); return; }
 
                                         using var tDb = new TenantDbContext(svcDbUtils.GetSafeDbPath(compId));
@@ -146,7 +149,11 @@ namespace BMS_BI_SERVICE.Core
 
                                         context.Response.Cookies.Append("access_token", newToken, new CookieOptions
                                         {
-                                            HttpOnly = true, Secure = context.HttpContext.Request.IsHttps, SameSite = SameSiteMode.Lax, MaxAge = TimeSpan.FromHours(cookieExpireHours), Path = "/"
+                                            HttpOnly = true,
+                                            Secure = context.HttpContext.Request.IsHttps,
+                                            SameSite = SameSiteMode.Lax,
+                                            MaxAge = TimeSpan.FromHours(cookieExpireHours),
+                                            Path = "/"
                                         });
                                         context.Token = newToken;
                                     }
@@ -204,9 +211,9 @@ namespace BMS_BI_SERVICE.Core
                 string path = context.Request.Path.Value ?? "";
                 string ip = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown IP";
                 string qs = context.Request.QueryString.Value ?? "";
-                
+
                 // Indo Law PII Masking & XSS Sanitization Logging
-                if (qs.Contains("@") || qs.Contains("ktp") || qs.Contains("phone") || qs.Contains("<script>")) 
+                if (qs.Contains("@") || qs.Contains("ktp") || qs.Contains("phone") || qs.Contains("<script>"))
                 {
                     qs = "?[MASKED_PII_OR_SANITIZED]";
                 }

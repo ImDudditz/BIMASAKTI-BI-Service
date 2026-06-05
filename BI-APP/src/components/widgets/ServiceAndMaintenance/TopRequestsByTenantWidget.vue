@@ -1,10 +1,15 @@
 <template>
-  <div class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300">
-    
+  <div
+    class="relative bg-white/90 backdrop-blur-md border border-slate-100 rounded-2xl shadow-sm p-4 sm:p-5 overflow-hidden flex flex-col h-[330px] hover:shadow-md hover:border-slate-200/80 transition-all duration-300"
+  >
     <div class="flex items-center justify-between mb-3">
       <div>
-        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">Top 5 Request by Tenant</h4>
-        <p class="text-[10px] font-medium text-slate-400">Tenants with the most active service requests</p>
+        <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 tracking-tight">
+          Top 5 Request by Tenant
+        </h4>
+        <p class="text-[10px] font-medium text-slate-400">
+          Tenants with the most active service requests
+        </p>
       </div>
     </div>
 
@@ -30,8 +35,8 @@ const props = defineProps({
   requestsData: {
     type: Array,
     required: true,
-    default: () => []
-  }
+    default: () => [],
+  },
 })
 
 // Store a map of tenant name to top request type for tooltip access
@@ -48,14 +53,14 @@ const chartOption = ref({
     textStyle: { color: '#fff', fontSize: 12 },
     axisPointer: {
       type: 'shadow',
-      shadowStyle: { color: 'rgba(59, 130, 246, 0.04)' }
+      shadowStyle: { color: 'rgba(59, 130, 246, 0.04)' },
     },
     formatter: (params) => {
       const data = params[0]
       const tenantName = data.name
       const count = data.value
       const topType = topRequestTypesMap.value[tenantName] || 'General'
-      
+
       return `
         <div style="font-weight: bold; margin-bottom: 4px; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
           Tenant: ${tenantName}
@@ -69,27 +74,27 @@ const chartOption = ref({
           Top Type: ${topType}
         </div>
       `
-    }
+    },
   },
   xAxis: {
     type: 'value',
     splitLine: { lineStyle: { color: '#f1f5f9', type: 'dashed' } },
-    axisLabel: { color: '#64748b', fontSize: 10 }
+    axisLabel: { color: '#64748b', fontSize: 10 },
   },
   yAxis: {
     type: 'category',
     data: [],
     inverse: true, // keeps highest count at the top
     axisLine: { lineStyle: { color: '#cbd5e1' } },
-    axisLabel: { 
-      color: '#475569', 
-      fontSize: 10, 
+    axisLabel: {
+      color: '#475569',
+      fontSize: 10,
       fontWeight: 600,
       formatter: (value) => {
         // Truncate long tenant names to keep layout extremely neat
         return value.length > 18 ? value.slice(0, 16) + '...' : value
-      }
-    }
+      },
+    },
   },
   series: [
     {
@@ -101,8 +106,8 @@ const chartOption = ref({
         borderRadius: [0, 4, 4, 0],
         color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
           { offset: 0, color: '#3b82f6' },
-          { offset: 1, color: '#93c5fd' }
-        ])
+          { offset: 1, color: '#93c5fd' },
+        ]),
       },
       label: {
         show: true,
@@ -110,27 +115,31 @@ const chartOption = ref({
         color: '#475569',
         fontSize: 10,
         fontWeight: 700,
-        formatter: '{c}'
-      }
-    }
-  ]
+        formatter: '{c}',
+      },
+    },
+  ],
 })
 
-watch(() => props.requestsData, (newData) => {
-  if (newData) {
-    const sortedData = [...newData].slice(0, 5)
-    
-    // Build map for quick O(1) tooltip lookup
-    const typeMap = {}
-    sortedData.forEach(item => {
-      typeMap[item.tenant] = item.topRequestType || 'General'
-    })
-    topRequestTypesMap.value = typeMap
+watch(
+  () => props.requestsData,
+  (newData) => {
+    if (newData) {
+      const sortedData = [...newData].slice(0, 5)
 
-    chartOption.value.yAxis.data = sortedData.map(item => item.tenant)
-    chartOption.value.series[0].data = sortedData.map(item => item.requestCount)
-  }
-}, { immediate: true, deep: true })
+      // Build map for quick O(1) tooltip lookup
+      const typeMap = {}
+      sortedData.forEach((item) => {
+        typeMap[item.tenant] = item.topRequestType || 'General'
+      })
+      topRequestTypesMap.value = typeMap
+
+      chartOption.value.yAxis.data = sortedData.map((item) => item.tenant)
+      chartOption.value.series[0].data = sortedData.map((item) => item.requestCount)
+    }
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <style scoped>

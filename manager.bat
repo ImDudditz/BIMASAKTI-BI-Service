@@ -81,7 +81,7 @@ echo   LAUNCHING FULL LOCAL DEVELOPMENT ENVIRONMENT
 echo  ============================================================
 echo.
 echo  Building solution sequentially to prevent file lock collisions...
-dotnet build "%ROOT_DIR%BMS_BI_SERVICE.slnx" >nul
+dotnet build "%ROOT_DIR%BI-Service.slnx" >nul
 echo.
 
 :: 1. Start Main Backend API
@@ -112,7 +112,7 @@ echo   LAUNCHING WEB CONTROL PANEL
 echo  ============================================================
 echo.
 echo  Building Web Manager...
-dotnet build "%MANAGER_DIR%\BMS_BI_Manager.csproj" >nul
+dotnet build "%MANAGER_DIR%\BI-MGR.csproj" >nul
 echo.
 :: Check if already running, free it first
 netstat -ano | findstr LISTENING | findstr :%MANAGER_PORT% >nul
@@ -363,15 +363,15 @@ if "%COMPILE_BACKEND%"=="1" goto DO_COMPILE_BACKEND
 goto CHECK_FRONTEND
 
 :DO_COMPILE_BACKEND
-if exist "%PUB_DIR%\BMS_Core_IIS" rmdir /s /q "%PUB_DIR%\BMS_Core_IIS"
-if exist "%PUB_DIR%\BMS_Manager_IIS" rmdir /s /q "%PUB_DIR%\BMS_Manager_IIS"
-if exist "%PUB_DIR%\BMS_Core_Standalone" rmdir /s /q "%PUB_DIR%\BMS_Core_Standalone"
-if exist "%PUB_DIR%\BMS_Manager_Standalone" rmdir /s /q "%PUB_DIR%\BMS_Manager_Standalone"
+if exist "%PUB_DIR%\BI-API" rmdir /s /q "%PUB_DIR%\BI-API"
+if exist "%PUB_DIR%\BI-MGR" rmdir /s /q "%PUB_DIR%\BI-MGR"
+if exist "%PUB_DIR%\BI-API-Standalone" rmdir /s /q "%PUB_DIR%\BI-API-Standalone"
+if exist "%PUB_DIR%\BI-MGR-Standalone" rmdir /s /q "%PUB_DIR%\BI-MGR-Standalone"
 
 echo.
 echo  [+] Cleaning source binaries before publish...
-dotnet clean "%BACKEND_DIR%\BMS_CORE_API.csproj" -c Release >nul 2>&1
-dotnet clean "%MANAGER_DIR%\BMS_BI_Manager.csproj" -c Release >nul 2>&1
+dotnet clean "%BACKEND_DIR%\BI-API.csproj" -c Release >nul 2>&1
+dotnet clean "%MANAGER_DIR%\BI-MGR.csproj" -c Release >nul 2>&1
 
 if "!BACKEND_DEPLOY_TYPE!"=="IIS" goto COMPILE_IIS
 goto COMPILE_STANDALONE
@@ -380,17 +380,17 @@ goto COMPILE_STANDALONE
 echo.
 echo  [+] Compiling Core Services for IIS Deployment (Optimized)...
 echo  - Building Main Backend API (IIS)...
-dotnet publish "%BACKEND_DIR%\BMS_CORE_API.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\BMS_Core_IIS" >nul
+dotnet publish "%BACKEND_DIR%\BI-API.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\BI-API" >nul
 
 echo  - Building BI SaaS Manager API (IIS)...
-dotnet publish "%MANAGER_DIR%\BMS_BI_Manager.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\BMS_Manager_IIS" >nul
+dotnet publish "%MANAGER_DIR%\BI-MGR.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\BI-MGR" >nul
 
 echo.
 echo  [+] Cleaning up unnecessary compiler metadata and dev configs...
-del /f /q "%PUB_DIR%\BMS_Core_IIS\appsettings.Development.json" >nul 2>&1
-del /f /q "%PUB_DIR%\BMS_Manager_IIS\appsettings.Development.json" >nul 2>&1
-del /f /q "%PUB_DIR%\BMS_Core_IIS\*.staticwebassets.endpoints.json" >nul 2>&1
-del /f /q "%PUB_DIR%\BMS_Manager_IIS\*.staticwebassets.endpoints.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BI-API\appsettings.Development.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BI-MGR\appsettings.Development.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BI-API\*.staticwebassets.endpoints.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BI-MGR\*.staticwebassets.endpoints.json" >nul 2>&1
 
 echo.
 echo  [+] Generating Sync Job Script for IIS...
@@ -399,8 +399,8 @@ echo @echo off
 echo echo ==================================================
 echo echo Running BMS Background Sync Job...
 echo echo ==================================================
-echo cd /d "%%~dp0BMS_Core_IIS"
-echo dotnet BMS_Core.dll --sync-all
+echo cd /d "%%~dp0BI-API"
+echo dotnet BI-API.dll --sync-all
 echo echo.
 echo echo Sync process completed.
 echo timeout /t 10
@@ -409,39 +409,39 @@ echo timeout /t 10
 echo.
 echo  [+] IIS Build Complete!
 echo      Please map your IIS site paths to the respective folders:
-echo      - Core API: %PUB_DIR%\BMS_Core_IIS
-echo      - Manager : %PUB_DIR%\BMS_Manager_IIS
+echo      - Core API: %PUB_DIR%\BI-API
+echo      - Manager : %PUB_DIR%\BI-MGR
 goto CHECK_FRONTEND
 
 :COMPILE_STANDALONE
 echo.
 echo  [+] Compiling Core Services (Standalone)...
-echo  - Building Main Backend API (BMS_Core.exe)...
-dotnet publish "%BACKEND_DIR%\BMS_CORE_API.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\BMS_Core_Standalone" >nul
+echo  - Building Main Backend API (BMS-Core.exe)...
+dotnet publish "%BACKEND_DIR%\BI-API.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\BI-API-Standalone" >nul
 
-echo  - Building BI SaaS Manager API (BMS_BM.exe)...
-dotnet publish "%MANAGER_DIR%\BMS_BI_Manager.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\BMS_Manager_Standalone" >nul
+echo  - Building BI SaaS Manager API (BI-MGR.exe)...
+dotnet publish "%MANAGER_DIR%\BI-MGR.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\BI-MGR-Standalone" >nul
 
 echo.
 echo  [+] Cleaning up unnecessary compiler metadata and dev configs...
-del /f /q "%PUB_DIR%\BMS_Core_Standalone\*.staticwebassets.endpoints.json" >nul 2>&1
-del /f /q "%PUB_DIR%\BMS_Core_Standalone\*.runtimeconfig.json" >nul 2>&1
-del /f /q "%PUB_DIR%\BMS_Core_Standalone\appsettings.Development.json" >nul 2>&1
-if exist "%PUB_DIR%\BMS_Core_Standalone\wwwroot" rmdir /s /q "%PUB_DIR%\BMS_Core_Standalone\wwwroot" >nul 2>&1
+del /f /q "%PUB_DIR%\BI-API-Standalone\*.staticwebassets.endpoints.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BI-API-Standalone\*.runtimeconfig.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BI-API-Standalone\appsettings.Development.json" >nul 2>&1
+if exist "%PUB_DIR%\BI-API-Standalone\wwwroot" rmdir /s /q "%PUB_DIR%\BI-API-Standalone\wwwroot" >nul 2>&1
 
-del /f /q "%PUB_DIR%\BMS_Manager_Standalone\*.staticwebassets.endpoints.json" >nul 2>&1
-del /f /q "%PUB_DIR%\BMS_Manager_Standalone\*.runtimeconfig.json" >nul 2>&1
-del /f /q "%PUB_DIR%\BMS_Manager_Standalone\appsettings.Development.json" >nul 2>&1
-if exist "%PUB_DIR%\BMS_Manager_Standalone\wwwroot" rmdir /s /q "%PUB_DIR%\BMS_Manager_Standalone\wwwroot" >nul 2>&1
+del /f /q "%PUB_DIR%\BI-MGR-Standalone\*.staticwebassets.endpoints.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BI-MGR-Standalone\*.runtimeconfig.json" >nul 2>&1
+del /f /q "%PUB_DIR%\BI-MGR-Standalone\appsettings.Development.json" >nul 2>&1
+if exist "%PUB_DIR%\BI-MGR-Standalone\wwwroot" rmdir /s /q "%PUB_DIR%\BI-MGR-Standalone\wwwroot" >nul 2>&1
 
 echo.
 echo  [+] Generating Backend Production Launcher...
 (
 echo @echo off
-echo echo Starting BMS Core API...
-echo start "BMS_Core API" cmd /c "cd /d BMS_Core_Standalone ^&^& BMS_Core.exe"
-echo echo Starting BMS Web Manager...
-echo start "BMS SaaS Manager" cmd /c "cd /d BMS_Manager_Standalone ^&^& BMS_BM.exe"
+echo echo Starting BI API...
+echo start "BI-API" cmd /c "cd /d BI-API-Standalone ^&^& BI-API.exe"
+echo echo Starting BI Manager...
+echo start "BI-MGR" cmd /c "cd /d BI-MGR-Standalone ^&^& BI-MGR.exe"
 ) > "%PUB_DIR%\start_backend.bat"
 
 (
@@ -449,8 +449,8 @@ echo @echo off
 echo echo ==================================================
 echo echo Running BMS Background Sync Job...
 echo echo ==================================================
-echo cd /d "%%~dp0BMS_Core_Standalone"
-echo BMS_Core.exe --sync-all
+echo cd /d "%%~dp0BI-API-Standalone"
+echo BI-API.exe --sync-all
 echo echo.
 echo echo Sync process completed.
 echo timeout /t 10
@@ -535,9 +535,9 @@ if errorlevel 1 (
     )
     echo.
     echo  [+] Checking Manager Project Health...
-    if exist "%MANAGER_DIR%\BMS_BI_Manager.csproj" (
+    if exist "%MANAGER_DIR%\BI-MGR.csproj" (
         echo      Manager Project file found. Building dry-run test...
-        dotnet build "%MANAGER_DIR%\BMS_BI_Manager.csproj" --no-restore >nul 2>&1
+        dotnet build "%MANAGER_DIR%\BI-MGR.csproj" --no-restore >nul 2>&1
         if errorlevel 1 (
             echo  [x] Project Build Health: FAILED. Run option [2] to clean cache and try again.
         ) else (

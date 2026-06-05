@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BMS_BI_SERVICE.Core.Services
+namespace Bimasakti.BiService.Api.Services
 {
     public interface IsvcAuthenticationService
     {
@@ -30,8 +30,8 @@ namespace BMS_BI_SERVICE.Core.Services
         }
 
         public string CreateAccessToken(
-            Dictionary<string, string> claimMap, 
-            string secretKey, 
+            Dictionary<string, string> claimMap,
+            string secretKey,
             int expireMinutes)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -48,7 +48,7 @@ namespace BMS_BI_SERVICE.Core.Services
                 Subject = new ClaimsIdentity(claimList),
                 Expires = DateTime.UtcNow.AddMinutes(expireMinutes),
                 SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key), 
+                    new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha256Signature)
             };
 

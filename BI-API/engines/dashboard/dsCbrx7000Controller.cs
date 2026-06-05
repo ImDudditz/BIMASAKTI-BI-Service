@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using BMS_BI_SERVICE.Core.Services;
+using Bimasakti.BiService.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BMS_BI_SERVICE.Core.Engines.Dashboard
+namespace Bimasakti.BiService.Api.Engines.Dashboard
 {
     [Authorize]
     [ApiController]

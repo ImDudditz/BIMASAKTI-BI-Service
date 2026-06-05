@@ -1,7 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 
-namespace BiPortal.FinancialReports.Manager.Models
+namespace Bimasakti.BiService.Mgr.Models
 {
     public class Company
     {

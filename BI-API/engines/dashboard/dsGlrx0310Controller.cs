@@ -8,10 +8,10 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
-using BMS_BI_SERVICE.Core.Services;
+using Bimasakti.BiService.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BMS_BI_SERVICE.Core.Engines.Dashboard
+namespace Bimasakti.BiService.Api.Engines.Dashboard
 {
     [Authorize]
     [ApiController]
@@ -84,13 +84,13 @@ namespace BMS_BI_SERVICE.Core.Engines.Dashboard
                         {
                             return BadRequest(new { status = "error", message = $"Insecure URL scheme rejected. Only HTTPS is allowed: {remoteUrl}" });
                         }
-                        
+
                         bool isPrivateOrLocal = parsedUri.IsLoopback || parsedUri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase) || parsedUri.Host.Equals("169.254.169.254");
                         if (parsedUri.HostNameType == UriHostNameType.IPv4 && System.Net.IPAddress.TryParse(parsedUri.Host, out var ipAddress))
                         {
                             var ipBytes = ipAddress.GetAddressBytes();
-                            if (ipBytes[0] == 10 || 
-                                (ipBytes[0] == 172 && ipBytes[1] >= 16 && ipBytes[1] <= 31) || 
+                            if (ipBytes[0] == 10 ||
+                                (ipBytes[0] == 172 && ipBytes[1] >= 16 && ipBytes[1] <= 31) ||
                                 (ipBytes[0] == 192 && ipBytes[1] == 168))
                             {
                                 isPrivateOrLocal = true;

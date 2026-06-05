@@ -1,9 +1,10 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure
-namespace BMS_BI_SERVICE.Core.Engines
+namespace Bimasakti.BiService.Api.Engines
 {
 #pragma warning disable IDE1006 // Naming Styles
     public static class svcDbUtils
@@ -33,32 +34,52 @@ namespace BMS_BI_SERVICE.Core.Engines
 
         public static string GetAssetsDirectory()
         {
+            try
+            {
+                string configPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
+                if (File.Exists(configPath))
+                {
+                    using var doc = JsonDocument.Parse(File.ReadAllText(configPath));
+                    if (doc.RootElement.TryGetProperty("Config", out var config) && config.TryGetProperty("ReferenceDir", out var refDir))
+                    {
+                        string dir = refDir.GetString();
+                        if (!string.IsNullOrEmpty(dir))
+                        {
+                            string fullDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), dir));
+                            if (!Directory.Exists(fullDir)) Directory.CreateDirectory(fullDir);
+                            return fullDir;
+                        }
+                    }
+                }
+            }
+            catch { }
+
             string? backendDir = null;
             string current = BaseDir;
             while (!string.IsNullOrEmpty(current))
             {
                 string dirName = Path.GetFileName(current);
                 if (dirName.Equals("BI-API", StringComparison.OrdinalIgnoreCase) ||
-                    dirName.Equals("BMS_Core_IIS", StringComparison.OrdinalIgnoreCase) ||
-                    dirName.Equals("BMS_Core_Standalone", StringComparison.OrdinalIgnoreCase))
+                    dirName.Equals("BI-API", StringComparison.OrdinalIgnoreCase) ||
+                    dirName.Equals("BI-API-Standalone", StringComparison.OrdinalIgnoreCase))
                 {
                     backendDir = current;
                     break;
                 }
-                if (File.Exists(Path.Combine(current, "BMS_BI_SERVICE.slnx")))
+                if (File.Exists(Path.Combine(current, "BI_SERVICE.slnx")))
                 {
                     backendDir = Path.Combine(current, "BI-API");
                     break;
                 }
                 // Support production Publish directories where Manager and Core are side-by-side
-                if (Directory.Exists(Path.Combine(current, "BMS_Core_IIS")))
+                if (Directory.Exists(Path.Combine(current, "BI-API")))
                 {
-                    backendDir = Path.Combine(current, "BMS_Core_IIS");
+                    backendDir = Path.Combine(current, "BI-API");
                     break;
                 }
-                if (Directory.Exists(Path.Combine(current, "BMS_Core_Standalone")))
+                if (Directory.Exists(Path.Combine(current, "BI-API-Standalone")))
                 {
-                    backendDir = Path.Combine(current, "BMS_Core_Standalone");
+                    backendDir = Path.Combine(current, "BI-API-Standalone");
                     break;
                 }
 
@@ -74,26 +95,26 @@ namespace BMS_BI_SERVICE.Core.Engines
                 {
                     string dirName = Path.GetFileName(current);
                     if (dirName.Equals("BI-API", StringComparison.OrdinalIgnoreCase) ||
-                        dirName.Equals("BMS_Core_IIS", StringComparison.OrdinalIgnoreCase) ||
-                        dirName.Equals("BMS_Core_Standalone", StringComparison.OrdinalIgnoreCase))
+                        dirName.Equals("BI-API", StringComparison.OrdinalIgnoreCase) ||
+                        dirName.Equals("BI-API-Standalone", StringComparison.OrdinalIgnoreCase))
                     {
                         backendDir = current;
                         break;
                     }
-                    if (File.Exists(Path.Combine(current, "BMS_BI_SERVICE.slnx")))
+                    if (File.Exists(Path.Combine(current, "BI_SERVICE.slnx")))
                     {
                         backendDir = Path.Combine(current, "BI-API");
                         break;
                     }
                     // Support production Publish directories
-                    if (Directory.Exists(Path.Combine(current, "BMS_Core_IIS")))
+                    if (Directory.Exists(Path.Combine(current, "BI-API")))
                     {
-                        backendDir = Path.Combine(current, "BMS_Core_IIS");
+                        backendDir = Path.Combine(current, "BI-API");
                         break;
                     }
-                    if (Directory.Exists(Path.Combine(current, "BMS_Core_Standalone")))
+                    if (Directory.Exists(Path.Combine(current, "BI-API-Standalone")))
                     {
-                        backendDir = Path.Combine(current, "BMS_Core_Standalone");
+                        backendDir = Path.Combine(current, "BI-API-Standalone");
                         break;
                     }
 
@@ -129,7 +150,7 @@ namespace BMS_BI_SERVICE.Core.Engines
                 Directory.CreateDirectory(tenantsDir);
             }
             string dirPath = Path.GetFullPath(Path.Combine(tenantsDir, safeId));
-            
+
             if (!Directory.Exists(dirPath))
             {
                 Directory.CreateDirectory(dirPath);
@@ -205,7 +226,7 @@ namespace BMS_BI_SERVICE.Core.Engines
             {
                 using var connection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={databasePath};Mode=ReadOnly;");
                 connection.Open();
-                
+
                 // Check if GLRX0310 exists
                 using (var cmd = new Microsoft.Data.Sqlite.SqliteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name='GLRX0310';", connection))
                 {

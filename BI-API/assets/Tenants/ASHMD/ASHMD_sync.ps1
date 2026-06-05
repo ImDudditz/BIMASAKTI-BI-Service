@@ -1,4 +1,4 @@
-# BMS_BI_SERVICE - Windows Scheduler SQLite Database Synchronization Job
+# BI_SERVICE - Windows Scheduler SQLite Database Synchronization Job
 # This script executes the modern, transaction-safe .NET sync job natively.
 
 $CompanyId = "ASHMD"
@@ -17,7 +17,7 @@ Write-Log "INFO" "=== Windows Scheduler Sync Job Triggered ==="
 $CurrentDir = $PSScriptRoot
 $BackendDir = $null
 While ($CurrentDir) {
-    If (Test-Path (Join-Path $CurrentDir "BMS_CORE_API.csproj")) {
+    If (Test-Path (Join-Path $CurrentDir "BI_API_API.csproj")) {
         $BackendDir = $CurrentDir
         Break
     }
@@ -27,13 +27,13 @@ While ($CurrentDir) {
 }
 
 If ($null -eq $BackendDir) {
-    Write-Log "CRITICAL" "Could not find BMS_BI_SERVICE backend project directory."
+    Write-Log "CRITICAL" "Could not find BI_SERVICE backend project directory."
     Exit 1
 }
 
 Write-Log "INFO" "Running standalone C# database sync via dotnet CLI..."
 Try {
-    $Output = dotnet run --project "$BackendDir\BMS_CORE_API.csproj" -- --sync $CompanyId 2>&1
+    $Output = dotnet run --project "$BackendDir\BI_API_API.csproj" -- --sync $CompanyId 2>&1
     $ExitCode = $LASTEXITCODE
     
     If ($ExitCode -eq 0) {

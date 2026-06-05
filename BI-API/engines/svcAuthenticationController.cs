@@ -7,11 +7,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using BMS_BI_SERVICE.Core.Services;
+using Bimasakti.BiService.Api.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BMS_BI_SERVICE.Core.Engines
+namespace Bimasakti.BiService.Api.Engines
 {
     // Models are defined in TenantModels.cs
 
@@ -200,7 +200,7 @@ namespace BMS_BI_SERVICE.Core.Engines
                 string current = AppDomain.CurrentDomain.BaseDirectory;
                 while (!string.IsNullOrEmpty(current))
                 {
-                    if (Directory.Exists(Path.Combine(current, "BMS-BI-APP")) && Directory.Exists(Path.Combine(current, "BMS-CORE-API")))
+                    if (Directory.Exists(Path.Combine(current, "BMS-BI-APP")) && Directory.Exists(Path.Combine(current, "BI-API-API")))
                     {
                         string possibleVite = Path.Combine(current, "BMS-BI-APP", "vite.config.js");
                         if (System.IO.File.Exists(possibleVite))

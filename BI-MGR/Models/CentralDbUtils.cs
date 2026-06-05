@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace BiPortal.FinancialReports.Manager.Models
+namespace Bimasakti.BiService.Mgr.Models
 {
     public static class CentralDbUtils
     {
@@ -9,10 +9,31 @@ namespace BiPortal.FinancialReports.Manager.Models
 
         public static string GetCentralDbPath()
         {
-            // Use BI-API's GetAssetsDirectory logic since it's already robust and shared
-            string assetsDir = BMS_BI_SERVICE.Core.Engines.svcDbUtils.GetAssetsDirectory();
-            string dbPath = Path.Combine(assetsDir, "BMS_BI_Central.db");
-            
+            string dbPath = "";
+            try
+            {
+                string configPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
+                if (File.Exists(configPath))
+                {
+                    using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(configPath));
+                    if (doc.RootElement.TryGetProperty("Config", out var config) && config.TryGetProperty("CentralDbPath", out var centralDbPath))
+                    {
+                        string pathFromConfig = centralDbPath.GetString();
+                        if (!string.IsNullOrEmpty(pathFromConfig))
+                        {
+                            dbPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), pathFromConfig));
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            if (string.IsNullOrEmpty(dbPath))
+            {
+                string assetsDir = Bimasakti.BiService.Api.Engines.svcDbUtils.GetAssetsDirectory();
+                dbPath = Path.Combine(assetsDir, "BMS_BI_Central.db");
+            }
+
             if (!SchemaInitializedDbs.ContainsKey(dbPath))
             {
                 try
