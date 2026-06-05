@@ -262,7 +262,7 @@ adminGroup.MapPost("/companies", async (PortalCompanySaveRequest req) =>
     }
     await db.SaveChangesAsync();
 
-    using var tenantDb = new TenantDbContext(svcDbUtils.GetSafeDbPath(companyId));
+    using var tenantDb = new CompanyDbContext(svcDbUtils.GetSafeDbPath(companyId));
     tenantDb.Database.EnsureCreated();
 
     var authSvc = new Bimasakti.BiService.Api.Services.svcAuthenticationService();
@@ -310,7 +310,7 @@ adminGroup.MapGet("/manager/companies/{companyId}/users", async (string companyI
 {
     try
     {
-        using var db = new TenantDbContext(svcDbUtils.GetSafeDbPath(companyId.Trim().ToUpperInvariant()));
+        using var db = new CompanyDbContext(svcDbUtils.GetSafeDbPath(companyId.Trim().ToUpperInvariant()));
         await db.Database.EnsureCreatedAsync();
         var users = await db.Users.Where(u => u.CompanyId == companyId).ToListAsync();
         return Results.Ok(users.Select(u => new { id = u.Id, username = u.Username, role = u.Role }));
@@ -322,7 +322,7 @@ adminGroup.MapGet("/manager/companies/{companyId}/users/{userId:int}/permissions
 {
     try
     {
-        using var db = new TenantDbContext(svcDbUtils.GetSafeDbPath(companyId.Trim().ToUpperInvariant()));
+        using var db = new CompanyDbContext(svcDbUtils.GetSafeDbPath(companyId.Trim().ToUpperInvariant()));
         await db.Database.EnsureCreatedAsync();
         return Results.Ok(new
         {
@@ -337,7 +337,7 @@ adminGroup.MapPost("/manager/companies/{companyId}/users/{userId:int}/permission
 {
     try
     {
-        using var db = new TenantDbContext(svcDbUtils.GetSafeDbPath(companyId.Trim().ToUpperInvariant()));
+        using var db = new CompanyDbContext(svcDbUtils.GetSafeDbPath(companyId.Trim().ToUpperInvariant()));
         await db.Database.EnsureCreatedAsync();
 
         var exW = await db.UserWidgets.Where(w => w.UserId == userId).ToDictionaryAsync(w => w.WidgetKey);

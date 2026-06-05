@@ -119,7 +119,7 @@ const activeLogoUrl = computed(() => {
   if (!logoExt.value) return ''
   try {
     return new URL(
-      `../../BI-API/assets/${companyId.value}/img/${companyId.value}_logo.${logoExt.value}`,
+      `../../BI-API/assets/Company/${companyId.value}/img/${companyId.value}_logo.${logoExt.value}`,
       import.meta.url,
     ).href
   } catch {

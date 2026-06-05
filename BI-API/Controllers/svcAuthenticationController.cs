@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Bimasakti.BiService.Api.Engines
 {
-    // Models are defined in TenantModels.cs
+    // Models are defined in CompanyModels.cs
 
     // --- ROUTER / CLASS ---
 
@@ -78,7 +78,7 @@ namespace Bimasakti.BiService.Api.Engines
 
                 string databasePath = svcDbUtils.GetSafeDbPath(companyId);
 
-                using (var dbContext = new TenantDbContext(databasePath))
+                using (var dbContext = new CompanyDbContext(databasePath))
                 {
                     var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Username.ToUpper() == loginRequest.Username.ToUpper());
 

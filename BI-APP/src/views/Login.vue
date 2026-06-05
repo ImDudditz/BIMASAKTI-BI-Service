@@ -3,7 +3,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-const bimasaktiLogo = new URL('../../../BI-API/assets/BMS/img/BMS_logo.png', import.meta.url).href
+const bimasaktiLogo = new URL('../../../BI-API/assets/Company/BMS/img/BMS_logo.png', import.meta.url).href
 
 const router = useRouter()
 const authStore = useAuthStore()

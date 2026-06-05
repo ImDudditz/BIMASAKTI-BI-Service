@@ -140,7 +140,7 @@ namespace Bimasakti.BiService.Api
                                         catch { }
                                         if (!isCompanyActive) { context.Fail("Inactive company."); return; }
 
-                                        using var tDb = new TenantDbContext(svcDbUtils.GetSafeDbPath(compId));
+                                        using var tDb = new CompanyDbContext(svcDbUtils.GetSafeDbPath(compId));
                                         var dbUser = await tDb.Users.FirstOrDefaultAsync(u => u.Username.ToUpper() == user.ToUpper() && u.CompanyId.ToUpper() == compId.ToUpper());
                                         if (dbUser == null || !dbUser.IsActive) { context.Fail("Inactive user."); return; }
 

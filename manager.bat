@@ -81,7 +81,13 @@ echo   LAUNCHING FULL LOCAL DEVELOPMENT ENVIRONMENT
 echo  ============================================================
 echo.
 echo  Building solution sequentially to prevent file lock collisions...
-dotnet build "%ROOT_DIR%BI-Service.slnx" >nul
+dotnet build "%ROOT_DIR%BI-Service.slnx" > build.log
+if errorlevel 1 (
+    echo  [x] Backend Build Failed! Displaying log:
+    type build.log
+    pause
+    goto MENU
+)
 echo.
 
 :: 1. Start Main Backend API
@@ -112,7 +118,13 @@ echo   LAUNCHING WEB CONTROL PANEL
 echo  ============================================================
 echo.
 echo  Building Web Manager...
-dotnet build "%MANAGER_DIR%\BI-MGR.csproj" >nul
+dotnet build "%MANAGER_DIR%\BI-MGR.csproj" > build.log
+if errorlevel 1 (
+    echo  [x] Web Manager Build Failed! Displaying log:
+    type build.log
+    pause
+    goto MENU
+)
 echo.
 :: Check if already running, free it first
 netstat -ano | findstr LISTENING | findstr :%MANAGER_PORT% >nul
@@ -380,10 +392,15 @@ goto COMPILE_STANDALONE
 echo.
 echo  [+] Compiling Core Services for IIS Deployment (Optimized)...
 echo  - Building Main Backend API (IIS)...
-dotnet publish "%BACKEND_DIR%\BI-API.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\BI-API" >nul
+dotnet publish "%BACKEND_DIR%\BI-API.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\BI-API" > build.log
+if errorlevel 1 ( type build.log & echo  [x] BI-API Build Failed. & pause & goto MENU )
 
 echo  - Building BI SaaS Manager API (IIS)...
-dotnet publish "%MANAGER_DIR%\BI-MGR.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\BI-MGR" >nul
+dotnet publish "%MANAGER_DIR%\BI-MGR.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\BI-MGR" > build.log
+if errorlevel 1 ( type build.log & echo  [x] BI-MGR Build Failed. & pause & goto MENU )
+
+echo  - Copying Assets...
+xcopy /E /I /Q /Y "%BACKEND_DIR%\assets" "%PUB_DIR%\BI-API\assets" >nul
 
 echo.
 echo  [+] Cleaning up unnecessary compiler metadata and dev configs...
@@ -417,10 +434,15 @@ goto CHECK_FRONTEND
 echo.
 echo  [+] Compiling Core Services (Standalone)...
 echo  - Building Main Backend API (BMS-Core.exe)...
-dotnet publish "%BACKEND_DIR%\BI-API.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\BI-API-Standalone" >nul
+dotnet publish "%BACKEND_DIR%\BI-API.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\BI-API-Standalone" > build.log
+if errorlevel 1 ( type build.log & echo  [x] BI-API Standalone Build Failed. & pause & goto MENU )
 
 echo  - Building BI SaaS Manager API (BI-MGR.exe)...
-dotnet publish "%MANAGER_DIR%\BI-MGR.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\BI-MGR-Standalone" >nul
+dotnet publish "%MANAGER_DIR%\BI-MGR.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\BI-MGR-Standalone" > build.log
+if errorlevel 1 ( type build.log & echo  [x] BI-MGR Standalone Build Failed. & pause & goto MENU )
+
+echo  - Copying Assets...
+xcopy /E /I /Q /Y "%BACKEND_DIR%\assets" "%PUB_DIR%\BI-API-Standalone\assets" >nul
 
 echo.
 echo  [+] Cleaning up unnecessary compiler metadata and dev configs...
@@ -432,7 +454,6 @@ if exist "%PUB_DIR%\BI-API-Standalone\wwwroot" rmdir /s /q "%PUB_DIR%\BI-API-Sta
 del /f /q "%PUB_DIR%\BI-MGR-Standalone\*.staticwebassets.endpoints.json" >nul 2>&1
 del /f /q "%PUB_DIR%\BI-MGR-Standalone\*.runtimeconfig.json" >nul 2>&1
 del /f /q "%PUB_DIR%\BI-MGR-Standalone\appsettings.Development.json" >nul 2>&1
-if exist "%PUB_DIR%\BI-MGR-Standalone\wwwroot" rmdir /s /q "%PUB_DIR%\BI-MGR-Standalone\wwwroot" >nul 2>&1
 
 echo.
 echo  [+] Generating Backend Production Launcher...
@@ -468,7 +489,8 @@ echo.
 echo  [+] Compiling Frontend Vue Assets (Hash-free)...
 pushd "%FRONTEND_DIR%"
 call npm install >nul 2>&1
-call npm run build >nul 2>&1
+call npm run build > build.log 2>&1
+if errorlevel 1 ( type build.log & echo  [x] Frontend Build Failed. & popd & pause & goto MENU )
 popd
 
 if "!FRONTEND_DEPLOY_TYPE!"=="STATIC" (
@@ -486,6 +508,10 @@ if "!FRONTEND_DEPLOY_TYPE!"=="STATIC" (
     echo  [+] Generating Frontend Production Launcher...
     (
     echo @echo off
+    echo if not exist "node_modules" ^(
+    echo     echo Installing production dependencies...
+    echo     call npm install --omit=dev
+    echo ^)
     echo echo Starting Frontend Proxy Server...
     echo start "BMS Frontend Proxy" cmd /k "node server.js"
     ) > "%PUB_DIR%\BMS_BI_APP\start_frontend.bat"

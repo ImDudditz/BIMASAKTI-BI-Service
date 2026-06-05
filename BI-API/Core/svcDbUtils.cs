@@ -20,7 +20,7 @@ namespace Bimasakti.BiService.Api.Engines
 
             try
             {
-                using (var dbContext = new TenantDbContext(databasePath))
+                using (var dbContext = new CompanyDbContext(databasePath))
                 {
                     dbContext.Database.EnsureCreated();
                 }
@@ -144,12 +144,12 @@ namespace Bimasakti.BiService.Api.Engines
                 .ToUpperInvariant();
 
             string assetsDir = GetAssetsDirectory();
-            string tenantsDir = Path.Combine(assetsDir, "Tenants");
-            if (!Directory.Exists(tenantsDir))
+            string companyDir = Path.Combine(assetsDir, "Company");
+            if (!Directory.Exists(companyDir))
             {
-                Directory.CreateDirectory(tenantsDir);
+                Directory.CreateDirectory(companyDir);
             }
-            string dirPath = Path.GetFullPath(Path.Combine(tenantsDir, safeId));
+            string dirPath = Path.GetFullPath(Path.Combine(companyDir, safeId));
 
             if (!Directory.Exists(dirPath))
             {

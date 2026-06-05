@@ -41,7 +41,7 @@ namespace Bimasakti.BiService.Api.Engines
     public class dsAdminDashboardController : ControllerBase
     {
         // Helper to enforce admin check
-        private async Task<User?> RequireAdmin(TenantDbContext dbContext, string username, string companyId)
+        private async Task<User?> RequireAdmin(CompanyDbContext dbContext, string username, string companyId)
         {
             var adminUser = await dbContext.Users.FirstOrDefaultAsync(user => user.Username == username && user.CompanyId == companyId);
             if (adminUser == null || adminUser.Role != "admin")
@@ -70,7 +70,7 @@ namespace Bimasakti.BiService.Api.Engines
 
             try
             {
-                using (var dbContext = new TenantDbContext(databasePath))
+                using (var dbContext = new CompanyDbContext(databasePath))
                 {
                     var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == username && u.CompanyId == companyId);
                     if (user == null)
@@ -122,7 +122,7 @@ namespace Bimasakti.BiService.Api.Engines
 
             try
             {
-                using (var dbContext = new TenantDbContext(databasePath))
+                using (var dbContext = new CompanyDbContext(databasePath))
                 {
                     var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == username && u.CompanyId == companyId);
                     if (user == null)
@@ -174,7 +174,7 @@ namespace Bimasakti.BiService.Api.Engines
 
             try
             {
-                using (var dbContext = new TenantDbContext(databasePath))
+                using (var dbContext = new CompanyDbContext(databasePath))
                 {
                     var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == username && u.CompanyId == companyId);
                     if (user == null)
@@ -235,7 +235,7 @@ namespace Bimasakti.BiService.Api.Engines
 
             try
             {
-                using (var dbContext = new TenantDbContext(databasePath))
+                using (var dbContext = new CompanyDbContext(databasePath))
                 {
                     var adminUser = await RequireAdmin(dbContext, adminUsername, companyId);
                     if (adminUser == null)
@@ -272,7 +272,7 @@ namespace Bimasakti.BiService.Api.Engines
 
             try
             {
-                using (var dbContext = new TenantDbContext(databasePath))
+                using (var dbContext = new CompanyDbContext(databasePath))
                 {
                     var adminUser = await RequireAdmin(dbContext, adminUsername, companyId);
                     if (adminUser == null)
@@ -320,7 +320,7 @@ namespace Bimasakti.BiService.Api.Engines
 
             try
             {
-                using (var dbContext = new TenantDbContext(databasePath))
+                using (var dbContext = new CompanyDbContext(databasePath))
                 {
                     var adminUser = await RequireAdmin(dbContext, adminUsername, companyId);
                     if (adminUser == null)

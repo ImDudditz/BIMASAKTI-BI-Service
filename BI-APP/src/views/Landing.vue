@@ -6,9 +6,9 @@ import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 
 // Core assets
-const bimasaktiLogo = new URL('../../../BI-API/assets/BMS/img/BMS_logo.png', import.meta.url).href
+const bimasaktiLogo = new URL('../../../BI-API/assets/Company/BMS/img/BMS_logo.png', import.meta.url).href
 const propertyOperations = new URL('../assets/property_operations.png', import.meta.url).href
-const tenantMobileApp = new URL('../assets/tenant_mobile_app.png', import.meta.url).href
+const MobileApp = new URL('../assets/mobile_app.png', import.meta.url).href
 const highriseBg = new URL('../assets/highrise_bg.svg', import.meta.url).href
 
 const router = useRouter()
@@ -1497,7 +1497,7 @@ const scrollToSection = (id) => {
         >
           <div class="border border-sky-50 rounded-lg overflow-hidden relative">
             <img
-              :src="tenantMobileApp"
+              :src="MobileApp"
               alt="Bimasakti Tenant Mobile Portal App"
               class="w-full h-full object-cover select-none"
             />

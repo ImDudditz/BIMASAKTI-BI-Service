@@ -4,12 +4,11 @@ import { useAuthStore } from '@/stores/auth'
 
 // 1. Dynamically determine the backend URL based on environment mode
 // In development, we use Vite's server proxy on '/api' to avoid SSL certificate trust issues on different ports.
-const backendUrl =
-  window.CONFIG && window.CONFIG.API_BASE_URL
+const backendUrl = import.meta.env.DEV
+  ? '/api'
+  : window.CONFIG && window.CONFIG.API_BASE_URL
     ? window.CONFIG.API_BASE_URL
-    : import.meta.env.PROD
-      ? import.meta.env.VITE_API_BASE_URL || '/api'
-      : '/api'
+    : import.meta.env.VITE_API_BASE_URL || '/api'
 
 // 3. Create the modular Axios instance
 const api = axios.create({

@@ -31,11 +31,11 @@ namespace Bimasakti.BiService.Api.Engines
         public bool IsActive { get; set; } = true;
     }
 
-    public class TenantDbContext : DbContext
+    public class CompanyDbContext : DbContext
     {
         private readonly string _databasePath;
 
-        public TenantDbContext(string databasePath)
+        public CompanyDbContext(string databasePath)
         {
             _databasePath = databasePath;
         }
