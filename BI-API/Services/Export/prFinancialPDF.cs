@@ -1,3 +1,6 @@
+using Bimasakti.BiService.Api.Controllers;
+using Bimasakti.BiService.Api.Core;
+using Bimasakti.BiService.Api.Models;
 using PdfSharpCore;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
@@ -6,7 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Bimasakti.BiService.Api.Engines
+namespace Bimasakti.BiService.Api.Services.Export
 {
     public static class prFinancialPDF
     {

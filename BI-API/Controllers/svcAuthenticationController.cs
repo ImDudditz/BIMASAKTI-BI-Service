@@ -1,3 +1,6 @@
+using Bimasakti.BiService.Api.Controllers;
+using Bimasakti.BiService.Api.Core;
+using Bimasakti.BiService.Api.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
@@ -11,7 +14,7 @@ using Bimasakti.BiService.Api.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Bimasakti.BiService.Api.Engines
+namespace Bimasakti.BiService.Api.Controllers
 {
     // Models are defined in CompanyModels.cs
 

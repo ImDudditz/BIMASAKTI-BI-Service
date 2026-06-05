@@ -1,7 +1,10 @@
+using Bimasakti.BiService.Api.Controllers;
+using Bimasakti.BiService.Api.Core;
+using Bimasakti.BiService.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
-namespace Bimasakti.BiService.Api.Engines
+namespace Bimasakti.BiService.Api.Models
 {
     public class User
     {

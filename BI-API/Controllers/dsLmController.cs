@@ -1,3 +1,6 @@
+using Bimasakti.BiService.Api.Controllers;
+using Bimasakti.BiService.Api.Core;
+using Bimasakti.BiService.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
 using System;
@@ -5,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Bimasakti.BiService.Api.Engines
+namespace Bimasakti.BiService.Api.Controllers
 {
     [Authorize]
     [ApiController]

@@ -122,7 +122,7 @@ namespace Bimasakti.BiService.Api.Services
                 using var connection = new SqliteConnection($"Data Source={databasePath};Mode=ReadOnly;");
                 await connection.OpenAsync();
 
-                var schema = Bimasakti.BiService.Api.Engines.svcDbUtils.GetGlrxSchema(databasePath);
+                var schema = Bimasakti.BiService.Api.Core.svcDbUtils.GetGlrxSchema(databasePath);
                 string tableName = schema.TableName;
                 string yearCol = schema.YearColumn;
                 string periodCol = schema.PeriodColumn;

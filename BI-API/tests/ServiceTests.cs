@@ -6,7 +6,9 @@ using Xunit;
 using Moq;
 using Microsoft.Data.Sqlite;
 using Bimasakti.BiService.Api.Services;
-using Bimasakti.BiService.Api.Engines;
+using Bimasakti.BiService.Api.Models;
+using Bimasakti.BiService.Api.Core;
+using Bimasakti.BiService.Api.Controllers;
 
 namespace Bimasakti.BiService.Api.Tests
 {

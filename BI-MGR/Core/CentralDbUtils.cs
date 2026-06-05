@@ -1,7 +1,11 @@
+using Bimasakti.BiService.Api.Controllers;
+using Bimasakti.BiService.Api.Core;
+using Bimasakti.BiService.Api.Models;
 using System;
 using System.IO;
+using Bimasakti.BiService.Mgr.Models;
 
-namespace Bimasakti.BiService.Mgr.Models
+namespace Bimasakti.BiService.Mgr.Core
 {
     public static class CentralDbUtils
     {
@@ -30,7 +34,7 @@ namespace Bimasakti.BiService.Mgr.Models
 
             if (string.IsNullOrEmpty(dbPath))
             {
-                string assetsDir = Bimasakti.BiService.Api.Engines.svcDbUtils.GetAssetsDirectory();
+                string assetsDir = Bimasakti.BiService.Api.Core.svcDbUtils.GetAssetsDirectory();
                 dbPath = Path.Combine(assetsDir, "BMS_BI_Central.db");
             }
 
