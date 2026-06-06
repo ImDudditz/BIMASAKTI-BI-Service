@@ -172,6 +172,7 @@ namespace Bimasakti.BiService.Api.Controllers
                         Path = "/"
                     });
 
+                    AuditLogger.Log(user.Username, "BI-API", $"Logged in to Company: {companyId}");
                     return Ok(new
                     {
                         status = "success",
@@ -208,6 +209,7 @@ namespace Bimasakti.BiService.Api.Controllers
                 Path = "/"
             });
 
+            AuditLogger.Log(User.Identity?.Name ?? "Unknown", "BI-API", "Logged out");
             return Ok(new { status = "success", message = "Successfully logged out and session cleared" });
         }
 
@@ -243,6 +245,26 @@ namespace Bimasakti.BiService.Api.Controllers
             catch { }
 
             return Ok(new { backendPort, frontendPort });
+        }
+    }
+
+    public static class AuditLogger
+    {
+        public static void Log(string user, string system, string action)
+        {
+            try
+            {
+                string assetsDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets"));
+                if (!Directory.Exists(assetsDir))
+                {
+                    assetsDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "BI-API", "assets"));
+                }
+                string logPath = Path.Combine(assetsDir, "BMS_BI_Audit.log");
+                string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                string line = $"{time} | {user,-15} | {system,-7} | {action}\n";
+                System.IO.File.AppendAllText(logPath, line);
+            }
+            catch { }
         }
     }
 }

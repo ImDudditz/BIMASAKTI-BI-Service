@@ -15,6 +15,7 @@
         <div>
             <button @click="tab = 'companies'" :class="{'font-bold underline': tab==='companies'}" class="mr-4 hover:text-blue-200">Companies</button>
             <button @click="tab = 'permissions'" :class="{'font-bold underline': tab==='permissions'}" class="mr-4 hover:text-blue-200">Permissions</button>
+            <button @click="openAuditTab" :class="{'font-bold underline': tab==='audit'}" class="mr-4 hover:text-blue-200">Audit Logs</button>
             <button @click="logout" class="bg-blue-700 px-3 py-1 rounded hover:bg-blue-800">Logout</button>
         </div>
     </nav>
@@ -68,6 +69,7 @@
                         <div class="flex gap-4">
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">Save Configuration</button>
                             <button v-if="isEditing" type="button" @click="syncData" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded flex-1">Trigger Sync Now</button>
+                            <button v-if="isEditing" type="button" @click="viewLogs" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-6 rounded">View Activity Log</button>
                         </div>
                     </form>
                 </div>
@@ -116,6 +118,32 @@
                     <button @click="savePermissions" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded mt-4">Save Permissions</button>
                 </div>
             </div>
+
+            <!-- Audit Tab -->
+            <div v-if="tab === 'audit'" class="bg-white p-6 rounded-lg shadow border max-w-5xl mx-auto">
+                <div class="flex justify-between items-center mb-6 border-b pb-2">
+                    <h3 class="font-bold text-lg">System Audit Logs</h3>
+                    <button @click="fetchAuditLogs" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded text-sm">Refresh Logs</button>
+                </div>
+                <div class="bg-gray-900 border p-4 rounded overflow-auto h-[60vh]">
+                    <pre class="text-green-400 text-sm font-mono whitespace-pre-wrap">{{ systemAuditLogs }}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Activity Log Modal -->
+    <div v-if="showLogModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-40 p-4">
+        <div class="bg-gray-900 rounded-lg shadow-2xl w-full max-w-5xl flex flex-col h-[80vh] border border-gray-700">
+            <div class="flex justify-between items-center p-4 border-b border-gray-700">
+                <h3 class="text-white font-bold text-lg font-mono">Activity Log: {{ selectedCompanyId }}</h3>
+                <div class="flex gap-3">
+                    <button @click="refreshLogs" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded font-bold text-sm">Refresh</button>
+                    <button @click="closeLogs" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded font-bold text-sm">Close</button>
+                </div>
+            </div>
+            <div class="flex-grow p-4 overflow-auto bg-black">
+                <pre class="text-green-400 font-mono text-sm whitespace-pre-wrap">{{ activityLogs }}</pre>
+            </div>
         </div>
     </div>
     
@@ -157,6 +185,11 @@ createApp({
         const permSelectedUser = ref('');
         const permissions = reactive({ widgets: {}, reports: {} });
         
+        const showLogModal = ref(false);
+        const activityLogs = ref('');
+
+        const systemAuditLogs = ref('Loading...');
+
         const toasts = ref([]);
         const showToast = (msg, type='info') => {
             const id = Date.now() + Math.random();
@@ -262,6 +295,44 @@ createApp({
             } catch (e) { showToast('Sync failed to start', 'error'); }
         };
 
+        const fetchLogs = async () => {
+            try {
+                const data = await api(`/companies/${selectedCompanyId.value}/logs`);
+                activityLogs.value = data.logs || "No logs available.";
+            } catch (e) { 
+                activityLogs.value = "Failed to load logs.";
+            }
+        };
+
+        const viewLogs = () => {
+            showLogModal.value = true;
+            activityLogs.value = "Loading...";
+            fetchLogs();
+        };
+
+        const refreshLogs = () => {
+            fetchLogs();
+        };
+
+        const closeLogs = () => {
+            showLogModal.value = false;
+        };
+
+        const fetchAuditLogs = async () => {
+            systemAuditLogs.value = "Loading...";
+            try {
+                const data = await api(`/audit-logs`);
+                systemAuditLogs.value = data.logs || "No audit logs available.";
+            } catch (e) { 
+                systemAuditLogs.value = "Failed to load audit logs.";
+            }
+        };
+
+        const openAuditTab = () => {
+            tab.value = 'audit';
+            fetchAuditLogs();
+        };
+
         // Permissions
         const loadUsers = async () => {
             permSelectedUser.value = '';
@@ -316,7 +387,9 @@ createApp({
             isAuthenticated, password, loginError, login, logout, tab,
             companies, selectedCompanyId, isEditing, form, clearForm, selectCompany, saveCompany, syncData,
             users, permSelectedCompany, permSelectedUser, permissions, loadUsers, loadPermissions, savePermissions,
-            availableWidgets, availableReports, toasts
+            availableWidgets, availableReports, toasts,
+            showLogModal, activityLogs, viewLogs, refreshLogs, closeLogs,
+            systemAuditLogs, fetchAuditLogs, openAuditTab
         };
     }
 }).mount('#app');

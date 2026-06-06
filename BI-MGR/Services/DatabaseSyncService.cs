@@ -40,11 +40,50 @@ namespace Bimasakti.BiService.Mgr.Services
                 syncConfigJson = centralCompany.SyncConfigJson;
             }
 
-            var logLines = new List<string>();
+            int retentionDays = 3;
+            try
+            {
+                var configPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
+                if (File.Exists(configPath))
+                {
+                    using var sysConfigDoc = JsonDocument.Parse(File.ReadAllText(configPath));
+                    if (sysConfigDoc.RootElement.TryGetProperty("Config", out var cfg) && 
+                        cfg.TryGetProperty("LogRetentionDays", out var retProp) && 
+                        retProp.TryGetInt32(out var retVal))
+                    {
+                        retentionDays = retVal;
+                    }
+                }
+            }
+            catch { }
+
+            if (File.Exists(logPath))
+            {
+                try
+                {
+                    var cutoffDate = DateTime.Now.AddDays(-retentionDays);
+                    var lines = File.ReadAllLines(logPath);
+                    var keptLines = new List<string>();
+                    foreach (var l in lines)
+                    {
+                        if (l.Length >= 19 && DateTime.TryParseExact(l.Substring(0, 19), "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime logDate))
+                        {
+                            if (logDate >= cutoffDate) keptLines.Add(l);
+                        }
+                        else
+                        {
+                            keptLines.Add(l);
+                        }
+                    }
+                    File.WriteAllLines(logPath, keptLines);
+                }
+                catch { }
+            }
+
             Action<string, string> logMessage = (level, msg) =>
             {
-                string line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {level} - {msg}";
-                logLines.Add(line);
+                string line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {level} - {msg}\n";
+                try { File.AppendAllText(logPath, line); } catch {}
             };
 
             logMessage("INFO", $"=== Starting Sync Job for Tenant: {companyId} ===");
@@ -55,12 +94,17 @@ namespace Bimasakti.BiService.Mgr.Services
                 if (!configDoc.RootElement.TryGetProperty("sync_urls", out var syncUrlsProp) || syncUrlsProp.ValueKind != JsonValueKind.Object)
                 {
                     logMessage("WARNING", "No 'sync_urls' found in config file. Nothing to sync.");
-                    await AppendLogFileAsync(logPath, logLines);
                     return (false, "No 'sync_urls' section found in config.");
                 }
 
                 using var connection = new SqliteConnection($"Data Source={dbPath}");
                 await connection.OpenAsync();
+
+                // Enable WAL mode for faster writes
+                using (var pragmaCmd = new SqliteCommand("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;", connection))
+                {
+                    await pragmaCmd.ExecuteNonQueryAsync();
+                }
 
                 int successTables = 0;
                 int totalRowsSynced = 0;
@@ -175,9 +219,14 @@ namespace Bimasakti.BiService.Mgr.Services
                             // Insert Data
                             string insertQuery = $"INSERT INTO {tableName} ({string.Join(", ", colNames)}) VALUES ({string.Join(", ", placeholders)});";
 
+                            using var insertCmd = new SqliteCommand(insertQuery, connection, transaction);
+                            foreach (var colName in colNames)
+                            {
+                                insertCmd.Parameters.Add(new SqliteParameter($"@{colName}", DBNull.Value));
+                            }
+
                             foreach (var record in dataset.EnumerateArray())
                             {
-                                using var insertCmd = new SqliteCommand(insertQuery, connection, transaction);
                                 foreach (var colName in colNames)
                                 {
                                     if (record.TryGetProperty(colName, out var val))
@@ -185,28 +234,28 @@ namespace Bimasakti.BiService.Mgr.Services
                                         switch (val.ValueKind)
                                         {
                                             case JsonValueKind.Null:
-                                                insertCmd.Parameters.AddWithValue($"@{colName}", DBNull.Value);
+                                                insertCmd.Parameters[$"@{colName}"].Value = DBNull.Value;
                                                 break;
                                             case JsonValueKind.Number:
                                                 if (val.TryGetDecimal(out var decVal))
-                                                    insertCmd.Parameters.AddWithValue($"@{colName}", decVal);
+                                                    insertCmd.Parameters[$"@{colName}"].Value = decVal;
                                                 else
-                                                    insertCmd.Parameters.AddWithValue($"@{colName}", val.GetDouble());
+                                                    insertCmd.Parameters[$"@{colName}"].Value = val.GetDouble();
                                                 break;
                                             case JsonValueKind.True:
-                                                insertCmd.Parameters.AddWithValue($"@{colName}", 1);
+                                                insertCmd.Parameters[$"@{colName}"].Value = 1;
                                                 break;
                                             case JsonValueKind.False:
-                                                insertCmd.Parameters.AddWithValue($"@{colName}", 0);
+                                                insertCmd.Parameters[$"@{colName}"].Value = 0;
                                                 break;
                                             default:
-                                                insertCmd.Parameters.AddWithValue($"@{colName}", val.GetString() ?? "");
+                                                insertCmd.Parameters[$"@{colName}"].Value = val.GetString() ?? "";
                                                 break;
                                         }
                                     }
                                     else
                                     {
-                                        insertCmd.Parameters.AddWithValue($"@{colName}", DBNull.Value);
+                                        insertCmd.Parameters[$"@{colName}"].Value = DBNull.Value;
                                     }
                                 }
                                 await insertCmd.ExecuteNonQueryAsync();
@@ -231,14 +280,12 @@ namespace Bimasakti.BiService.Mgr.Services
                 }
 
                 logMessage("INFO", $"=== Sync Job Completed for Tenant: {companyId} ===");
-                await AppendLogFileAsync(logPath, logLines);
                 await InitializeDefaultPresets(companyId, dbPath);
                 return (true, $"Synchronized {successTables} tables with {totalRowsSynced} total rows successfully.");
             }
             catch (Exception ex)
             {
                 logMessage("CRITICAL", $"Critical error in sync job: {ex.Message}");
-                await AppendLogFileAsync(logPath, logLines);
                 return (false, $"Critical sync failure: {ex.Message}");
             }
         }

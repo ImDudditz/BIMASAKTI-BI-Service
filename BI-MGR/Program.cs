@@ -154,6 +154,7 @@ app.MapPost("/api/login", async (HttpContext ctx) =>
         var claims = new List<Claim> { new Claim(ClaimTypes.Name, "superadmin") };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         await ctx.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+        AuditLogger.Log("SuperAdmin", "BI-MGR", "Logged in");
         return Results.Ok(new { message = "Logged in" });
     }
     Console.WriteLine($"[Auth] Failed login attempt.");
@@ -163,6 +164,7 @@ app.MapPost("/api/login", async (HttpContext ctx) =>
 app.MapPost("/api/logout", async (HttpContext ctx) =>
 {
     await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    AuditLogger.Log("SuperAdmin", "BI-MGR", "Logged out");
     return Results.Ok(new { message = "Logged out successfully" });
 });
 
@@ -197,6 +199,20 @@ app.MapPost("/api/internal/companies/{id}/sync", (string id) =>
 var adminGroup = app.MapGroup("/api").RequireAuthorization();
 
 adminGroup.MapGet("/status", () => Results.Ok(new { message = "SaaS Manager Running" }));
+
+adminGroup.MapGet("/audit-logs", () =>
+{
+    try
+    {
+        string dbPath = Bimasakti.BiService.Mgr.Core.CentralDbUtils.GetCentralDbPath();
+        string logPath = Path.Combine(Path.GetDirectoryName(dbPath) ?? "", "BMS_BI_Audit.log");
+        if (!File.Exists(logPath)) return Results.Ok(new { logs = "No audit logs found." });
+        
+        var lines = File.ReadLines(logPath).TakeLast(1000).ToArray();
+        return Results.Ok(new { logs = string.Join("\n", lines) });
+    }
+    catch { return Results.Ok(new { logs = "Error reading audit logs." }); }
+});
 
 adminGroup.MapGet("/companies", async () =>
 {
@@ -394,5 +410,21 @@ public class PortalCompanySaveRequest
     public string Mode { get; set; } = "";
     public string SyncUrls { get; set; } = "";
     public bool IsActive { get; set; } = true;
+}
+
+public static class AuditLogger
+{
+    public static void Log(string user, string system, string action)
+    {
+        try
+        {
+            string dbPath = Bimasakti.BiService.Mgr.Core.CentralDbUtils.GetCentralDbPath();
+            string logPath = Path.Combine(Path.GetDirectoryName(dbPath) ?? "", "BMS_BI_Audit.log");
+            string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            string line = $"{time} | {user,-15} | {system,-7} | {action}\n";
+            File.AppendAllText(logPath, line);
+        }
+        catch { }
+    }
 }
 
