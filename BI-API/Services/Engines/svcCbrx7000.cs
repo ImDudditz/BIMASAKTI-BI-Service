@@ -5,7 +5,7 @@ using System.IO;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Bimasakti.BiService.Api.Services
+namespace Bimasakti.BiService.Api.Services.Engines
 {
     public class CashFlowItem
     {
@@ -140,3 +140,4 @@ namespace Bimasakti.BiService.Api.Services
         }
     }
 }
+

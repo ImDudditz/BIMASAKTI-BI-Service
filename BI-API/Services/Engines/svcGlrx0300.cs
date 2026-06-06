@@ -7,40 +7,9 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-namespace Bimasakti.BiService.Api.Services
+namespace Bimasakti.BiService.Api.Services.Engines
 {
-    public class LedgerReportItem
-    {
-        public decimal Balance { get; set; }
-        public string No { get; set; } = "";
-        public string Name { get; set; } = "";
-
-        [System.Text.Json.Serialization.JsonPropertyName("end_budget")]
-        public decimal EndBudget { get; set; }
-    }
-
-    public class LedgerReportGroup
-    {
-        public decimal Total { get; set; }
-        public List<LedgerReportItem> Items { get; set; } = new();
-    }
-
-    public class LedgerReportSection
-    {
-        public decimal Total { get; set; }
-        public Dictionary<string, LedgerReportGroup> Groups { get; set; } = new();
-    }
-
-    public class LedgerReportResponse
-    {
-        public string Status { get; set; } = "success";
-        public Dictionary<string, LedgerReportSection> Data { get; set; } = new();
-        public decimal NetIncome { get; set; }
-        public decimal NetIncomeBudget { get; set; }
-        public string? ErrorMessage { get; set; }
-    }
-
-    public interface IsvcGlrx0310
+    public interface IsvcGlrx0300
     {
         Task<LedgerReportResponse> GenerateLedgerReportAsync(
             string databasePath,
@@ -50,7 +19,7 @@ namespace Bimasakti.BiService.Api.Services
             string companyId);
     }
 
-    public class svcGlrx0310 : IsvcGlrx0310
+    public class svcGlrx0300 : IsvcGlrx0300
     {
         public async Task<LedgerReportResponse> GenerateLedgerReportAsync(
             string databasePath,
@@ -116,19 +85,37 @@ namespace Bimasakti.BiService.Api.Services
                 }
                 catch
                 {
-                    // Fallback to empty mappings (default prefix mapping rules will apply)
+                    // Fallback to empty mappings
                 }
 
                 using var connection = new SqliteConnection($"Data Source={databasePath};Mode=ReadOnly;");
                 await connection.OpenAsync();
 
-                var schema = Bimasakti.BiService.Api.Core.svcDbUtils.GetGlrxSchema(databasePath);
-                string tableName = schema.TableName;
-                string yearCol = schema.YearColumn;
-                string periodCol = schema.PeriodColumn;
-                string endingBsisColumn = schema.EndBsisColumn;
-                string endingBalanceColumn = schema.EndBalanceColumn;
-                string endingBudgetColumn = schema.EndBudgetColumn;
+                string tableName = "GLRX0300";
+                string yearCol = "year";
+                string periodCol = "period";
+                string endingBsisColumn = "end_bsis";
+                string endingBalanceColumn = "end_balance";
+                string endingBudgetColumn = "end_budget";
+
+                // Check schema for GLRX0300 alternate columns
+                var columns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                try
+                {
+                    using var pragmaCmd = new SqliteCommand($"PRAGMA table_info({tableName});", connection);
+                    using var readerSchema = await pragmaCmd.ExecuteReaderAsync();
+                    while (await readerSchema.ReadAsync())
+                    {
+                        columns.Add(readerSchema.GetString(1));
+                    }
+
+                    if (columns.Contains("year_period")) yearCol = "year_period";
+                    if (columns.Contains("month_period")) periodCol = "month_period";
+                    if (columns.Contains("ending_bsis")) endingBsisColumn = "ending_bsis";
+                    if (columns.Contains("ending_balance")) endingBalanceColumn = "ending_balance";
+                    if (columns.Contains("ending_budget")) endingBudgetColumn = "ending_budget";
+                }
+                catch { }
 
                 string ledgerQuery = $@"
                      SELECT 
@@ -170,23 +157,19 @@ namespace Bimasakti.BiService.Api.Services
                 while (await reader.ReadAsync())
                 {
                     string accountNumber = reader.IsDBNull(0) ? "" : reader.GetString(0).Trim();
-                    if (string.IsNullOrEmpty(accountNumber))
-                    {
-                        continue;
-                    }
+                    if (string.IsNullOrEmpty(accountNumber)) continue;
 
                     string accountName = reader.IsDBNull(1) ? "" : reader.GetString(1).Trim();
                     decimal endingBalanceSheetBsis = reader.IsDBNull(2) ? 0 : reader.GetDecimal(2);
                     decimal endingBalance = reader.IsDBNull(3) ? 0 : reader.GetDecimal(3);
                     decimal endingBudget = reader.IsDBNull(4) ? 0 : reader.GetDecimal(4);
 
-                    char firstCharacter = accountNumber[0];
+                    char firstCharacter = accountNumber.Length > 0 ? accountNumber[0] : ' ';
                     bool isCurrentEarningAccount = accountNumber.Contains("current earning", StringComparison.OrdinalIgnoreCase) ||
                                                     accountName.Contains("current earning", StringComparison.OrdinalIgnoreCase) ||
                                                     accountName.Contains("Laba Periode Berjalan", StringComparison.OrdinalIgnoreCase) ||
                                                     accountName.Contains("Laba ditahan tahun Berjalan", StringComparison.OrdinalIgnoreCase);
 
-                    // Layout section mappings
                     string targetSectionName;
                     string targetGroupName;
 
@@ -207,42 +190,24 @@ namespace Bimasakti.BiService.Api.Services
                         }
                         else
                         {
-                            if (firstCharacter == '1')
-                            {
-                                targetSectionName = "Assets";
-                            }
-                            else if (firstCharacter == '2')
-                            {
-                                targetSectionName = "Liabilities";
-                            }
-                            else if (firstCharacter == '3')
-                            {
-                                targetSectionName = "Equity";
-                            }
-                            else if (firstCharacter == '4')
-                            {
-                                targetSectionName = "Revenue";
-                            }
-                            else
-                            {
-                                targetSectionName = "Expenses";
-                            }
+                            if (firstCharacter == '1') targetSectionName = "Assets";
+                            else if (firstCharacter == '2') targetSectionName = "Liabilities";
+                            else if (firstCharacter == '3') targetSectionName = "Equity";
+                            else if (firstCharacter == '4') targetSectionName = "Revenue";
+                            else targetSectionName = "Expenses";
                         }
                     }
 
-                    // Balance calculation inverting logic
                     decimal balance;
                     if (isCurrentEarningAccount)
                     {
                         balance = endingBalance;
                     }
-                    else if (targetSectionName == "Equity")
+                    else if (targetSectionName == "Equity" || firstCharacter == '3')
                     {
-                        balance = endingBalance; // Use end_balance as Y axis for Equity
-                    }
-                    else if (firstCharacter == '3')
-                    {
-                        balance = endingBalance * -1; // Use end_balance as Y axis for Equity
+                        balance = endingBalance * (firstCharacter == '3' && targetSectionName != "Equity" ? -1 : 1);
+                        if (firstCharacter == '3') balance = endingBalance * -1;
+                        if (targetSectionName == "Equity" && firstCharacter != '3') balance = endingBalance;
                     }
                     else if (firstCharacter == '1' || firstCharacter == '5' || firstCharacter == '6' || firstCharacter == '7' || firstCharacter == '8' || firstCharacter == '9')
                     {
@@ -322,3 +287,4 @@ namespace Bimasakti.BiService.Api.Services
         }
     }
 }
+

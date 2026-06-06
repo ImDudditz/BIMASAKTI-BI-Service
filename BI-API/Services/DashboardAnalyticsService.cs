@@ -62,13 +62,13 @@ namespace Bimasakti.BiService.Api.Services
         public List<TopTenantRequestItem> TopTenantRequests { get; set; } = new List<TopTenantRequestItem>();
     }
 
-    public interface IsvcDashboardAnalyticsService
+    public interface IDashboardAnalyticsService
     {
         Task<OperationsMetricsResponse> GetOperationsMetricsAsync(string databasePath, string companyId);
         Task<MaintenanceStatusResponse> GetMaintenanceStatusAsync(string databasePath, string companyId, string? year = null, string? period = null);
     }
 
-    public class svcDashboardAnalyticsService : IsvcDashboardAnalyticsService
+    public class DashboardAnalyticsService : IDashboardAnalyticsService
     {
         public async Task<OperationsMetricsResponse> GetOperationsMetricsAsync(string databasePath, string companyId)
         {
@@ -472,3 +472,4 @@ namespace Bimasakti.BiService.Api.Services
         }
     }
 }
+

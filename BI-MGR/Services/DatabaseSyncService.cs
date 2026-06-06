@@ -20,7 +20,7 @@ namespace Bimasakti.BiService.Mgr.Services
 
         public async Task<(bool Success, string Message)> SyncCompanyDatabaseAsync(string companyId)
         {
-            string dbPath = svcDbUtils.GetSafeDbPath(companyId);
+            string dbPath = DbUtils.GetSafeDbPath(companyId);
             string companyDir = Path.GetDirectoryName(dbPath) ?? "";
             string centralDbPath = CentralDbUtils.GetCentralDbPath();
             string logPath = Path.Combine(companyDir, $"{companyId.ToUpperInvariant()}_history.log");
@@ -257,7 +257,7 @@ namespace Bimasakti.BiService.Mgr.Services
                     using (var connection = new SqliteConnection($"Data Source={dbPath};Mode=ReadOnly;"))
                     {
                         await connection.OpenAsync();
-                        string tableName = svcDbUtils.GetGlrxTableName(dbPath);
+                        string tableName = DbUtils.GetGlrxTableName(dbPath);
                         string query = $"SELECT DISTINCT account_no, account_name FROM {tableName} WHERE account_no IS NOT NULL AND account_no != '' ORDER BY account_no;";
                         using (var command = new SqliteCommand(query, connection))
                         using (var reader = await command.ExecuteReaderAsync())
@@ -335,3 +335,4 @@ namespace Bimasakti.BiService.Mgr.Services
         }
     }
 }
+

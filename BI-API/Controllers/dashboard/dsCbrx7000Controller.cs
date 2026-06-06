@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Bimasakti.BiService.Api.Services;
+using Bimasakti.BiService.Api.Services.Engines;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Bimasakti.BiService.Api.Controllers.Dashboard
@@ -30,7 +31,7 @@ namespace Bimasakti.BiService.Api.Controllers.Dashboard
             if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
             string companyId = companyIdClaim.ToUpperInvariant();
 
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
 
             if (!System.IO.File.Exists(databasePath))
             {
@@ -54,3 +55,5 @@ namespace Bimasakti.BiService.Api.Controllers.Dashboard
         }
     }
 }
+
+

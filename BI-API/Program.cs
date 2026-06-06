@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using Bimasakti.BiService.Api.Services;
+using Bimasakti.BiService.Api.Services.Engines;
 using Bimasakti.BiService.Api.Models;
 using Bimasakti.BiService.Api.Core;
 using Bimasakti.BiService.Api.Controllers;
@@ -132,21 +133,39 @@ namespace Bimasakti.BiService.Api
                                         bool isCompanyActive = false;
                                         try
                                         {
-                                            var response = await SharedHttpClient.GetAsync($"http://localhost:8003/api/internal/companies/{compId}/status");
-                                            if (response.IsSuccessStatusCode)
+                                            string centralDbPath = builder.Configuration.GetValue<string>("Config:CentralDbPath", "");
+                                            if (string.IsNullOrEmpty(centralDbPath))
                                             {
-                                                var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-                                                if (doc.RootElement.TryGetProperty("isActive", out var p) && p.GetBoolean()) isCompanyActive = true;
+                                                string assetsDir = DbUtils.GetAssetsDirectory();
+                                                centralDbPath = Path.Combine(assetsDir, "BMS_BI_Central.db");
+                                            }
+                                            else
+                                            {
+                                                centralDbPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, centralDbPath));
+                                            }
+
+                                            if (System.IO.File.Exists(centralDbPath))
+                                            {
+                                                using var connection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={centralDbPath}");
+                                                await connection.OpenAsync();
+                                                using var command = connection.CreateCommand();
+                                                command.CommandText = "SELECT is_active FROM companies WHERE company_id = @companyId LIMIT 1;";
+                                                command.Parameters.AddWithValue("@companyId", compId);
+                                                var result = await command.ExecuteScalarAsync();
+                                                if (result != null && result != DBNull.Value)
+                                                {
+                                                    isCompanyActive = Convert.ToInt32(result) > 0;
+                                                }
                                             }
                                         }
                                         catch { }
                                         if (!isCompanyActive) { context.Fail("Inactive company."); return; }
 
-                                        using var tDb = new CompanyDbContext(svcDbUtils.GetSafeDbPath(compId));
+                                        using var tDb = new CompanyDbContext(DbUtils.GetSafeDbPath(compId));
                                         var dbUser = await tDb.Users.FirstOrDefaultAsync(u => u.Username.ToUpper() == user.ToUpper() && u.CompanyId.ToUpper() == compId.ToUpper());
                                         if (dbUser == null || !dbUser.IsActive) { context.Fail("Inactive user."); return; }
 
-                                        var authSvc = context.HttpContext.RequestServices.GetRequiredService<IsvcAuthenticationService>();
+                                        var authSvc = context.HttpContext.RequestServices.GetRequiredService<IAuthenticationService>();
                                         string newToken = authSvc.CreateAccessToken(claims, secretKey, accessExpireMinutes);
 
                                         context.Response.Cookies.Append("access_token", newToken, new CookieOptions
@@ -169,10 +188,24 @@ namespace Bimasakti.BiService.Api
             });
 
             // Register Services
-            builder.Services.AddScoped<IsvcAuthenticationService, svcAuthenticationService>();
+            builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             builder.Services.AddScoped<IsvcGlrx0310, svcGlrx0310>();
             builder.Services.AddScoped<IsvcCbrx7000, svcCbrx7000>();
-            builder.Services.AddScoped<IsvcDashboardAnalyticsService, svcDashboardAnalyticsService>();
+            builder.Services.AddScoped<IDashboardAnalyticsService, DashboardAnalyticsService>();
+            builder.Services.AddScoped<IsvcAprx0100, svcAprx0100>();
+            builder.Services.AddScoped<IsvcArrx0100, svcArrx0100>();
+            builder.Services.AddScoped<IsvcCbrx0200, svcCbrx0200>();
+            builder.Services.AddScoped<IsvcIcrx0700, svcIcrx0700>();
+            builder.Services.AddScoped<IsvcLmrx0220, svcLmrx0220>();
+            builder.Services.AddScoped<IsvcLmrx0400, svcLmrx0400>();
+            builder.Services.AddScoped<IsvcLmrx0710, svcLmrx0710>();
+            builder.Services.AddScoped<IsvcLmrx0800, svcLmrx0800>();
+            builder.Services.AddScoped<IsvcLmrx1000, svcLmrx1000>();
+            builder.Services.AddScoped<IsvcLmrx2100, svcLmrx2100>();
+            builder.Services.AddScoped<IsvcPjrx0100, svcPjrx0100>();
+            builder.Services.AddScoped<IsvcPjrx1100, svcPjrx1100>();
+            builder.Services.AddScoped<IsvcSsrx7100, svcSsrx7100>();
+            builder.Services.AddScoped<IsvcSsrx7200, svcSsrx7200>();
 
 
             var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").GetChildren().Select(c => c.Value).OfType<string>().ToArray();

@@ -10,7 +10,7 @@ using System.Text.Json;
 namespace Bimasakti.BiService.Api.Core
 {
 #pragma warning disable IDE1006 // Naming Styles
-    public static class svcDbUtils
+    public static class DbUtils
     {
         // Equivalent to os.path.dirname(os.path.abspath(__file__))
         private static readonly string BaseDir = AppContext.BaseDirectory;
@@ -344,3 +344,4 @@ namespace Bimasakti.BiService.Api.Core
         public string EndBsisColumn { get; set; } = "end_bsis";
     }
 }
+

@@ -3,6 +3,7 @@ using Bimasakti.BiService.Api.Core;
 using Bimasakti.BiService.Api.Models;
 using System;
 using System.IO;
+using System.Linq;
 using Bimasakti.BiService.Mgr.Models;
 
 namespace Bimasakti.BiService.Mgr.Core
@@ -26,6 +27,11 @@ namespace Bimasakti.BiService.Mgr.Core
                         if (!string.IsNullOrEmpty(pathFromConfig))
                         {
                             dbPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), pathFromConfig));
+                            string dir = Path.GetDirectoryName(dbPath);
+                            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                            {
+                                Directory.CreateDirectory(dir);
+                            }
                         }
                     }
                 }
@@ -34,7 +40,7 @@ namespace Bimasakti.BiService.Mgr.Core
 
             if (string.IsNullOrEmpty(dbPath))
             {
-                string assetsDir = Bimasakti.BiService.Api.Core.svcDbUtils.GetAssetsDirectory();
+                string assetsDir = Bimasakti.BiService.Api.Core.DbUtils.GetAssetsDirectory();
                 dbPath = Path.Combine(assetsDir, "BMS_BI_Central.db");
             }
 
@@ -45,6 +51,44 @@ namespace Bimasakti.BiService.Mgr.Core
                     using (var dbContext = new CentralDbContext(dbPath))
                     {
                         dbContext.Database.EnsureCreated();
+                        
+                        if (!dbContext.Companies.Any(c => c.CompanyId == "BMS"))
+                        {
+                            dbContext.Companies.Add(new Company { CompanyId = "BMS", IsActive = true, SyncConfigJson = "{}" });
+                            dbContext.SaveChanges();
+                            
+                            try
+                            {
+                                string bmsDbPath = Bimasakti.BiService.Api.Core.DbUtils.GetSafeDbPath("BMS");
+                                using var tenantDb = new CompanyDbContext(bmsDbPath);
+                                tenantDb.Database.EnsureCreated();
+                                
+                                var authSvc = new Bimasakti.BiService.Api.Services.AuthenticationService();
+                                var allWidgets = new[] { "kpi_cards", "capital_growth", "operating_cash_flow", "revenue_budget", "expense_budget", "operation_metrics", "lease_expirations", "tickets_kpi", "maintenance_status", "tickets_by_category" };
+                                var allReports = new[] { "balance_sheet", "income_statement" };
+                                
+                                Action<string, string> ensureUser = (username, pass) =>
+                                {
+                                    var u = tenantDb.Users.FirstOrDefault(x => x.Username == username);
+                                    if (u == null)
+                                    {
+                                        u = new User { Username = username, PasswordHash = authSvc.GetPasswordHash(pass), Role = "admin", CompanyId = "BMS", IsActive = true };
+                                        tenantDb.Users.Add(u);
+                                        tenantDb.SaveChanges();
+                                        foreach (var w in allWidgets) tenantDb.UserWidgets.Add(new UserWidget { UserId = u.Id, WidgetKey = w, IsActive = true });
+                                        foreach (var r in allReports) tenantDb.UserReports.Add(new UserReport { UserId = u.Id, ReportKey = r, IsActive = true });
+                                    }
+                                };
+
+                                ensureUser("sa", "sfbmub");
+                                ensureUser("realta", "nvctgc");
+                                tenantDb.SaveChanges();
+                            }
+                            catch (Exception seedEx)
+                            {
+                                Console.WriteLine($"[DB] Warning: Failed to seed BMS tenant DB: {seedEx.Message}");
+                            }
+                        }
                     }
                     SchemaInitializedDbs.TryAdd(dbPath, true);
                 }
@@ -57,3 +101,4 @@ namespace Bimasakti.BiService.Mgr.Core
         }
     }
 }
+

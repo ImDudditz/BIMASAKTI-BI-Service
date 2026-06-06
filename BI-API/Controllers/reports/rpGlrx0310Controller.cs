@@ -12,7 +12,9 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Bimasakti.BiService.Api.Services;
+using Bimasakti.BiService.Api.Services.Engines;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 
 namespace Bimasakti.BiService.Api.Controllers.Reports
 {
@@ -31,10 +33,12 @@ namespace Bimasakti.BiService.Api.Controllers.Reports
     public class rpGlrx0310Controller : ControllerBase
     {
         private readonly IsvcGlrx0310 _ledgerService;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
 
-        public rpGlrx0310Controller(IsvcGlrx0310 ledgerService)
+        public rpGlrx0310Controller(IsvcGlrx0310 ledgerService, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             _ledgerService = ledgerService;
+            _configuration = configuration;
         }
 
         // --- 1. Available Filters ---
@@ -45,7 +49,7 @@ namespace Bimasakti.BiService.Api.Controllers.Reports
             if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
             string companyId = companyIdClaim.ToUpperInvariant();
 
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
 
             if (!System.IO.File.Exists(databasePath))
             {
@@ -64,7 +68,7 @@ namespace Bimasakti.BiService.Api.Controllers.Reports
                 {
                     await connection.OpenAsync();
 
-                    var schema = svcDbUtils.GetGlrxSchema(databasePath);
+                    var schema = DbUtils.GetGlrxSchema(databasePath);
                     string tableName = schema.TableName;
                     string yearCol = schema.YearColumn;
                     string periodCol = schema.PeriodColumn;
@@ -141,7 +145,7 @@ namespace Bimasakti.BiService.Api.Controllers.Reports
             if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
             string companyId = companyIdClaim.ToUpperInvariant();
 
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
             var chartOfAccountsList = new List<object>();
 
             if (!System.IO.File.Exists(databasePath))
@@ -154,7 +158,7 @@ namespace Bimasakti.BiService.Api.Controllers.Reports
                 using (var connection = new SqliteConnection($"Data Source={databasePath};Mode=ReadOnly;"))
                 {
                     await connection.OpenAsync();
-                    string tableName = svcDbUtils.GetGlrxTableName(databasePath);
+                    string tableName = DbUtils.GetGlrxTableName(databasePath);
                     string coaQuery = $"SELECT DISTINCT account_no, account_name FROM {tableName} WHERE account_no IS NOT NULL AND account_no != '' ORDER BY account_no;";
                     using (var command = new SqliteCommand(coaQuery, connection))
                     using (var reader = await command.ExecuteReaderAsync())
@@ -186,7 +190,7 @@ namespace Bimasakti.BiService.Api.Controllers.Reports
             if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
             string companyId = companyIdClaim.ToUpperInvariant();
 
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
 
             try
             {
@@ -238,7 +242,7 @@ namespace Bimasakti.BiService.Api.Controllers.Reports
             string companyId = companyIdClaim.ToUpperInvariant();
             mappingRequest.CompanyId = companyId; // Force override with trusted claim
 
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
 
             try
             {
@@ -295,7 +299,7 @@ namespace Bimasakti.BiService.Api.Controllers.Reports
                     using (var connection = new SqliteConnection($"Data Source={databasePath};Mode=ReadOnly;"))
                     {
                         await connection.OpenAsync();
-                        string tableName = svcDbUtils.GetGlrxTableName(databasePath);
+                        string tableName = DbUtils.GetGlrxTableName(databasePath);
                         string query = $"SELECT DISTINCT account_no, account_name FROM {tableName} WHERE account_no IS NOT NULL AND account_no != '' ORDER BY account_no;";
                         using (var command = new SqliteCommand(query, connection))
                         using (var reader = await command.ExecuteReaderAsync())
@@ -452,7 +456,7 @@ namespace Bimasakti.BiService.Api.Controllers.Reports
             if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
             string companyId = companyIdClaim.ToUpperInvariant();
 
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
 
             try
             {
@@ -480,7 +484,7 @@ namespace Bimasakti.BiService.Api.Controllers.Reports
                     using (var connection = new SqliteConnection($"Data Source={databasePath};Mode=ReadOnly;"))
                     {
                         await connection.OpenAsync();
-                        string tableName = svcDbUtils.GetGlrxTableName(databasePath);
+                        string tableName = DbUtils.GetGlrxTableName(databasePath);
                         string query = $"SELECT DISTINCT account_no, account_name FROM {tableName} WHERE account_no IS NOT NULL AND account_no != '' ORDER BY account_no;";
                         using (var command = new SqliteCommand(query, connection))
                         using (var reader = await command.ExecuteReaderAsync())
@@ -585,7 +589,7 @@ namespace Bimasakti.BiService.Api.Controllers.Reports
                 { "preset3", "Preset 3" }
             };
 
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
             if (!System.IO.File.Exists(databasePath))
             {
                 return Ok(defaultPresetNames);
@@ -624,7 +628,7 @@ namespace Bimasakti.BiService.Api.Controllers.Reports
             string companyId = companyIdClaim.ToUpperInvariant();
             mappingRequest.CompanyId = companyId;
 
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
 
             try
             {
@@ -674,7 +678,7 @@ namespace Bimasakti.BiService.Api.Controllers.Reports
             if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
             string companyId = companyIdClaim.ToUpperInvariant();
 
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
 
             if (!preset.Equals("preset1", StringComparison.OrdinalIgnoreCase) &&
                 !preset.Equals("preset2", StringComparison.OrdinalIgnoreCase) &&
@@ -709,8 +713,9 @@ namespace Bimasakti.BiService.Api.Controllers.Reports
 
             try
             {
+                int managerPort = _configuration.GetValue<int>("Manager:Port", 8003);
                 using var hc = new System.Net.Http.HttpClient();
-                var response = await hc.PostAsync($"http://localhost:8003/api/internal/companies/{companyId}/sync", null);
+                var response = await hc.PostAsync($"http://127.0.0.1:{managerPort}/api/internal/companies/{companyId}/sync", null);
                 if (!response.IsSuccessStatusCode)
                 {
                     return Ok(new { status = "error", message = "Failed to trigger sync in Manager service." });

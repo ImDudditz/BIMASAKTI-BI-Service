@@ -6,6 +6,7 @@ using Xunit;
 using Moq;
 using Microsoft.Data.Sqlite;
 using Bimasakti.BiService.Api.Services;
+using Bimasakti.BiService.Api.Services.Engines;
 using Bimasakti.BiService.Api.Models;
 using Bimasakti.BiService.Api.Core;
 using Bimasakti.BiService.Api.Controllers;
@@ -16,7 +17,7 @@ namespace Bimasakti.BiService.Api.Tests
 
     public class AuthenticationServiceTests
     {
-        private readonly IsvcAuthenticationService _authenticationService = new svcAuthenticationService();
+        private readonly IAuthenticationService _authenticationService = new AuthenticationService();
 
         [Fact]
         public void GetPasswordHash_ShouldReturnValidSha256HexString()
@@ -237,8 +238,8 @@ namespace Bimasakti.BiService.Api.Tests
         public async Task VerifyRealDatabaseSyncAndLedgerReport_ShouldReturnSuccessAndPopulatedData()
         {
             // Arrange
-            // Get path strictly using svcDbUtils.GetSafeDbPath which we refactored
-            string dbPath = svcDbUtils.GetSafeDbPath("ASHMD");
+            // Get path strictly using DbUtils.GetSafeDbPath which we refactored
+            string dbPath = DbUtils.GetSafeDbPath("ASHMD");
             string companyId = "ASHMD";
             string preset = "preset1";
 
@@ -297,7 +298,7 @@ namespace Bimasakti.BiService.Api.Tests
 
     public class DashboardAnalyticsServiceTests
     {
-        private readonly IsvcDashboardAnalyticsService _dashboardAnalyticsService = new svcDashboardAnalyticsService();
+        private readonly IDashboardAnalyticsService _dashboardAnalyticsService = new DashboardAnalyticsService();
 
         [Fact]
         public async Task GetOperationsMetricsAsync_ShouldReturnDefaultKPIs_WhenDatabaseDoesNotExist()
@@ -336,3 +337,5 @@ namespace Bimasakti.BiService.Api.Tests
         }
     }
 }
+
+

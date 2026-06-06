@@ -42,7 +42,7 @@ namespace Bimasakti.BiService.Api.Controllers
     [Authorize]
     [ApiController]
     [Route("api")]
-    public class dsAdminDashboardController : ControllerBase
+    public class AdminDashboardController : ControllerBase
     {
         // Helper to enforce admin check
         private async Task<User?> RequireAdmin(CompanyDbContext dbContext, string username, string companyId)
@@ -70,7 +70,7 @@ namespace Bimasakti.BiService.Api.Controllers
 
             string companyId = companyIdClaim.ToUpperInvariant();
             string username = usernameClaim;
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
 
             try
             {
@@ -122,7 +122,7 @@ namespace Bimasakti.BiService.Api.Controllers
 
             string companyId = companyIdClaim.ToUpperInvariant();
             string username = usernameClaim;
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
 
             try
             {
@@ -174,7 +174,7 @@ namespace Bimasakti.BiService.Api.Controllers
 
             string companyId = companyIdClaim.ToUpperInvariant();
             string username = usernameClaim;
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
 
             try
             {
@@ -235,7 +235,7 @@ namespace Bimasakti.BiService.Api.Controllers
             }
 
             string companyId = companyIdClaim.ToUpperInvariant();
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
 
             try
             {
@@ -272,7 +272,7 @@ namespace Bimasakti.BiService.Api.Controllers
             }
 
             string companyId = companyIdClaim.ToUpperInvariant();
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
 
             try
             {
@@ -320,7 +320,7 @@ namespace Bimasakti.BiService.Api.Controllers
             }
 
             string companyId = companyIdClaim.ToUpperInvariant();
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
 
             try
             {
@@ -418,3 +418,4 @@ namespace Bimasakti.BiService.Api.Controllers
         }
     }
 }
+

@@ -11,6 +11,7 @@ using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Bimasakti.BiService.Api.Services;
+using Bimasakti.BiService.Api.Services.Engines;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authorization;
 
@@ -23,16 +24,16 @@ namespace Bimasakti.BiService.Api.Controllers
     [ApiController]
     [Route("api/auth")]
     [AllowAnonymous]
-    public class svcAuthenticationController : ControllerBase
+    public class AuthenticationController : ControllerBase
     {
-        private readonly IsvcAuthenticationService _authenticationService;
+        private readonly IAuthenticationService _authenticationService;
         private readonly IConfiguration _configuration;
         private static readonly string SecretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new InvalidOperationException("JWT_SECRET is missing.");
 
         private int AccessTokenExpireMinutes => _configuration.GetValue<int>("Jwt:AccessTokenExpireMinutes", 15);
         private int CookieExpireHours => _configuration.GetValue<int>("Jwt:CookieExpireHours", 1);
 
-        public svcAuthenticationController(IsvcAuthenticationService authenticationService, IConfiguration configuration)
+        public AuthenticationController(IAuthenticationService authenticationService, IConfiguration configuration)
         {
             _authenticationService = authenticationService;
             _configuration = configuration;
@@ -61,25 +62,42 @@ namespace Bimasakti.BiService.Api.Controllers
                 bool isCompanyActive = false;
                 try
                 {
-                    using var hc = new System.Net.Http.HttpClient();
-                    var response = await hc.GetAsync($"http://localhost:8003/api/internal/companies/{companyId}/status");
-                    if (response.IsSuccessStatusCode)
+                    string centralDbPath = _configuration.GetValue<string>("Config:CentralDbPath", "");
+                    if (string.IsNullOrEmpty(centralDbPath))
                     {
-                        var doc = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-                        if (doc.RootElement.TryGetProperty("isActive", out var p) && p.GetBoolean())
+                        string assetsDir = DbUtils.GetAssetsDirectory();
+                        centralDbPath = Path.Combine(assetsDir, "BMS_BI_Central.db");
+                    }
+                    else
+                    {
+                        centralDbPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, centralDbPath));
+                    }
+
+                    if (System.IO.File.Exists(centralDbPath))
+                    {
+                        using var connection = new SqliteConnection($"Data Source={centralDbPath}");
+                        await connection.OpenAsync();
+                        using var command = connection.CreateCommand();
+                        command.CommandText = "SELECT is_active FROM companies WHERE company_id = @companyId LIMIT 1;";
+                        command.Parameters.AddWithValue("@companyId", companyId);
+                        var result = await command.ExecuteScalarAsync();
+                        if (result != null && result != DBNull.Value)
                         {
-                            isCompanyActive = true;
+                            isCompanyActive = Convert.ToInt32(result) > 0;
                         }
                     }
                 }
-                catch { }
+                catch (Exception dbEx) 
+                {
+                    Console.WriteLine($"[Auth] Central DB Check failed: {dbEx.Message}");
+                }
 
                 if (!isCompanyActive)
                 {
                     return Unauthorized(new { detail = "Company is inactive or does not exist." });
                 }
 
-                string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+                string databasePath = DbUtils.GetSafeDbPath(companyId);
 
                 using (var dbContext = new CompanyDbContext(databasePath))
                 {
@@ -104,7 +122,7 @@ namespace Bimasakti.BiService.Api.Controllers
                         await dbContext.Database.OpenConnectionAsync();
                         using (var nameCommand = dbContext.Database.GetDbConnection().CreateCommand())
                         {
-                            string tableName = svcDbUtils.GetGlrxTableName(databasePath);
+                            string tableName = DbUtils.GetGlrxTableName(databasePath);
                             nameCommand.CommandText = $"SELECT company_name FROM {tableName} WHERE company_id = @companyId LIMIT 1;";
                             var parameter = nameCommand.CreateParameter();
                             parameter.ParameterName = "@companyId";

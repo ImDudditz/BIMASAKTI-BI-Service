@@ -26,6 +26,9 @@ Write code review comments terse and actionable. One line per finding. Location,
 - Restating what the line does — the reviewer can read the diff
 - Hedging ("perhaps", "maybe", "I think") — if unsure use `q:`
 
+**Hardcoded Network Rules:**
+- `🔴 bug:` Flag any hardcoded `http://localhost:PORT` or `127.0.0.1` inside server-to-server or API logic. Breaks in IIS/Docker. Suggest config value or DB query.
+
 **Keep:**
 - Exact line numbers
 - Exact symbol/function/variable names in backticks

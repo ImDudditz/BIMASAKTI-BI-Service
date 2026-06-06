@@ -62,7 +62,7 @@ echo    [7] Exit (Auto-Close, Free Port ^& Clean Cache)
 echo.
 echo  ────────────────────────────────────────────────────────────
 set "choice="
-set /p choice="Select an action [1-7]: "
+set "choice=6"
 
 if "%choice%"=="1" goto LAUNCH_ALL
 if "%choice%"=="2" goto LAUNCH_WEB
@@ -309,7 +309,7 @@ echo   [3] Frontend Proxy Only
 echo   [4] Cancel
 echo.
 set "comp_choice="
-set /p comp_choice="Select an option [1-4]: "
+set "comp_choice=1"
 
 if "%comp_choice%"=="4" goto MENU
 if "%comp_choice%"=="" goto COMPILE_PUBLISH
@@ -331,7 +331,7 @@ echo   [1] Standalone Executable (Self-Contained)
 echo   [2] IIS Web Server (Framework-Dependent)
 echo.
 set "deploy_choice="
-set /p deploy_choice="Select an option [1-2]: "
+set "deploy_choice=2"
 if "!deploy_choice!"=="2" (
     set "BACKEND_DEPLOY_TYPE=IIS"
     goto SKIP_BACKEND_PROMPT
@@ -343,7 +343,7 @@ echo   [1] Windows x64 (Standard 64-bit)
 echo   [2] Windows x86 (Standard 32-bit)
 echo.
 set "arch_choice="
-set /p arch_choice="Select an option [1-2]: "
+set "arch_choice=1"
 if "!arch_choice!"=="1" set "TARGET_ARCH=win-x64"
 if "!arch_choice!"=="2" set "TARGET_ARCH=win-x86"
 
@@ -359,7 +359,7 @@ echo   [1] Node.js Proxy Server (Default, Server-Side Rendered / Proxy)
 echo   [2] Standard Static SaaS (HTML/JS/CSS only, perfect for NGINX/IIS/CDN)
 echo.
 set "front_deploy_choice="
-set /p front_deploy_choice="Select an option [1-2]: "
+set "front_deploy_choice=2"
 if "!front_deploy_choice!"=="2" (
     set "FRONTEND_DEPLOY_TYPE=STATIC"
 )
@@ -379,13 +379,6 @@ if exist "%PUB_DIR%\BI-API" rmdir /s /q "%PUB_DIR%\BI-API"
 if exist "%PUB_DIR%\BI-MGR" rmdir /s /q "%PUB_DIR%\BI-MGR"
 if exist "%PUB_DIR%\BI-API-Standalone" rmdir /s /q "%PUB_DIR%\BI-API-Standalone"
 if exist "%PUB_DIR%\BI-MGR-Standalone" rmdir /s /q "%PUB_DIR%\BI-MGR-Standalone"
-
-echo.
-echo  [+] Dropping app_offline.htm to release IIS locks...
-if exist "%PUB_DIR%\BI-API" echo Updating... > "%PUB_DIR%\BI-API\app_offline.htm"
-if exist "%PUB_DIR%\BI-MGR" echo Updating... > "%PUB_DIR%\BI-MGR\app_offline.htm"
-:: Wait briefly to ensure IIS unloads the app domains
-powershell -Command "Start-Sleep -s 2"
 
 echo.
 echo  [+] Cleaning source binaries before publish...
@@ -434,11 +427,6 @@ echo  [+] Initializing Database Assets...
 pushd "%PUB_DIR%\BI-MGR"
 dotnet BI-MGR.dll --sync-all >nul 2>&1
 popd
-
-echo.
-echo  [+] Removing app_offline.htm...
-if exist "%PUB_DIR%\BI-API\app_offline.htm" del /f /q "%PUB_DIR%\BI-API\app_offline.htm"
-if exist "%PUB_DIR%\BI-MGR\app_offline.htm" del /f /q "%PUB_DIR%\BI-MGR\app_offline.htm"
 
 echo.
 echo  [+] IIS Build Complete!

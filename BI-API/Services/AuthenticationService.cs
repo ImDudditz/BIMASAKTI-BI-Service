@@ -8,14 +8,14 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Bimasakti.BiService.Api.Services
 {
-    public interface IsvcAuthenticationService
+    public interface IAuthenticationService
     {
         string GetPasswordHash(string password);
         bool VerifyPassword(string plainPassword, string hashedPassword);
         string CreateAccessToken(Dictionary<string, string> claimMap, string secretKey, int expireMinutes);
     }
 
-    public class svcAuthenticationService : IsvcAuthenticationService
+    public class AuthenticationService : IAuthenticationService
     {
         public string GetPasswordHash(string password)
         {
@@ -57,3 +57,4 @@ namespace Bimasakti.BiService.Api.Services
         }
     }
 }
+

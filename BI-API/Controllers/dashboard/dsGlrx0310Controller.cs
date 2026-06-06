@@ -12,6 +12,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Bimasakti.BiService.Api.Services;
+using Bimasakti.BiService.Api.Services.Engines;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Bimasakti.BiService.Api.Controllers.Dashboard
@@ -21,10 +22,10 @@ namespace Bimasakti.BiService.Api.Controllers.Dashboard
     [Route("api")]
     public class dsGlrx0310Controller : ControllerBase
     {
-        private readonly IsvcDashboardAnalyticsService _dashboardAnalyticsService;
+        private readonly IDashboardAnalyticsService _dashboardAnalyticsService;
         private static readonly HttpClient HttpClientInstance = new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
 
-        public dsGlrx0310Controller(IsvcDashboardAnalyticsService dashboardAnalyticsService)
+        public dsGlrx0310Controller(IDashboardAnalyticsService dashboardAnalyticsService)
         {
             _dashboardAnalyticsService = dashboardAnalyticsService;
         }
@@ -37,7 +38,7 @@ namespace Bimasakti.BiService.Api.Controllers.Dashboard
             if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
             string companyId = companyIdClaim.ToUpperInvariant();
 
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
             string configDirectory = Path.GetDirectoryName(databasePath)!;
             string configFilePath = Path.Combine(configDirectory, $"{companyId}_config.json");
 
@@ -210,10 +211,12 @@ namespace Bimasakti.BiService.Api.Controllers.Dashboard
             if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
             string companyId = companyIdClaim.ToUpperInvariant();
 
-            string databasePath = svcDbUtils.GetSafeDbPath(companyId);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
 
             var analyticsResult = await _dashboardAnalyticsService.GetOperationsMetricsAsync(databasePath, companyId);
             return Ok(analyticsResult);
         }
     }
 }
+
+

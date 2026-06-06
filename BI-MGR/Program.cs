@@ -249,27 +249,31 @@ adminGroup.MapPost("/companies", async (PortalCompanySaveRequest req) =>
     using var db = new CentralDbContext(CentralDbUtils.GetCentralDbPath());
     var comp = await db.Companies.FirstOrDefaultAsync(c => c.CompanyId == companyId);
 
-    if (req.Mode == "New" && comp == null)
+    if (req.Mode == "New")
     {
+        if (comp != null) return Results.BadRequest(new { message = "Company already exists." });
         if (dict.Count == 0) return Results.BadRequest(new { message = "At least one valid sync URL required." });
+        
         comp = new Company { CompanyId = companyId, SyncConfigJson = syncConfigJson, IsActive = req.IsActive };
         db.Companies.Add(comp);
     }
-    else if (comp != null)
+    else if (req.Mode == "Update")
     {
+        if (comp == null) return Results.BadRequest(new { message = "Company not found for edit." });
+        
         comp.SyncConfigJson = syncConfigJson;
         comp.IsActive = req.IsActive;
     }
     else
     {
-        return Results.BadRequest(new { message = "Company not found for edit." });
+        return Results.BadRequest(new { message = "Invalid mode." });
     }
     await db.SaveChangesAsync();
 
-    using var tenantDb = new CompanyDbContext(svcDbUtils.GetSafeDbPath(companyId));
+    using var tenantDb = new CompanyDbContext(DbUtils.GetSafeDbPath(companyId));
     tenantDb.Database.EnsureCreated();
 
-    var authSvc = new Bimasakti.BiService.Api.Services.svcAuthenticationService();
+    var authSvc = new Bimasakti.BiService.Api.Services.AuthenticationService();
     var allWidgets = new[] { "kpi_cards", "capital_growth", "operating_cash_flow", "revenue_budget", "expense_budget", "operation_metrics", "lease_expirations", "tickets_kpi", "maintenance_status", "tickets_by_category" };
     var allReports = new[] { "balance_sheet", "income_statement" };
 
@@ -314,7 +318,7 @@ adminGroup.MapGet("/manager/companies/{companyId}/users", async (string companyI
 {
     try
     {
-        using var db = new CompanyDbContext(svcDbUtils.GetSafeDbPath(companyId.Trim().ToUpperInvariant()));
+        using var db = new CompanyDbContext(DbUtils.GetSafeDbPath(companyId.Trim().ToUpperInvariant()));
         await db.Database.EnsureCreatedAsync();
         var users = await db.Users.Where(u => u.CompanyId == companyId).ToListAsync();
         return Results.Ok(users.Select(u => new { id = u.Id, username = u.Username, role = u.Role }));
@@ -326,7 +330,7 @@ adminGroup.MapGet("/manager/companies/{companyId}/users/{userId:int}/permissions
 {
     try
     {
-        using var db = new CompanyDbContext(svcDbUtils.GetSafeDbPath(companyId.Trim().ToUpperInvariant()));
+        using var db = new CompanyDbContext(DbUtils.GetSafeDbPath(companyId.Trim().ToUpperInvariant()));
         await db.Database.EnsureCreatedAsync();
         return Results.Ok(new
         {
@@ -341,7 +345,7 @@ adminGroup.MapPost("/manager/companies/{companyId}/users/{userId:int}/permission
 {
     try
     {
-        using var db = new CompanyDbContext(svcDbUtils.GetSafeDbPath(companyId.Trim().ToUpperInvariant()));
+        using var db = new CompanyDbContext(DbUtils.GetSafeDbPath(companyId.Trim().ToUpperInvariant()));
         await db.Database.EnsureCreatedAsync();
 
         var exW = await db.UserWidgets.Where(w => w.UserId == userId).ToDictionaryAsync(w => w.WidgetKey);
@@ -365,7 +369,9 @@ adminGroup.MapPost("/manager/companies/{companyId}/users/{userId:int}/permission
 
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APP_POOL_ID")))
 {
-    app.Run("http://localhost:8003");
+    int mgrPort = builder.Configuration.GetValue<int>("Server:Port", 8003);
+    string mgrHost = builder.Configuration.GetValue<string>("Server:Host", "127.0.0.1");
+    app.Run($"http://{mgrHost}:{mgrPort}");
 }
 else
 {
@@ -379,3 +385,4 @@ public class PortalCompanySaveRequest
     public string SyncUrls { get; set; } = "";
     public bool IsActive { get; set; } = true;
 }
+
