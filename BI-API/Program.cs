@@ -205,6 +205,8 @@ namespace Bimasakti.BiService.Api
 
             // Register Services
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+            builder.Services.AddScoped<IWidgetConfigService, WidgetConfigService>();
+            builder.Services.AddScoped<IDynamicDataService, DynamicDataService>();
             builder.Services.AddScoped<IsvcGlrx0310, svcGlrx0310>();
             builder.Services.AddScoped<IsvcCbrx7000, svcCbrx7000>();
             builder.Services.AddScoped<IDashboardAnalyticsService, DashboardAnalyticsService>();

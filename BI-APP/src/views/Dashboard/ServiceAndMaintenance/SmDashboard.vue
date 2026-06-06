@@ -140,19 +140,19 @@
           </button>
         </div>
 
-        <!-- Dashboard Dynamic Columns Layout (Like fsDashboard Split Grid) -->
+        <!-- Dashboard Dynamic Columns Layout -->
         <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4 pb-6 w-full items-start">
-          <!-- Left Column: KPIs & Tickets By Category Breakdown -->
+          <!-- Left Column -->
           <div class="flex flex-col gap-4 w-full">
-            <template v-for="widget in leftColumnWidgets" :key="widget.widget_key">
-              <component :is="widgetRegistry[widget.widget_key]" v-bind="getWidgetProps(widget)" />
+            <template v-for="widget in leftColumnWidgets" :key="widget.id">
+              <DynamicWidget :config="widget" />
             </template>
           </div>
 
-          <!-- Right Column: Status summary & Top Complaints/Requests charts -->
+          <!-- Right Column -->
           <div class="flex flex-col gap-4 w-full">
-            <template v-for="widget in rightColumnWidgets" :key="widget.widget_key">
-              <component :is="widgetRegistry[widget.widget_key]" v-bind="getWidgetProps(widget)" />
+            <template v-for="widget in rightColumnWidgets" :key="widget.id">
+              <DynamicWidget :config="widget" />
             </template>
           </div>
         </div>
@@ -168,6 +168,7 @@ import api from '@/services/api'
 import { useReportFilterStore } from '@/stores/reportFilters'
 import { useAuthStore } from '@/stores/auth'
 import ReportLayout from '@/components/ReportLayout.vue'
+import DynamicWidget from '@/components/widgets/DynamicWidget.vue'
 
 const filterStore = useReportFilterStore()
 const { selectedYear, selectedPeriod, availableYears, availablePeriods } = storeToRefs(filterStore)
@@ -183,140 +184,36 @@ const companyId = ref(authStore.user?.company_id || 'ASHMD')
 const comparisonYears = ref([])
 
 const monthNames = {
-  '01': 'January',
-  '02': 'February',
-  '03': 'March',
-  '04': 'April',
-  '05': 'May',
-  '06': 'June',
-  '07': 'July',
-  '08': 'August',
-  '09': 'September',
-  10: 'October',
-  11: 'November',
-  12: 'December',
+  '01': 'January', '02': 'February', '03': 'March', '04': 'April',
+  '05': 'May', '06': 'June', '07': 'July', '08': 'August',
+  '09': 'September', 10: 'October', 11: 'November', 12: 'December',
 }
 
-// Widget Registry (Dynamic Async Components like fsDashboard)
-const widgetRegistry = {
-  tickets_kpi: defineAsyncComponent(
-    () => import('@/components/widgets/ServiceAndMaintenance/TicketsKPI.vue'),
-  ),
-  maintenance_status: defineAsyncComponent(
-    () => import('@/components/widgets/ServiceAndMaintenance/MaintenanceStatusWidget.vue'),
-  ),
-  top_area_complaints: defineAsyncComponent(
-    () => import('@/components/widgets/ServiceAndMaintenance/TopComplaintsByAreaWidget.vue'),
-  ),
-  top_tenant_requests: defineAsyncComponent(
-    () => import('@/components/widgets/ServiceAndMaintenance/TopRequestsByTenantWidget.vue'),
-  ),
-  tickets_by_category: defineAsyncComponent(
-    () => import('@/components/widgets/ServiceAndMaintenance/TicketsByCategoryWidget.vue'),
-  ),
-}
-
-// Maintenance bound structures
-const statusPayload = ref(null)
-const ticketsByCategory = ref([])
-const topAreaComplaints = ref([])
-const topTenantRequests = ref([])
-const activeWidgets = ref([])
+const dynamicWidgets = ref([])
 
 const leftColumnWidgets = computed(() => {
-  const leftKeys = ['tickets_kpi', 'tickets_by_category', 'top_tenant_requests']
-  // Keep the order: tickets_kpi -> tickets_by_category -> top_tenant_requests
-  const order = { tickets_kpi: 0, tickets_by_category: 1, top_tenant_requests: 2 }
-  return activeWidgets.value
-    .filter((w) => leftKeys.includes(w.widget_key))
-    .sort((a, b) => (order[a.widget_key] ?? 0) - (order[b.widget_key] ?? 0))
+  return dynamicWidgets.value.filter((_, index) => index % 2 === 0)
 })
 
 const rightColumnWidgets = computed(() => {
-  const rightKeys = ['maintenance_status', 'top_area_complaints']
-  // Keep the order: maintenance_status -> top_area_complaints
-  const order = { maintenance_status: 0, top_area_complaints: 1 }
-  return activeWidgets.value
-    .filter((w) => rightKeys.includes(w.widget_key))
-    .sort((a, b) => (order[a.widget_key] ?? 0) - (order[b.widget_key] ?? 0))
+  return dynamicWidgets.value.filter((_, index) => index % 2 !== 0)
 })
 
 const isAuthorized = computed(() => {
-  return (
-    authStore.isAdmin ||
-    authStore.userWidgets.includes('tickets_kpi') ||
-    authStore.userWidgets.includes('maintenance_status') ||
-    authStore.userWidgets.includes('tickets_by_category') ||
-    authStore.userWidgets.includes('top_area_complaints') ||
-    authStore.userWidgets.includes('top_tenant_requests')
-  )
+  return authStore.isAdmin || dynamicWidgets.value.length > 0
 })
 
-const getWidgetProps = (widget) => {
-  const baseProps = { config: widget.config }
-  switch (widget.widget_key) {
-    case 'tickets_kpi':
-      return {
-        ...baseProps,
-        companyId: companyId.value,
-        selectedYear: selectedYear.value,
-        selectedPeriod: selectedPeriod.value,
-      }
-    case 'top_area_complaints':
-      return {
-        ...baseProps,
-        complaintsData: topAreaComplaints.value,
-      }
-    case 'top_tenant_requests':
-      return {
-        ...baseProps,
-        requestsData: topTenantRequests.value,
-      }
-    case 'tickets_by_category':
-      return {
-        ...baseProps,
-        categoriesData: ticketsByCategory.value,
-      }
-    default:
-      return baseProps
-  }
-}
-
 const fetchUserWidgets = async () => {
-  const defaultMaintWidgets = [
-    { widget_key: 'tickets_kpi' },
-    { widget_key: 'maintenance_status' },
-    { widget_key: 'top_area_complaints' },
-    { widget_key: 'top_tenant_requests' },
-    { widget_key: 'tickets_by_category' },
-  ]
-
   try {
-    const company_id = authStore.user?.company_id
     const username = authStore.user?.username
-    if (!company_id || !username) {
-      activeWidgets.value = defaultMaintWidgets
-      return
-    }
+    if (!username) return
 
-    const res = await api.get('/dashboard/my-widgets', { params: { company_id, username } })
-    const maintenanceKeys = [
-      'tickets_kpi',
-      'maintenance_status',
-      'top_area_complaints',
-      'top_tenant_requests',
-      'tickets_by_category',
-    ]
-
-    const userMaintWidgets = res.data.filter((w) => maintenanceKeys.includes(w.widget_key))
-
-    if (userMaintWidgets.length > 0) {
-      activeWidgets.value = userMaintWidgets
-    } else {
-      activeWidgets.value = defaultMaintWidgets
-    }
-  } catch {
-    activeWidgets.value = defaultMaintWidgets
+    const res = await api.get('/dynamic-widgets/available', { params: { username } })
+    // Only show Operations category for this dashboard
+    dynamicWidgets.value = res.data.filter((w) => w.category === 'Operations')
+  } catch (err) {
+    console.error('Failed to load dynamic widgets', err)
+    dynamicWidgets.value = []
   }
 }
 
@@ -335,29 +232,12 @@ const loadDashboardData = async () => {
   isLoading.value = true
   error.value = null
 
-  const y = selectedYear.value
-  const p = selectedPeriod.value.toString().padStart(2, '0')
-
   try {
-    // Queries maintenance status details from the backend endpoint
-    const res = await api.get('/v1/dashboard/maintenance/status', {
-      params: {
-        year: y,
-        period: p,
-        company_id: company_id,
-      },
-    })
-    statusPayload.value = res.data
-
-    // Store localized structures
-    ticketsByCategory.value = res.data.ticketsByCategory || []
-    topAreaComplaints.value = res.data.topAreaComplaints || []
-    topTenantRequests.value = res.data.topTenantRequests || []
+    // DynamicWidgets handle their own data fetching now
+    // We just simulate overall dashboard loading here if needed
+    await new Promise(resolve => setTimeout(resolve, 500))
   } catch (err) {
-    console.error('Maintenance Dashboard connection failure:', err)
-    error.value =
-      err.response?.data?.message ||
-      'Maintenance service connection timeout. Please verify network routing or backend session authorization.'
+    error.value = 'Dashboard connection failure.'
   } finally {
     isLoading.value = false
   }

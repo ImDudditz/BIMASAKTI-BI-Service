@@ -15,6 +15,7 @@
         <div>
             <button @click="tab = 'companies'" :class="{'font-bold underline': tab==='companies'}" class="mr-4 hover:text-blue-200">Companies</button>
             <button @click="tab = 'permissions'" :class="{'font-bold underline': tab==='permissions'}" class="mr-4 hover:text-blue-200">Permissions</button>
+            <button @click="openWidgetDesigner" :class="{'font-bold underline': tab==='widgets'}" class="mr-4 hover:text-blue-200">Widget Designer</button>
             <button @click="openAuditTab" :class="{'font-bold underline': tab==='audit'}" class="mr-4 hover:text-blue-200">Audit Logs</button>
             <button @click="logout" class="bg-blue-700 px-3 py-1 rounded hover:bg-blue-800">Logout</button>
         </div>
@@ -129,6 +130,80 @@
                     <pre class="text-green-400 text-sm font-mono whitespace-pre-wrap">{{ systemAuditLogs }}</pre>
                 </div>
             </div>
+            <!-- Widget Designer Tab -->
+            <div v-if="tab === 'widgets'" class="grid grid-cols-1 md:grid-cols-4 gap-6 w-full">
+                <!-- List -->
+                <div class="col-span-1 bg-white p-4 rounded-lg shadow border">
+                    <h3 class="font-bold text-lg mb-4 border-b pb-2">Widgets</h3>
+                    <div class="space-y-2 max-h-96 overflow-y-auto pr-2">
+                        <button v-for="w in dynamicWidgets" :key="w.id" @click="selectWidget(w)" 
+                                class="w-full text-left p-3 border rounded transition flex justify-between items-center bg-gray-50 hover:bg-blue-50">
+                            <span class="font-bold text-sm">{{ w.name }}</span>
+                            <span class="text-xs text-gray-500">{{ w.category }}</span>
+                        </button>
+                    </div>
+                    <button @click="clearWidgetForm" class="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded font-bold">+ New Widget</button>
+                </div>
+
+                <!-- Form -->
+                <div class="col-span-3 bg-white p-6 rounded-lg shadow border">
+                    <h3 class="font-bold text-lg mb-4 border-b pb-2">{{ widgetForm.id ? 'Edit Widget: ' + widgetForm.id : 'Design New Widget' }}</h3>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold mb-1">ID (No spaces)</label>
+                                <input v-model="widgetForm.id" class="w-full border p-2 rounded bg-gray-50" placeholder="sales_kpi">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Name</label>
+                                <input v-model="widgetForm.name" class="w-full border p-2 rounded bg-gray-50" placeholder="Sales KPI">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Category</label>
+                                <select v-model="widgetForm.category" class="w-full border p-2 rounded bg-gray-50">
+                                    <option value="Financial">Financial</option>
+                                    <option value="Tenancy">Tenancy</option>
+                                    <option value="Operations">Operations</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Chart Type</label>
+                                <select v-model="widgetForm.type" class="w-full border p-2 rounded bg-gray-50">
+                                    <option value="echarts_bar">Bar Chart</option>
+                                    <option value="echarts_line">Line Chart</option>
+                                    <option value="echarts_pie">Pie Chart</option>
+                                </select>
+                            </div>
+                            <div class="border p-4 rounded bg-gray-50">
+                                <h4 class="font-bold mb-2">Query Builder</h4>
+                                <label class="block text-xs font-bold mb-1">Table</label>
+                                <input v-model="widgetForm.query.table" class="w-full border p-2 rounded text-sm mb-2" placeholder="e.g. Sales">
+                                
+                                <label class="block text-xs font-bold mb-1">Dimension (X-Axis)</label>
+                                <input :value="widgetForm.query.dimensions[0]" @input="e => widgetForm.query.dimensions[0] = e.target.value" class="w-full border p-2 rounded text-sm mb-2" placeholder="e.g. Region">
+                                
+                                <label class="block text-xs font-bold mb-1">Measure Field (Y-Axis)</label>
+                                <input :value="widgetForm.query.measures[0]?.field" @input="e => updateMeasureField(e.target.value)" class="w-full border p-2 rounded text-sm mb-2" placeholder="e.g. Amount">
+                                
+                                <label class="block text-xs font-bold mb-1">Aggregation</label>
+                                <select :value="widgetForm.query.measures[0]?.agg || 'Sum'" @change="e => updateMeasureAgg(e.target.value)" class="w-full border p-2 rounded text-sm">
+                                    <option value="Sum">Sum</option>
+                                    <option value="Count">Count</option>
+                                    <option value="Avg">Avg</option>
+                                </select>
+                            </div>
+                            <div class="flex gap-2 mt-4">
+                                <button @click="saveDynamicWidget" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded flex-1">Save Widget</button>
+                                <button v-if="widgetForm.id" @click="deleteDynamicWidget" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded">Delete</button>
+                            </div>
+                        </div>
+                        <div class="border p-4 bg-gray-100 flex flex-col items-center justify-center text-gray-500 rounded text-sm h-full min-h-[400px] overflow-hidden">
+                            <p class="font-bold mb-2">Live Preview Data Model</p>
+                            <pre class="text-xs text-left w-full mt-4 bg-gray-800 text-green-400 p-4 rounded overflow-auto flex-1">{{ JSON.stringify(widgetForm, null, 2) }}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <!-- Activity Log Modal -->
@@ -189,6 +264,12 @@ createApp({
         const activityLogs = ref('');
 
         const systemAuditLogs = ref('Loading...');
+        
+        const dynamicWidgets = ref([]);
+        const widgetForm = reactive({
+            id: '', category: 'Operations', name: '', type: 'echarts_bar',
+            query: { table: '', dimensions: [''], measures: [{ field: '', agg: 'Sum' }], filters: [] }
+        });
 
         const toasts = ref([]);
         const showToast = (msg, type='info') => {
@@ -376,6 +457,75 @@ createApp({
             { key: 'tickets_by_category', label: 'Tickets Distribution Chart' }
         ];
 
+        const loadDynamicWidgets = async () => {
+            try {
+                // Since this is BI-MGR, the dynamic widgets API is on BI-API.
+                // Assuming MGR knows API URL or they share same host in this setup
+                const res = await fetch('http://localhost:8001/api/dynamic-widgets/available?username=admin');
+                if(res.ok) {
+                    dynamicWidgets.value = await res.json();
+                }
+            } catch (e) { console.error('Failed to load dynamic widgets', e); }
+        };
+
+        const openWidgetDesigner = () => {
+            tab.value = 'widgets';
+            loadDynamicWidgets();
+        };
+
+        const clearWidgetForm = () => {
+            widgetForm.id = '';
+            widgetForm.name = '';
+            widgetForm.category = 'Operations';
+            widgetForm.type = 'echarts_bar';
+            widgetForm.query = { table: '', dimensions: [''], measures: [{ field: '', agg: 'Sum' }], filters: [] };
+        };
+
+        const selectWidget = (w) => {
+            widgetForm.id = w.id;
+            widgetForm.name = w.name;
+            widgetForm.category = w.category;
+            widgetForm.type = w.type;
+            widgetForm.query = JSON.parse(JSON.stringify(w.query));
+            if(!widgetForm.query.dimensions || widgetForm.query.dimensions.length === 0) widgetForm.query.dimensions = [''];
+            if(!widgetForm.query.measures || widgetForm.query.measures.length === 0) widgetForm.query.measures = [{field:'', agg:'Sum'}];
+        };
+
+        const updateMeasureField = (val) => {
+            if(!widgetForm.query.measures[0]) widgetForm.query.measures[0] = {field: '', agg: 'Sum'};
+            widgetForm.query.measures[0].field = val;
+        };
+        const updateMeasureAgg = (val) => {
+            if(!widgetForm.query.measures[0]) widgetForm.query.measures[0] = {field: '', agg: 'Sum'};
+            widgetForm.query.measures[0].agg = val;
+        };
+
+        const saveDynamicWidget = async () => {
+            if(!widgetForm.id || !widgetForm.name || !widgetForm.query.table) return showToast('Fill required fields', 'error');
+            try {
+                const res = await fetch('http://localhost:8001/api/dynamic-widgets/save', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(widgetForm)
+                });
+                if(res.ok) {
+                    showToast('Widget saved', 'success');
+                    loadDynamicWidgets();
+                } else showToast('Failed to save', 'error');
+            } catch(e) { showToast('Error saving widget', 'error'); }
+        };
+
+        const deleteDynamicWidget = async () => {
+            try {
+                const res = await fetch(`http://localhost:8001/api/dynamic-widgets/${widgetForm.category}/${widgetForm.id}`, { method: 'DELETE' });
+                if(res.ok) {
+                    showToast('Widget deleted', 'success');
+                    clearWidgetForm();
+                    loadDynamicWidgets();
+                } else showToast('Failed to delete', 'error');
+            } catch(e) { showToast('Error deleting widget', 'error'); }
+        };
+
         const availableReports = [
             { key: 'balance_sheet', label: 'Balance Sheet Statement' },
             { key: 'income_statement', label: 'Income Statement Statement' }
@@ -389,7 +539,9 @@ createApp({
             users, permSelectedCompany, permSelectedUser, permissions, loadUsers, loadPermissions, savePermissions,
             availableWidgets, availableReports, toasts,
             showLogModal, activityLogs, viewLogs, refreshLogs, closeLogs,
-            systemAuditLogs, fetchAuditLogs, openAuditTab
+            systemAuditLogs, fetchAuditLogs, openAuditTab,
+            dynamicWidgets, widgetForm, openWidgetDesigner, clearWidgetForm, selectWidget, 
+            updateMeasureField, updateMeasureAgg, saveDynamicWidget, deleteDynamicWidget
         };
     }
 }).mount('#app');

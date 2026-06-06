@@ -366,7 +366,10 @@ namespace Bimasakti.BiService.Api.Services
                         {
                             topTypeQuery += " AND strftime('%Y', call_date) = @year AND strftime('%m', call_date) = @period";
                         }
-                        topTypeQuery += " GROUP BY call_type_name ORDER BY COUNT(DISTINCT call_no) DESC LIMIT 1;";
+                        topTypeQuery += @"
+                            GROUP BY call_type_name
+                            ORDER BY COUNT(*) DESC
+                            LIMIT 1;";
 
                         using (var command = new SqliteCommand(topTypeQuery, connection))
                         {
@@ -377,7 +380,10 @@ namespace Bimasakti.BiService.Api.Services
                                 command.Parameters.AddWithValue("@period", period.PadLeft(2, '0'));
                             }
                             var result = await command.ExecuteScalarAsync();
-                            item.TopRequestType = result != null && result != DBNull.Value ? result.ToString()!.Trim() : "General";
+                            if (result != null && result != DBNull.Value)
+                            {
+                                item.TopRequestType = result.ToString() ?? "General";
+                            }
                         }
                     }
 
