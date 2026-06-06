@@ -236,7 +236,7 @@ adminGroup.MapPost("/companies", async (PortalCompanySaveRequest req) =>
 
     // Parse URLs
     var dict = new Dictionary<string, string>();
-    foreach (var line in (req.SyncUrls ?? "").Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+    foreach (var line in (req.SyncUrls ?? "").Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
     {
         string t = line.Trim();
         if (string.IsNullOrEmpty(t)) continue;
