@@ -38,13 +38,14 @@ namespace Bimasakti.BiService.Api
             string secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new Exception("CRITICAL: Missing JWT_SECRET");
             if (secretKey.Length < 32) throw new Exception("CRITICAL: JWT_SECRET too short");
 
-            var (host, port) = GetServerConfig();
+            var (host, ports) = GetServerConfig();
 
             var builder = WebApplication.CreateBuilder(args);
 
             if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APP_POOL_ID")))
             {
-                builder.WebHost.UseUrls($"http://{host}:{port}");
+                var urls = ports.Select(p => $"http://{host}:{p}").ToArray();
+                builder.WebHost.UseUrls(urls);
             }
 
             ConfigureServices(builder, secretKey);
@@ -58,10 +59,10 @@ namespace Bimasakti.BiService.Api
 
 
 
-        private static (string host, int port) GetServerConfig()
+        private static (string host, int[] ports) GetServerConfig()
         {
             string host = "0.0.0.0";
-            int port = 8001;
+            var portsList = new List<int> { 8001 };
             string configPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
 
             if (File.Exists(configPath))
@@ -72,12 +73,27 @@ namespace Bimasakti.BiService.Api
                     if (doc.RootElement.TryGetProperty("Server", out var server))
                     {
                         if (server.TryGetProperty("Host", out var h)) host = h.GetString() ?? host;
-                        if (server.TryGetProperty("Port", out var p) && p.TryGetInt32(out var parsedPort)) port = parsedPort;
+                        
+                        if (server.TryGetProperty("Ports", out var pArray) && pArray.ValueKind == JsonValueKind.Array)
+                        {
+                            portsList.Clear();
+                            foreach (var item in pArray.EnumerateArray())
+                            {
+                                if (item.TryGetInt32(out var intP)) portsList.Add(intP);
+                            }
+                        }
+                        else if (server.TryGetProperty("Port", out var p) && p.TryGetInt32(out var parsedPort))
+                        {
+                            portsList.Clear();
+                            portsList.Add(parsedPort);
+                        }
                     }
                 }
                 catch { /* Use defaults */ }
             }
-            return (host, port);
+            
+            if (portsList.Count == 0) portsList.Add(8001);
+            return (host, portsList.Distinct().ToArray());
         }
 
         private static void ConfigureServices(WebApplicationBuilder builder, string secretKey)

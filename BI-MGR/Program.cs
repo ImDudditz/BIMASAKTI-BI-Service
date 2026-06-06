@@ -369,9 +369,19 @@ adminGroup.MapPost("/manager/companies/{companyId}/users/{userId:int}/permission
 
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APP_POOL_ID")))
 {
-    int mgrPort = builder.Configuration.GetValue<int>("Server:Port", 8003);
     string mgrHost = builder.Configuration.GetValue<string>("Server:Host", "127.0.0.1");
-    app.Run($"http://{mgrHost}:{mgrPort}");
+    var portsArray = builder.Configuration.GetSection("Server:Ports").Get<int[]>();
+    
+    if (portsArray != null && portsArray.Length > 0)
+    {
+        foreach (var p in portsArray) app.Urls.Add($"http://{mgrHost}:{p}");
+        app.Run();
+    }
+    else
+    {
+        int mgrPort = builder.Configuration.GetValue<int>("Server:Port", 8003);
+        app.Run($"http://{mgrHost}:{mgrPort}");
+    }
 }
 else
 {
