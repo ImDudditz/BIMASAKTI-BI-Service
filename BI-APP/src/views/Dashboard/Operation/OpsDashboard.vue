@@ -142,14 +142,18 @@
 
         <!-- Dashboard Layout Grid -->
         <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4 pb-6 w-full">
-          <!-- Primary Metrics Chart (Stat cards + daily foot traffic) -->
-          <div class="lg:col-span-2">
-            <OperationMetricsWidget />
+          <!-- Left Column -->
+          <div class="flex flex-col gap-4 w-full">
+            <template v-for="widget in leftColumnWidgets" :key="widget.id">
+              <DynamicWidget :config="widget" />
+            </template>
           </div>
 
-          <!-- Secondary Leases Chart -->
-          <div class="lg:col-span-2">
-            <LeaseExpirationsWidget :expirationsData="leaseExpirations" />
+          <!-- Right Column -->
+          <div class="flex flex-col gap-4 w-full">
+            <template v-for="widget in rightColumnWidgets" :key="widget.id">
+              <DynamicWidget :config="widget" />
+            </template>
           </div>
         </div>
       </div>
@@ -164,8 +168,7 @@ import api from '@/services/api'
 import { useReportFilterStore } from '@/stores/reportFilters'
 import { useAuthStore } from '@/stores/auth'
 import ReportLayout from '@/components/ReportLayout.vue'
-import OperationMetricsWidget from '@/components/widgets/Operation/OperationMetricsWidget.vue'
-import LeaseExpirationsWidget from '@/components/widgets/Operation/LeaseExpirationsWidget.vue'
+import DynamicWidget from '@/components/widgets/DynamicWidget.vue'
 
 const filterStore = useReportFilterStore()
 const { selectedYear, selectedPeriod, availableYears, availablePeriods } = storeToRefs(filterStore)
@@ -178,31 +181,37 @@ const error = ref(null)
 const comparisonYears = ref([])
 
 const monthNames = {
-  '01': 'January',
-  '02': 'February',
-  '03': 'March',
-  '04': 'April',
-  '05': 'May',
-  '06': 'June',
-  '07': 'July',
-  '08': 'August',
-  '09': 'September',
-  10: 'October',
-  11: 'November',
-  12: 'December',
+  '01': 'January', '02': 'February', '03': 'March', '04': 'April',
+  '05': 'May', '06': 'June', '07': 'July', '08': 'August',
+  '09': 'September', '10': 'October', '11': 'November', '12': 'December',
 }
 
-// Operational bound structures
-const metricsPayload = ref(null)
-const leaseExpirations = ref([])
+const dynamicWidgets = ref([])
+
+const leftColumnWidgets = computed(() => {
+  return dynamicWidgets.value.filter((_, index) => index % 2 === 0)
+})
+
+const rightColumnWidgets = computed(() => {
+  return dynamicWidgets.value.filter((_, index) => index % 2 !== 0)
+})
 
 const isAuthorized = computed(() => {
-  return (
-    authStore.isAdmin ||
-    authStore.userWidgets.includes('operation_metrics') ||
-    authStore.userWidgets.includes('lease_expirations')
-  )
+  return authStore.isAdmin || dynamicWidgets.value.length > 0
 })
+
+const fetchUserWidgets = async () => {
+  try {
+    const username = authStore.user?.username
+    if (!username) return
+
+    const res = await api.get('/dynamic-widgets/available', { params: { username } })
+    dynamicWidgets.value = res.data.filter((w) => w.category === 'Operations' || w.category === 'Operation')
+  } catch (err) {
+    console.error('Failed to load dynamic widgets', err)
+    dynamicWidgets.value = []
+  }
+}
 
 const loadDashboardData = async () => {
   if (!isAuthorized.value) {
@@ -219,33 +228,18 @@ const loadDashboardData = async () => {
   isLoading.value = true
   error.value = null
 
-  const y = selectedYear.value
-  const p = selectedPeriod.value.toString().padStart(2, '0')
-
   try {
-    // Queries operation metrics from the backend endpoint
-    const res = await api.get('/v1/dashboard/operation/metrics', {
-      params: {
-        year: y,
-        period: p,
-        company_id: company_id,
-      },
-    })
-    metricsPayload.value = res.data
-
-    // Store localized lease expirations timeline list
-    leaseExpirations.value = res.data.leaseExpirationsTimeline || []
+    // DynamicWidgets handle their own data fetching now
+    await new Promise(resolve => setTimeout(resolve, 500))
   } catch (err) {
-    console.error('Ops Dashboard connection failure:', err)
-    error.value =
-      err.response?.data?.message ||
-      'Operational service connection timeout. Please verify network routing or backend session authorization.'
+    error.value = 'Dashboard connection failure.'
   } finally {
     isLoading.value = false
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await fetchUserWidgets()
   filterStore.fetchFilters().then(() => loadDashboardData())
 })
 

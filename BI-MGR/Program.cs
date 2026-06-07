@@ -330,6 +330,57 @@ adminGroup.MapPost("/companies/{id}/sync", (string id) =>
     return Results.Ok(new { message = $"Sync started in background for {id}" });
 });
 
+adminGroup.MapPost("/manager/sync-bms-skeletons", () =>
+{
+    Task.Run(async () =>
+    {
+        try
+        {
+            await new SkeletonSyncService().SyncBmsSkeletonsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Skeleton Sync error: " + ex.Message);
+        }
+    });
+    return Results.Ok(new { message = "Skeleton sync started in background for BMS Company database" });
+});
+
+adminGroup.MapGet("/manager/bms-schema", async () =>
+{
+    var schema = new Dictionary<string, List<string>>();
+    try
+    {
+        string dbPath = Bimasakti.BiService.Api.Core.DbUtils.GetSafeDbPath("BMS");
+        if (System.IO.File.Exists(dbPath))
+        {
+            using var conn = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={dbPath};Mode=ReadOnly;");
+            await conn.OpenAsync();
+            var tables = new List<string>();
+            using (var cmd = new Microsoft.Data.Sqlite.SqliteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'Users' AND name NOT LIKE 'UserWidgets' AND name NOT LIKE 'UserReports';", conn))
+            using (var reader = await cmd.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync()) tables.Add(reader.GetString(0));
+            }
+            foreach (var t in tables)
+            {
+                var cols = new List<string>();
+                using (var cmd = new Microsoft.Data.Sqlite.SqliteCommand($"PRAGMA table_info({t});", conn))
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync()) cols.Add(reader.GetString(1));
+                }
+                schema[t] = cols;
+            }
+        }
+        return Results.Ok(schema);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+});
+
 adminGroup.MapGet("/manager/companies/{companyId}/users", async (string companyId) =>
 {
     try

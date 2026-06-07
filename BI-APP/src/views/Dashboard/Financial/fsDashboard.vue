@@ -1,291 +1,76 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch, defineAsyncComponent } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import api from '@/services/api'
 import { useReportFilterStore } from '@/stores/reportFilters'
 import { useAuthStore } from '@/stores/auth'
 import ReportLayout from '@/components/ReportLayout.vue'
+import DynamicWidget from '@/components/widgets/DynamicWidget.vue'
 
 const filterStore = useReportFilterStore()
-const { selectedYear, selectedPeriod, availableYears, availablePeriods, activePreset } =
-  storeToRefs(filterStore)
+const { selectedYear, selectedPeriod, availableYears, availablePeriods } = storeToRefs(filterStore)
 
 const authStore = useAuthStore()
 
+// Localized Async States
 const isLoading = ref(true)
-
-const activeWidgets = ref([])
-
-const monthNames = {
-  '01': 'January',
-  '02': 'February',
-  '03': 'March',
-  '04': 'April',
-  '05': 'May',
-  '06': 'June',
-  '07': 'July',
-  '08': 'August',
-  '09': 'September',
-  10: 'October',
-  11: 'November',
-  12: 'December',
-}
-
-const formatMoney = (val) => {
-  const num = Math.round(parseFloat(val) || 0)
-  return new Intl.NumberFormat('id-ID', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(Math.abs(num))
-}
-
-const formatShortMoney = (num) => {
-  if (num === null || num === undefined) return '0'
-  const absNum = Math.abs(num)
-  let val, suffix
-  if (absNum >= 1e9) {
-    val = absNum / 1e9
-    suffix = 'B'
-  } else if (absNum >= 1e6) {
-    val = absNum / 1e6
-    suffix = 'M'
-  } else if (absNum >= 1e3) {
-    val = absNum / 1e3
-    suffix = 'K'
-  } else {
-    return formatMoney(num)
-  }
-
-  const formatted = new Intl.NumberFormat('id-ID', {
-    minimumFractionDigits: suffix === 'K' ? 1 : 2,
-    maximumFractionDigits: suffix === 'K' ? 1 : 2,
-  }).format(val)
-  return num < 0 ? `(${formatted}${suffix})` : formatted + suffix
-}
-
+const error = ref(null)
 const comparisonYears = ref([])
 
-// Widget Registry
-const widgetRegistry = {
-  kpi_cards: defineAsyncComponent(
-    () => import('@/components/widgets/Financial/KpiCardsWidget.vue'),
-  ),
-  capital_growth: defineAsyncComponent(
-    () => import('@/components/widgets/Financial/CapitalGrowthWidget.vue'),
-  ),
-  operating_cash_flow: defineAsyncComponent(
-    () => import('@/components/widgets/Financial/OperatingCashFlowWidget.vue'),
-  ),
-  revenue_budget: defineAsyncComponent(
-    () => import('@/components/widgets/Financial/RevenueBudgetWidget.vue'),
-  ),
-  expense_budget: defineAsyncComponent(
-    () => import('@/components/widgets/Financial/ExpenseBudgetWidget.vue'),
-  ),
-  operation_metrics: defineAsyncComponent(
-    () => import('@/components/widgets/Operation/OperationMetricsWidget.vue'),
-  ),
-  lease_expirations: defineAsyncComponent(
-    () => import('@/components/widgets/Operation/LeaseExpirationsWidget.vue'),
-  ),
-  tickets_kpi: defineAsyncComponent(
-    () => import('@/components/widgets/ServiceAndMaintenance/TicketsKPI.vue'),
-  ),
-  maintenance_status: defineAsyncComponent(
-    () => import('@/components/widgets/ServiceAndMaintenance/MaintenanceStatusWidget.vue'),
-  ),
-  tickets_by_category: defineAsyncComponent(
-    () => import('@/components/widgets/ServiceAndMaintenance/TicketsByCategoryWidget.vue'),
-  ),
+const monthNames = {
+  '01': 'January', '02': 'February', '03': 'March', '04': 'April',
+  '05': 'May', '06': 'June', '07': 'July', '08': 'August',
+  '09': 'September', '10': 'October', '11': 'November', '12': 'December',
 }
 
-const baseEchartsOptions = {
-  textStyle: { fontFamily: "'Inter', sans-serif" },
-  grid: { left: '3%', right: '4%', bottom: '5%', top: '15%', containLabel: true },
-}
+const dynamicWidgets = ref([])
 
-// Reactive Dashboard Data
-const rawLedgerData = ref(null)
-const leaseExpirations = ref([])
-const ticketsByCategory = ref([])
+const leftColumnWidgets = computed(() => {
+  return dynamicWidgets.value.filter((_, index) => index % 2 === 0)
+})
 
-const getWidgetProps = (widget) => {
-  const baseProps = { formatMoney, formatShortMoney, baseEchartsOptions, config: widget.config }
-  switch (widget.widget_key) {
-    case 'kpi_cards':
-      return { ...baseProps, rawLedgerData: rawLedgerData.value }
-    case 'capital_growth':
-      return { ...baseProps, rawLedgerData: rawLedgerData.value, selectedYear: selectedYear.value }
-    case 'operating_cash_flow':
-      return { ...baseProps, selectedYear: selectedYear.value }
-    case 'revenue_budget':
-      return { ...baseProps, rawLedgerData: rawLedgerData.value, selectedYear: selectedYear.value }
-    case 'expense_budget':
-      return { ...baseProps, rawLedgerData: rawLedgerData.value, selectedYear: selectedYear.value }
-    case 'lease_expirations':
-      return { ...baseProps, expirationsData: leaseExpirations.value }
-    case 'tickets_by_category':
-      return { ...baseProps, categoriesData: ticketsByCategory.value }
-    case 'tickets_kpi':
-      return {
-        ...baseProps,
-        companyId: authStore.user?.company_id || 'ASHMD',
-        selectedYear: selectedYear.value,
-        selectedPeriod: selectedPeriod.value,
-      }
-    default:
-      return baseProps
-  }
-}
+const rightColumnWidgets = computed(() => {
+  return dynamicWidgets.value.filter((_, index) => index % 2 !== 0)
+})
+
+const isAuthorized = computed(() => {
+  return authStore.isAdmin || dynamicWidgets.value.length > 0
+})
 
 const fetchUserWidgets = async () => {
   try {
-    const company_id = authStore.user?.company_id
     const username = authStore.user?.username
-    if (!company_id || !username) return
-    const res = await api.get('/dashboard/my-widgets', { params: { company_id, username } })
-    activeWidgets.value = res.data
-  } catch {
-    // Ignore error
+    if (!username) return
+
+    const res = await api.get('/dynamic-widgets/available', { params: { username } })
+    dynamicWidgets.value = res.data.filter((w) => w.category === 'Financial' || w.category === 'Finance')
+  } catch (err) {
+    console.error('Failed to load dynamic widgets', err)
+    dynamicWidgets.value = []
   }
 }
 
-// Request cancellation controller
-let activeController = null
-
 const loadDashboardData = async () => {
-  const company_id = authStore.user?.company_id
+  if (!isAuthorized.value) {
+    isLoading.value = false
+    return
+  }
+
+  const company_id = authStore.user?.company_id || 'ASHMD'
   if (!company_id || !selectedYear.value || !selectedPeriod.value) {
     isLoading.value = false
     return
   }
 
-  // Cancel any active outstanding requests from a previous dashboard filter change
-  if (activeController) {
-    activeController.abort()
-  }
-  activeController = new AbortController()
-  const signal = activeController.signal
-
   isLoading.value = true
-
-  const y = selectedYear.value
-  const p = selectedPeriod.value.toString().padStart(2, '0')
+  error.value = null
 
   try {
-    // 1. Fetch current period data
-    const currRes = await api.get('/reports/ledger', {
-      params: { year: y, period: p, preset: activePreset.value, company_id: company_id },
-      signal,
-    })
-
-    let currentPeriodPayload = null
-    if (currRes.data && currRes.data.status === 'success') {
-      currentPeriodPayload = {
-        year: y,
-        period: p,
-        data: currRes.data.data,
-        net_income: currRes.data.net_income || currRes.data.netIncome || 0,
-      }
-    }
-
-    // 2. Fetch previous period data (for month-over-month growth comparisons)
-    let previousPeriodPayload = null
-    const prevY = p === '01' ? (parseInt(y) - 1).toString() : y
-    const prevP = p === '01' ? '12' : (parseInt(p) - 1).toString().padStart(2, '0')
-    try {
-      const prevRes = await api.get('/reports/ledger', {
-        params: { year: prevY, period: prevP, preset: activePreset.value, company_id: company_id },
-        signal,
-      })
-      if (prevRes.data && prevRes.data.status === 'success') {
-        previousPeriodPayload = {
-          year: prevY,
-          period: prevP,
-          data: prevRes.data.data,
-          net_income: prevRes.data.net_income || prevRes.data.netIncome || 0,
-        }
-      }
-    } catch (err) {
-      if (err.name === 'CanceledError' || err.message === 'canceled') throw err
-      // Ignore other errors for optional comparisons
-    }
-
-    // 3. Fetch yearly data for selected year and comparison years (12 periods each)
-    const yearsToFetch = [...new Set([selectedYear.value, ...comparisonYears.value])]
-    const yearlyDataPayload = {}
-
-    for (const year of yearsToFetch) {
-      const yearPromises = []
-      for (let i = 1; i <= 12; i++) {
-        yearPromises.push(
-          api
-            .get('/reports/ledger', {
-              params: {
-                year: year,
-                period: i.toString().padStart(2, '0'),
-                preset: activePreset.value,
-                company_id: company_id,
-              },
-              signal,
-            })
-            .then((res) => res.data)
-            .catch((err) => {
-              if (err.name === 'CanceledError' || err.message === 'canceled') throw err
-              return null
-            }),
-        )
-      }
-      yearlyDataPayload[year] = await Promise.all(yearPromises)
-    }
-
-    // Package the raw results into a single state payload passed down to the widgets
-    rawLedgerData.value = {
-      current: currentPeriodPayload,
-      previous: previousPeriodPayload,
-      yearlyData: yearlyDataPayload,
-    }
-
-    // Fetch Operation Metrics if any operation widget is active
-    const hasOps = activeWidgets.value.some((w) =>
-      ['operation_metrics', 'lease_expirations'].includes(w.widget_key),
-    )
-    if (hasOps) {
-      try {
-        const opsRes = await api.get('/v1/dashboard/operation/metrics', {
-          params: { year: y, period: p, company_id: company_id },
-          signal,
-        })
-        leaseExpirations.value = opsRes.data.leaseExpirationsTimeline || []
-      } catch (err) {
-        if (err.name === 'CanceledError' || err.message === 'canceled') throw err
-        console.error('Failed to fetch operation metrics for fsDashboard:', err)
-      }
-    }
-
-    // Fetch Maintenance Status if any maintenance widget is active
-    const hasMaint = activeWidgets.value.some((w) =>
-      ['tickets_kpi', 'maintenance_status', 'tickets_by_category'].includes(w.widget_key),
-    )
-    if (hasMaint) {
-      try {
-        const maintRes = await api.get('/v1/dashboard/maintenance/status', {
-          params: { year: y, period: p, company_id: company_id },
-          signal,
-        })
-        ticketsByCategory.value = maintRes.data.ticketsByCategory || []
-      } catch (err) {
-        if (err.name === 'CanceledError' || err.message === 'canceled') throw err
-        console.error('Failed to fetch maintenance metrics for fsDashboard:', err)
-      }
-    }
-
-    isLoading.value = false
+    // DynamicWidgets handle their own data fetching now
+    await new Promise(resolve => setTimeout(resolve, 500))
   } catch (err) {
-    if (err.name === 'CanceledError' || err.message === 'canceled') {
-      console.log('[fsDashboard] Requests aborted successfully.')
-      return
-    }
+    error.value = 'Dashboard connection failure.'
+  } finally {
     isLoading.value = false
   }
 }
@@ -295,14 +80,9 @@ onMounted(async () => {
   filterStore.fetchFilters().then(() => loadDashboardData())
 })
 
-onBeforeUnmount(() => {
-  // Abort any outstanding request when navigating away from the dashboard
-  if (activeController) {
-    activeController.abort()
-  }
+watch([selectedYear, selectedPeriod, comparisonYears], () => {
+  loadDashboardData()
 })
-
-watch([selectedYear, selectedPeriod, activePreset, comparisonYears], () => loadDashboardData())
 </script>
 
 <template>
@@ -311,7 +91,7 @@ watch([selectedYear, selectedPeriod, activePreset, comparisonYears], () => loadD
     :subtitle="`As of ${monthNames[selectedPeriod]} ${selectedYear}`"
   >
     <template #controls>
-      <div class="flex items-center gap-1.5">
+      <div class="flex items-center gap-1.5" v-if="isAuthorized">
         <div
           class="flex items-center bg-white border border-sky-200 rounded shadow-sm overflow-hidden shrink-0"
           v-if="availableYears.length > 0"
@@ -359,38 +139,107 @@ watch([selectedYear, selectedPeriod, activePreset, comparisonYears], () => loadD
       <div
         class="max-w-screen-2xl mx-auto px-2 sm:px-4 lg:px-6 py-4 flex flex-col min-h-full w-full"
       >
+        <!-- Access Restricted View -->
         <div
-          v-if="isLoading"
-          class="flex flex-col items-center justify-center flex-1 min-h-0 w-full h-full"
+          v-if="!isAuthorized"
+          class="flex-1 flex flex-col items-center justify-center py-20 px-4 text-center"
         >
           <div
-            class="w-10 h-10 border-4 border-sky-100 border-t-sky-600 rounded-full animate-spin"
+            class="max-w-md w-full bg-white/85 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/60 p-8 space-y-6 animate-slide-up"
+          >
+            <div
+              class="w-16 h-16 bg-rose-50 border border-rose-100 rounded-full flex items-center justify-center mx-auto text-rose-500 shadow-inner"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                class="w-8 h-8"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+                />
+              </svg>
+            </div>
+            <div class="space-y-2">
+              <h3 class="text-xl font-black text-slate-800 tracking-tight">Access Restricted</h3>
+              <p class="text-sm text-slate-500 font-medium leading-relaxed">
+                You do not have permission to view the Executive Dashboard. Please contact your
+                system administrator to request access.
+              </p>
+            </div>
+            <div class="pt-2">
+              <RouterLink
+                to="/dashboard"
+                class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-md hover:shadow-indigo-500/20 active:scale-95 transition-all duration-200"
+              >
+                Back to Dashboard
+              </RouterLink>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div
+          v-else-if="isLoading"
+          class="flex flex-col items-center justify-center flex-1 min-h-0 w-full py-24"
+        >
+          <div
+            class="w-10 h-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"
           ></div>
-          <p class="text-sky-600 font-medium animate-pulse text-sm mt-4">
-            Loading Executive Data...
+          <p class="text-indigo-600 font-medium animate-pulse text-sm mt-4">
+            Loading executive databases...
           </p>
         </div>
 
-        <div v-else class="flex flex-col gap-4 pb-6 w-full">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
-            <template v-for="widget in activeWidgets" :key="widget.widget_key">
-              <div
-                :class="{
-                  'lg:col-span-2': [
-                    'kpi_cards',
-                    'operation_metrics',
-                    'lease_expirations',
-                    'tickets_kpi',
-                    'maintenance_status',
-                    'tickets_by_category',
-                  ].includes(widget.widget_key),
-                }"
-              >
-                <component
-                  :is="widgetRegistry[widget.widget_key]"
-                  v-bind="getWidgetProps(widget)"
-                />
-              </div>
+        <!-- Error Panel -->
+        <div
+          v-else-if="error"
+          class="flex flex-col items-center justify-center flex-1 min-h-0 w-full py-20 text-center"
+        >
+          <div class="p-3.5 bg-rose-50 rounded-full text-rose-500 mb-4 shadow-sm">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-8 h-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          </div>
+          <h4 class="text-slate-800 font-bold tracking-tight">Sync Fail</h4>
+          <p class="text-slate-500 text-xs mt-1 max-w-md leading-relaxed">{{ error }}</p>
+          <button
+            @click="loadDashboardData"
+            class="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm transition-all duration-200"
+          >
+            Retry Connection
+          </button>
+        </div>
+
+        <!-- Dashboard Layout Grid -->
+        <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4 pb-6 w-full">
+          <!-- Left Column -->
+          <div class="flex flex-col gap-4 w-full">
+            <template v-for="widget in leftColumnWidgets" :key="widget.id">
+              <DynamicWidget :config="widget" />
+            </template>
+          </div>
+
+          <!-- Right Column -->
+          <div class="flex flex-col gap-4 w-full">
+            <template v-for="widget in rightColumnWidgets" :key="widget.id">
+              <DynamicWidget :config="widget" />
             </template>
           </div>
         </div>
