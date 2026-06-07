@@ -6,10 +6,16 @@
     <title>SaaS Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-    <script src="lib/Sortable.min.js"></script>
-    <script src="lib/vue-draggable-next.global.js"></script>
-    <script src="lib/vue-pivottable.umd.js"></script>
-    <link rel="stylesheet" href="lib/vue-pivottable.css">
+    <!-- FINOS Perspective CDN -->
+    <link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer@2.10.1/dist/css/themes.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective@2.10.1/dist/cdn/perspective.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer@2.10.1/dist/cdn/perspective-viewer.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-datagrid@2.10.1/dist/cdn/perspective-viewer-datagrid.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-d3fc@2.10.1/dist/cdn/perspective-viewer-d3fc.js"></script>
+    <script type="module">
+        import perspective from "https://cdn.jsdelivr.net/npm/@finos/perspective@2.10.1/dist/cdn/perspective.js";
+        window.perspective = perspective;
+    </script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
 <div id="app" class="min-h-screen flex flex-col">
@@ -135,10 +141,10 @@
                 </div>
             </div>
             <!-- Widget Designer Tab -->
-            <div v-if="tab === 'widgets'" class="flex gap-4 w-full h-[85vh]">
-                <!-- Left Panel (20%) -->
-                <div class="w-1/5 bg-white p-4 rounded-lg shadow border flex flex-col h-full">
-                    <h3 class="font-bold text-lg mb-4 border-b pb-2 flex justify-between items-center">
+            <div v-if="tab === 'widgets'" class="flex h-[90vh] gap-3">
+                <!-- Left Sidebar -->
+                <div class="w-48 bg-white p-3 rounded-lg shadow border flex flex-col h-full">
+                    <h3 class="font-bold text-lg mb-3 border-b pb-2 flex justify-between items-center">
                         Widgets
                         <button v-if="widgetForm.id" @click="deleteDynamicWidget" class="text-xs bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded">Delete</button>
                     </h3>
@@ -187,90 +193,17 @@
                     </div>
 
                     <!-- Live Canvas Area -->
-                    <div class="flex-1 flex overflow-hidden">
-                        <div class="flex-[3] overflow-auto p-4 bg-[#f3f2f1] relative">
-                            <div class="h-full bg-white shadow-sm border border-[var(--excel-border)] overflow-auto">
-                                <vue-pivottable
-                                    v-if="pivotData.length > 0 && (widgetForm.query.rows.length || widgetForm.query.columns.length || widgetForm.query.values.length)"
-                                    :data="pivotData"
-                                    :renderer-name="'Table'"
-                                    :aggregator-name="currentAggregator"
-                                    :rows="widgetForm.query.rows"
-                                    :cols="widgetForm.query.columns"
-                                    :vals="pivotVals"
-                                ></vue-pivottable>
-                                <div v-else class="flex flex-col items-center justify-center text-center text-gray-400 pointer-events-none h-full p-10 bg-white">
-                                    <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                                    <p class="font-bold">Pivot Grid Ready</p>
-                                    <p class="text-xs mt-1">Select a Data Source and drag fields to begin</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Right Sidebar: Pivot Fields -->
-                        <div class="flex-1 min-w-[250px] max-w-[350px] bg-white border-l border-[var(--excel-border)] flex flex-col text-[#323130]">
-                            <div class="p-2 font-semibold border-b border-[var(--excel-border)] bg-[#f9f9f9] text-[13px]">
-                                PivotTable Fields
-                            </div>
-                            
-                            <div class="flex-1 overflow-y-auto p-3 border-b-2 border-[var(--excel-border)]">
-                                <input type="text" placeholder="Search fields" class="w-full box-border mb-3 p-1.5 text-xs border border-[var(--excel-border)] outline-none focus:border-blue-500">
-                                <div v-if="widgetForm.query.table && bmsSchema[widgetForm.query.table]">
-                                    <div v-for="col in bmsSchema[widgetForm.query.table]" :key="col" 
-                                         class="p-1.5 mb-1 bg-white border border-transparent cursor-grab flex items-center text-[12px] hover:bg-[var(--excel-light-gray)] hover:border-[var(--excel-border)] shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
-                                         draggable="true" 
-                                         @dragstart="(e) => onDragStart(e, col)">
-                                        <svg class="w-3.5 h-3.5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
-                                        {{ col }}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 grid-rows-2 gap-2 p-2 h-[45%] bg-[#f9f9f9]">
-                                <div class="bg-white border border-[var(--excel-border)] flex flex-col" @dragover.prevent @drop="onDrop('filters')">
-                                    <div class="text-[11px] font-semibold text-[#666] p-1 border-b border-[var(--excel-border)] bg-[var(--excel-light-gray)]">Y Filters</div>
-                                    <div class="flex-1 p-1.5 overflow-y-auto min-h-[50px] bg-white">
-                                        <div v-for="(filt, i) in widgetForm.query.filters" :key="'f'+i" class="bg-white border border-[var(--excel-border)] p-1 mb-1 text-[11px] shadow-sm flex justify-between items-center hover:bg-gray-50 group">
-                                            <span class="truncate pr-1">{{ filt.field }}</span>
-                                            <button @click="removeField('filters', i)" class="text-gray-400 hover:text-red-500 font-bold opacity-0 group-hover:opacity-100 transition-opacity">&times;</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="bg-white border border-[var(--excel-border)] flex flex-col" @dragover.prevent @drop="onDrop('columns')">
-                                    <div class="text-[11px] font-semibold text-[#666] p-1 border-b border-[var(--excel-border)] bg-[var(--excel-light-gray)]">||| Columns</div>
-                                    <div class="flex-1 p-1.5 overflow-y-auto min-h-[50px] bg-white">
-                                        <div v-for="(col, i) in widgetForm.query.columns" :key="'c'+i" class="bg-white border border-[var(--excel-border)] p-1 mb-1 text-[11px] shadow-sm flex justify-between items-center hover:bg-gray-50 group">
-                                            <span class="truncate pr-1">{{ col }}</span>
-                                            <button @click="removeField('columns', i)" class="text-gray-400 hover:text-red-500 font-bold opacity-0 group-hover:opacity-100 transition-opacity">&times;</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="bg-white border border-[var(--excel-border)] flex flex-col" @dragover.prevent @drop="onDrop('rows')">
-                                    <div class="text-[11px] font-semibold text-[#666] p-1 border-b border-[var(--excel-border)] bg-[var(--excel-light-gray)]">≡ Rows</div>
-                                    <div class="flex-1 p-1.5 overflow-y-auto min-h-[50px] bg-white">
-                                        <div v-for="(row, i) in widgetForm.query.rows" :key="'r'+i" class="bg-white border border-[var(--excel-border)] p-1 mb-1 text-[11px] shadow-sm flex justify-between items-center hover:bg-gray-50 group">
-                                            <span class="truncate pr-1">{{ row }}</span>
-                                            <button @click="removeField('rows', i)" class="text-gray-400 hover:text-red-500 font-bold opacity-0 group-hover:opacity-100 transition-opacity">&times;</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="bg-white border border-[var(--excel-border)] flex flex-col" @dragover.prevent @drop="onDrop('values')">
-                                    <div class="text-[11px] font-semibold text-[#666] p-1 border-b border-[var(--excel-border)] bg-[var(--excel-light-gray)]">Σ Values</div>
-                                    <div class="flex-1 p-1.5 overflow-y-auto min-h-[50px] bg-white">
-                                        <div v-for="(val, i) in widgetForm.query.values" :key="'v'+i" class="bg-white border border-[var(--excel-border)] p-1 mb-1 text-[11px] shadow-sm flex flex-col group">
-                                            <div class="flex justify-between items-center mb-1">
-                                                <span class="font-bold truncate" :title="val.field">{{ val.field }}</span>
-                                                <button @click="removeField('values', i)" class="text-gray-400 hover:text-red-500 font-bold opacity-0 group-hover:opacity-100 transition-opacity ml-1">&times;</button>
-                                            </div>
-                                            <select v-model="val.agg" class="text-[10px] border border-[var(--excel-border)] outline-none w-full p-0.5 bg-[var(--excel-light-gray)]">
-                                                <option value="Sum">Sum</option>
-                                                <option value="Count">Count</option>
-                                                <option value="Average">Average</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="flex-1 relative overflow-hidden bg-white">
+                        <perspective-viewer 
+                            v-show="widgetForm.query.table"
+                            id="pivot-viewer" 
+                            class="absolute inset-0 w-full h-full"
+                            settings="true"
+                        ></perspective-viewer>
+                        <div v-if="!widgetForm.query.table" class="flex flex-col items-center justify-center text-center text-gray-400 pointer-events-none h-full p-10 bg-white absolute inset-0">
+                            <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <p class="font-bold">Pivot Grid Ready</p>
+                            <p class="text-xs mt-1">Select a Data Source to begin</p>
                         </div>
                     </div>
                 </div>
@@ -316,14 +249,16 @@
         --text-color: #323130;
     }
     
-    /* Excel Table aesthetics */
-    table.pvtTable { border-collapse: collapse; min-width: 50%; font-size: 13px; font-family: 'Segoe UI', sans-serif; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    table.pvtTable th, table.pvtTable td { border: 1px solid #c8c6c4; padding: 6px 10px; }
-    table.pvtTable th { background-color: #fff; color: #323130; font-weight: 600; text-align: left; }
-    table.pvtTable th.pvtColLabel { text-align: center; }
-    table.pvtTable td { background-color: #ffffff; text-align: right; color: #323130; }
-    table.pvtTable td.pvtRowLabel { text-align: left; background-color: #fff; font-weight: 600; }
-    table.pvtTable td.pvtTotal, table.pvtTable th.pvtTotalLabel { font-weight: bold; background-color: #f3f2f1; }
+    #pivot-viewer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        background: #ffffff;
+    }
 </style>
 <script>
 // ==========================================
@@ -337,10 +272,7 @@ window.CONFIG = {
 
 const { createApp, ref, reactive, onMounted, watch, computed } = Vue;
 
-const { VuePivottable } = window.VuePivottable || {};
-
 createApp({
-    components: { VuePivottable },
     setup() {
         const pivotData = ref([]);
         const isAuthenticated = ref(false);
@@ -587,11 +519,15 @@ createApp({
             widgetForm.query = { table: '', rows: [], columns: [], values: [], filters: [] };
         };
 
-        const selectWidget = (w) => {
+        const selectWidget = async (w) => {
+            const tableAlreadySame = widgetForm.query.table === w.query.table;
+
             widgetForm.id = w.id;
             widgetForm.name = w.name;
             widgetForm.category = w.category;
             widgetForm.type = w.type;
+            widgetForm.formatting = w.formatting || {};
+
             const q = JSON.parse(JSON.stringify(w.query));
             widgetForm.query = {
                 table: q.table || '',
@@ -600,11 +536,38 @@ createApp({
                 values: q.values || q.measures || [],
                 filters: q.filters || []
             };
+
+            if (tableAlreadySame && widgetForm.query.table) {
+                const schemaColumns = bmsSchema.value[widgetForm.query.table] || [];
+                await updatePerspectiveViewer(pivotData.value, schemaColumns);
+            }
         };
 
         const saveDynamicWidget = async () => {
             if(!widgetForm.id || !widgetForm.name || !widgetForm.query.table) return showToast('Fill required fields', 'error');
             try {
+                const viewer = document.getElementById('pivot-viewer');
+                if (viewer) {
+                    const config = await viewer.save();
+                    widgetForm.formatting = config;
+
+                    widgetForm.query.rows = config.row_pivots || [];
+                    widgetForm.query.columns = config.column_pivots || [];
+                    widgetForm.query.values = (config.columns || []).map(col => {
+                        const agg = (config.aggregates && config.aggregates[col]) || 'sum';
+                        const capitalizedAgg = agg.charAt(0).toUpperCase() + agg.slice(1).toLowerCase();
+                        return { field: col, agg: capitalizedAgg };
+                    });
+                    const configFilters = config.filter || config.filters || [];
+                    widgetForm.query.filters = configFilters.map(f => {
+                        return {
+                            field: f[0],
+                            operator: f[1] === '==' ? '=' : f[1],
+                            value: String(f[2])
+                        };
+                    });
+                }
+
                 const res = await fetch(`http://${window.location.hostname}:8001/api/dynamic-widgets/save`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -614,7 +577,10 @@ createApp({
                     showToast('Widget saved', 'success');
                     loadDynamicWidgets();
                 } else showToast('Failed to save', 'error');
-            } catch(e) { showToast('Error saving widget', 'error'); }
+            } catch(e) { 
+                console.error(e);
+                showToast('Error saving widget', 'error'); 
+            }
         };
 
         const deleteDynamicWidget = async () => {
@@ -628,71 +594,105 @@ createApp({
             } catch(e) { showToast('Error deleting widget', 'error'); }
         };
 
-        const pivotVals = computed(() => widgetForm.query.values.map(v => v.field));
-        const currentAggregator = computed(() => {
-            if (widgetForm.query.values.length > 0) return widgetForm.query.values[0].agg;
-            return 'Count';
-        });
+        let perspectiveWorker = null;
+        let perspectiveTable = null;
 
-        const draggedField = ref(null);
-        
-        const onDragStart = (e, field) => {
-            draggedField.value = field;
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', field);
-        };
-
-        const onDrop = (zone) => {
-            if (!draggedField.value) return;
-            const field = draggedField.value;
-            if (zone === 'rows' && !widgetForm.query.rows.includes(field)) widgetForm.query.rows.push(field);
-            if (zone === 'columns' && !widgetForm.query.columns.includes(field)) widgetForm.query.columns.push(field);
-            if (zone === 'values' && !widgetForm.query.values.find(v => v.field === field)) {
-                widgetForm.query.values.push({ field, agg: 'Sum' });
+        const initPerspective = async () => {
+            if (!perspectiveWorker && window.perspective) {
+                perspectiveWorker = window.perspective.worker();
             }
-            if (zone === 'filters' && !widgetForm.query.filters.find(f => f.field === field)) {
-                widgetForm.query.filters.push({ field, operator: '=', value: '' });
+        };
+
+        const mapColumnType = (colName) => {
+            const name = colName.toLowerCase();
+            if (name.includes('date') || name.includes('period') || name.includes('time')) {
+                return 'date';
             }
-            draggedField.value = null;
+            if (name.includes('amt') || name.includes('amount') || name.includes('balance') || name.includes('total') || name.includes('qty') || name.includes('rate') || name.includes('price')) {
+                return 'float';
+            }
+            return 'string';
         };
 
-        const removeField = (zone, index) => {
-            widgetForm.query[zone].splice(index, 1);
+        const updatePerspectiveViewer = async (tableData, columnsList) => {
+            await initPerspective();
+            if (!perspectiveWorker) return;
+
+            try {
+                if (perspectiveTable) {
+                    perspectiveTable.delete();
+                    perspectiveTable = null;
+                }
+
+                const schema = {};
+                columnsList.forEach(col => {
+                    schema[col] = mapColumnType(col);
+                });
+
+                perspectiveTable = await perspectiveWorker.table(schema);
+                await perspectiveTable.update(tableData);
+
+                const viewer = document.getElementById('pivot-viewer');
+                if (viewer) {
+                    await viewer.load(perspectiveTable);
+                    
+                    if (widgetForm.formatting && Object.keys(widgetForm.formatting).length > 0) {
+                        await viewer.restore({ ...widgetForm.formatting, settings: true });
+                    } else {
+                        await viewer.restore({
+                            settings: true,
+                            plugin: "Datagrid",
+                            row_pivots: ["Type_Name", "Ref_Date", "Due_Date", "Dept"].filter(c => columnsList.includes(c)),
+                            columns: ["L_Trx_Amt", "L_Rmn_Amt", "X_Local_Amt"].filter(c => columnsList.includes(c)),
+                            aggregates: {
+                                "L_Trx_Amt": "sum",
+                                "L_Rmn_Amt": "sum",
+                                "X_Local_Amt": "sum"
+                            }
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error("Error updating Perspective viewer:", err);
+            }
         };
 
-        watch(() => widgetForm.query.table, (newTable, oldTable) => {
+        watch(() => widgetForm.query.table, async (newTable, oldTable) => {
             if (oldTable && newTable !== oldTable) {
                 widgetForm.query.rows = [];
                 widgetForm.query.columns = [];
                 widgetForm.query.values = [];
                 widgetForm.query.filters = [];
+                widgetForm.formatting = {};
             }
             if (!newTable || !bmsSchema.value[newTable]) {
                 pivotData.value = [];
+                const viewer = document.getElementById('pivot-viewer');
+                if (viewer) {
+                    viewer.reset();
+                }
                 return;
             }
-            const schema = bmsSchema.value[newTable];
+
+            const schemaColumns = bmsSchema.value[newTable];
             const data = [];
             for (let i = 0; i < 100; i++) {
                 const row = {};
-                schema.forEach(col => {
-                    if (col.includes('amount') || col.includes('amt') || col.includes('balance') || col.includes('total')) {
-                        row[col] = (Math.random() * 100000).toFixed(2);
-                    } else if (col.includes('date') || col.includes('period')) {
+                schemaColumns.forEach(col => {
+                    const type = mapColumnType(col);
+                    if (type === 'float') {
+                        row[col] = parseFloat((Math.random() * 100000).toFixed(2));
+                    } else if (type === 'date') {
                         row[col] = `2023-0${Math.floor(Math.random() * 9) + 1}-01`;
-                    } else if (col.includes('name') || col.includes('code')) {
-                        row[col] = `${col.split('_')[0].toUpperCase()} ${Math.floor(Math.random() * 5) + 1}`;
                     } else {
-                        row[col] = `Value ${Math.floor(Math.random() * 10)}`;
+                        row[col] = `${col.split('_')[0].toUpperCase()} ${Math.floor(Math.random() * 5) + 1}`;
                     }
                 });
                 data.push(row);
             }
             pivotData.value = data;
-        });
 
-        watch(tab, (newVal) => {
-            // tab change logic if needed
+            await updatePerspectiveViewer(data, schemaColumns);
         });
 
         const syncBmsSkeletons = async () => {
@@ -718,8 +718,7 @@ createApp({
             systemAuditLogs, fetchAuditLogs, openAuditTab,
             dynamicWidgets, widgetForm, openWidgetDesigner, clearWidgetForm, selectWidget, 
             saveDynamicWidget, deleteDynamicWidget, syncBmsSkeletons,
-            bmsSchema, loadBmsSchema, pivotData, pivotVals, currentAggregator,
-            onDragStart, onDrop, removeField
+            bmsSchema, loadBmsSchema, pivotData
         };
     }
 }).mount('#app');

@@ -182,29 +182,29 @@ if !BOOT_SUCCESS!==0 (
         pause
     )
 
-    echo  [+] Redirecting your browser to http://localhost:%MANAGER_PORT% in Incognito/Private mode ...
+    echo  [+] Redirecting your browser to http://localhost:%MANAGER_PORT% ...
     
     set "BrowserProgId="
     for /f "tokens=2* skip=2" %%a in ('reg query HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice /v ProgId 2^>nul') do set "BrowserProgId=%%b"
     
     echo !BrowserProgId! | findstr /i "Chrome" >nul
     if not errorlevel 1 (
-        start chrome -incognito "http://localhost:%MANAGER_PORT%"
+        start chrome "http://localhost:%MANAGER_PORT%"
         goto BROWSER_DONE
     )
     echo !BrowserProgId! | findstr /i "Edge" >nul
     if not errorlevel 1 (
-        start msedge -inprivate "http://localhost:%MANAGER_PORT%"
+        start msedge "http://localhost:%MANAGER_PORT%"
         goto BROWSER_DONE
     )
     echo !BrowserProgId! | findstr /i "Firefox" >nul
     if not errorlevel 1 (
-        start firefox -private-window "http://localhost:%MANAGER_PORT%"
+        start firefox "http://localhost:%MANAGER_PORT%"
         goto BROWSER_DONE
     )
     echo !BrowserProgId! | findstr /i "Brave" >nul
     if not errorlevel 1 (
-        start brave -incognito "http://localhost:%MANAGER_PORT%"
+        start brave "http://localhost:%MANAGER_PORT%"
         goto BROWSER_DONE
     )
     
