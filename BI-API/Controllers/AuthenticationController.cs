@@ -62,8 +62,8 @@ namespace Bimasakti.BiService.Api.Controllers
                 bool isCompanyActive = false;
                 try
                 {
-                    string centralDbPath = _configuration.GetValue<string>("Config:CentralDbPath", "");
-                    if (string.IsNullOrEmpty(centralDbPath))
+                    string centralDbPath = _configuration.GetValue<string>("Config:CentralDbPath") ?? "";
+                    if (string.IsNullOrEmpty(centralDbPath) || centralDbPath.Contains("assets/BMS_BI_Central.db"))
                     {
                         string assetsDir = DbUtils.GetAssetsDirectory();
                         centralDbPath = Path.Combine(assetsDir, "BMS_BI_Central.db");

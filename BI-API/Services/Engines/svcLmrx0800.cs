@@ -46,7 +46,7 @@ namespace Bimasakti.BiService.Api.Services.Engines
             string databasePath = DbUtils.GetSafeDbPath(companyId);
             if (!System.IO.File.Exists(databasePath)) return new List<object>();
 
-            var results = new List<Dictionary<string, object>>();
+            var results = new List<Dictionary<string, object?>>();
             using var connection = new SqliteConnection($"Data Source={databasePath};Mode=ReadOnly;");
             await connection.OpenAsync();
 
@@ -55,7 +55,7 @@ namespace Bimasakti.BiService.Api.Services.Engines
                 using var reader = await command.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
                 {
-                    var row = new Dictionary<string, object>();
+                    var row = new Dictionary<string, object?>();
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
                         row[reader.GetName(i)] = reader.IsDBNull(i) ? null : reader.GetValue(i);

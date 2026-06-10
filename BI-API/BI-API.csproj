@@ -44,4 +44,8 @@
     <Content Remove="assets\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Widgets\**\*.dsbi" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

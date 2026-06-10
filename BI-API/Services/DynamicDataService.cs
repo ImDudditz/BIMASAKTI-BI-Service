@@ -9,14 +9,14 @@ namespace Bimasakti.BiService.Api.Services
 {
     public interface IDynamicDataService
     {
-        Task<List<Dictionary<string, object>>> ExecuteWidgetQueryAsync(string databasePath, DsbiQueryConfig queryConfig);
+        Task<List<Dictionary<string, object?>>> ExecuteWidgetQueryAsync(string databasePath, DsbiQueryConfig queryConfig);
     }
 
     public class DynamicDataService : IDynamicDataService
     {
-        public async Task<List<Dictionary<string, object>>> ExecuteWidgetQueryAsync(string databasePath, DsbiQueryConfig queryConfig)
+        public async Task<List<Dictionary<string, object?>>> ExecuteWidgetQueryAsync(string databasePath, DsbiQueryConfig queryConfig)
         {
-            var resultList = new List<Dictionary<string, object>>();
+            var resultList = new List<Dictionary<string, object?>>();
 
             if (!System.IO.File.Exists(databasePath))
                 return resultList;
@@ -91,7 +91,7 @@ namespace Bimasakti.BiService.Api.Services
 
                 while (await reader.ReadAsync())
                 {
-                    var row = new Dictionary<string, object>();
+                    var row = new Dictionary<string, object?>();
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
                         row[reader.GetName(i)] = reader.IsDBNull(i) ? null : reader.GetValue(i);

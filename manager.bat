@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 setlocal enabledelayedexpansion
 
 :: ============================================================
@@ -12,7 +13,7 @@ if "!VT!"=="" (
 :: ============================================================
 :: ANSI Color Constants
 :: ============================================================
-set "ESC="
+for /F "delims=" %%a in ('powershell -NoProfile -Command "[char]27"') do set "ESC=%%a"
 set "RESET=!ESC![0m"
 set "BOLD=!ESC![1m"
 set "DIM=!ESC![2m"
@@ -146,6 +147,9 @@ for %%p in (!BACKEND_PORT! !FRONTEND_PORT! !MANAGER_PORT!) do (
         )
     )
 )
+taskkill /F /FI "WINDOWTITLE eq BMS  Backend Core [:!BACKEND_PORT!]" >nul 2>&1
+taskkill /F /FI "WINDOWTITLE eq BMS  Frontend Portal [:!FRONTEND_PORT!]" >nul 2>&1
+taskkill /F /FI "WINDOWTITLE eq BMS  Web Control Panel [:!MANAGER_PORT!]" >nul 2>&1
 
 echo.
 call :INFO "Starting !CYAN!BI-API!RESET! (Backend) on port !BOLD!!WHITE!!BACKEND_PORT!!RESET!..."
@@ -183,6 +187,7 @@ if not errorlevel 1 (
         taskkill /F /T /PID %%a >nul 2>&1
     )
 )
+taskkill /F /FI "WINDOWTITLE eq BMS  Web Control Panel [:!MANAGER_PORT!]" >nul 2>&1
 
 call :INFO "Starting !CYAN!BI-MGR!RESET! (Manager) on port !BOLD!!WHITE!!MANAGER_PORT!!RESET!..."
 start "BMS  Web Control Panel [:!MANAGER_PORT!]" /D "!MANAGER_DIR!" cmd /k "dotnet run --no-build > manager_startup.log 2>&1 & type manager_startup.log"
@@ -364,6 +369,9 @@ for %%p in (!BACKEND_PORT! !FRONTEND_PORT! !MANAGER_PORT!) do (
         )
     )
 )
+taskkill /F /FI "WINDOWTITLE eq BMS  Backend Core [:!BACKEND_PORT!]" >nul 2>&1
+taskkill /F /FI "WINDOWTITLE eq BMS  Frontend Portal [:!FRONTEND_PORT!]" >nul 2>&1
+taskkill /F /FI "WINDOWTITLE eq BMS  Web Control Panel [:!MANAGER_PORT!]" >nul 2>&1
 
 echo.
 if !freed! GTR 0 (
@@ -557,6 +565,9 @@ for %%p in (!BACKEND_PORT! !FRONTEND_PORT! !MANAGER_PORT!) do (
         )
     )
 )
+taskkill /F /FI "WINDOWTITLE eq BMS  Backend Core [:!BACKEND_PORT!]" >nul 2>&1
+taskkill /F /FI "WINDOWTITLE eq BMS  Frontend Portal [:!FRONTEND_PORT!]" >nul 2>&1
+taskkill /F /FI "WINDOWTITLE eq BMS  Web Control Panel [:!MANAGER_PORT!]" >nul 2>&1
 
 call :INFO "Cleaning Vite cache..."
 if exist "!FRONTEND_DIR!\node_modules\.vite" rmdir /s /q "!FRONTEND_DIR!\node_modules\.vite" >nul 2>&1

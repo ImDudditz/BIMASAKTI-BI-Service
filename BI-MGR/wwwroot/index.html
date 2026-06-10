@@ -244,6 +244,7 @@ createApp({
                 await api('/me');
                 isAuthenticated.value = true;
                 loadCompanies();
+                await loadAvailableWidgets();
             } catch (e) { isAuthenticated.value = false; }
         };
 
@@ -253,6 +254,7 @@ createApp({
                 isAuthenticated.value = true;
                 loginError.value = '';
                 loadCompanies();
+                await loadAvailableWidgets();
             } catch (e) { loginError.value = 'Invalid password'; }
         };
         
