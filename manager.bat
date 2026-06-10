@@ -1,285 +1,365 @@
 @echo off
-title BI Portal Manager
-chcp 65001 >nul
 setlocal enabledelayedexpansion
 
-:: Disable Console Window Close Button (Force Option 5 exit to ensure clean port/cache shutdown)
-powershell -Command "`$q = [char]34; `$code = 'using System; using System.Runtime.InteropServices; public class WindowHelper { [DllImport(' + `$q + 'kernel32.dll' + `$q + ')] public static extern IntPtr GetConsoleWindow(); [DllImport(' + `$q + 'user32.dll' + `$q + ')] public static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert); [DllImport(' + `$q + 'user32.dll' + `$q + ')] public static extern bool DeleteMenu(IntPtr hMenu, uint uPosition, uint uFlags); }'; Add-Type -TypeDefinition `$code; `$hWnd = [WindowHelper]::GetConsoleWindow(); `$hMenu = [WindowHelper]::GetSystemMenu(`$hWnd, `$false); [void][WindowHelper]::DeleteMenu(`$hMenu, 0xF060, 0x00000000)" >nul 2>&1
+:: ============================================================
+:: Enable ANSI Virtual Terminal Processing (Windows 10+)
+:: ============================================================
+for /f "tokens=*" %%a in ('reg query HKCU\Console /v VirtualTerminalLevel 2^>nul') do set VT=%%a
+if "!VT!"=="" (
+    reg add HKCU\Console /v VirtualTerminalLevel /t REG_DWORD /d 1 /f >nul 2>&1
+)
 
+:: ============================================================
+:: ANSI Color Constants
+:: ============================================================
+set "ESC="
+set "RESET=!ESC![0m"
+set "BOLD=!ESC![1m"
+set "DIM=!ESC![2m"
+set "RED=!ESC![91m"
+set "GREEN=!ESC![92m"
+set "YELLOW=!ESC![93m"
+set "BLUE=!ESC![94m"
+set "MAGENTA=!ESC![95m"
+set "CYAN=!ESC![96m"
+set "WHITE=!ESC![97m"
+set "GRAY=!ESC![90m"
+set "BG_BLUE=!ESC![44m"
+set "BG_CYAN=!ESC![46m"
+
+:: ============================================================
+:: Paths
+:: ============================================================
 set "ROOT_DIR=%~dp0"
 set "BACKEND_DIR=%ROOT_DIR%BI-API"
 set "FRONTEND_DIR=%ROOT_DIR%BI-APP"
 set "MANAGER_DIR=%ROOT_DIR%BI-MGR"
+set "PUB_DIR=%ROOT_DIR%Publish"
 
-:: Read dynamically from appsettings.json
-set "MANAGER_PORT="
-for /f %%a in ('powershell -Command "(Get-Content '%ROOT_DIR%BI-API\appsettings.json' | ConvertFrom-Json).Manager.Port" 2^>nul') do set "MANAGER_PORT=%%a"
-if "%MANAGER_PORT%"=="" set "MANAGER_PORT=8003"
+:: ============================================================
+:: Fast Port Defaults (override below from config)
+:: ============================================================
+set "BACKEND_PORT=8001"
+set "FRONTEND_PORT=8002"
+set "MANAGER_PORT=8003"
 
-set "BACKEND_PORT="
-for /f %%a in ('powershell -Command "(Get-Content '%ROOT_DIR%BI-API\appsettings.json' | ConvertFrom-Json).Server.Port" 2^>nul') do set "BACKEND_PORT=%%a"
-if "%BACKEND_PORT%"=="" set "BACKEND_PORT=8001"
+:: ============================================================
+:: Read all ports in ONE powershell call (fast startup)
+:: ============================================================
+for /f "usebackq tokens=1,2 delims==" %%a in (`powershell -NoProfile -Command ^
+    "$s=(Get-Content '%ROOT_DIR%BI-API\appsettings.json' | ConvertFrom-Json); [string]$s.Server.Port + '=' + [string]$s.Manager.Port" ^
+    2^>nul`) do (
+    set "BACKEND_PORT=%%a"
+    set "MANAGER_PORT=%%b"
+)
 
-set "FRONTEND_PORT="
-for /f %%a in ('powershell -Command "(Select-String -Path '%ROOT_DIR%BI-APP\vite.config.js' -Pattern 'port:\s*(\d+)').Matches.Groups[1].Value" 2^>nul') do set "FRONTEND_PORT=%%a"
-if "%FRONTEND_PORT%"=="" set "FRONTEND_PORT=8002"
+for /f "usebackq" %%a in (`powershell -NoProfile -Command ^
+    "(Select-String -Path '%ROOT_DIR%BI-APP\vite.config.js' -Pattern 'port:\s*(\d+)').Matches.Groups[1].Value" ^
+    2^>nul`) do set "FRONTEND_PORT=%%a"
 
-color 07
+title BMS BI Service  ^|  Dev Manager
 
 :MENU
 cls
-echo.
-echo  ┌──────────────────────────────────────────────────────────┐
-echo  │                 BMS_BI_SERVICE LAUNCHER                  │
-echo  └──────────────────────────────────────────────────────────┘
-echo.
-echo   [ System Status ]
+
+:: ── Banner ─────────────────────────────────────────────────
+echo !BOLD!!CYAN!
+echo   ██████╗ ██╗    ███████╗███████╗██████╗ ██╗   ██╗██╗ ██████╗███████╗
+echo   ██╔══██╗██║    ██╔════╝██╔════╝██╔══██╗██║   ██║██║██╔════╝██╔════╝
+echo   ██████╔╝██║    ███████╗█████╗  ██████╔╝██║   ██║██║██║     █████╗
+echo   ██╔══██╗██║    ╚════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝██║██║     ██╔══╝
+echo   ██████╔╝██║    ███████║███████╗██║  ██║ ╚████╔╝ ██║╚██████╗███████╗
+echo   ╚═════╝ ╚═╝    ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚═╝ ╚═════╝╚══════╝
+echo !RESET!
+echo   !DIM!!GRAY!BIMASAKTI BI Service  ─  Developer CLI Launcher!RESET!
 echo.
 
-netstat -ano | findstr LISTENING | findstr :%MANAGER_PORT% >nul
-if errorlevel 1 ( set "MGR_STATUS=OFFLINE" ) else ( set "MGR_STATUS=ACTIVE " )
+:: ── Service Status ─────────────────────────────────────────
+echo   !BOLD!!WHITE![ SERVICE STATUS ]!RESET!
+echo   !GRAY!──────────────────────────────────────────────────────!RESET!
 
-netstat -ano | findstr LISTENING | findstr :%BACKEND_PORT% >nul
-if errorlevel 1 ( set "BACK_STATUS=OFFLINE" ) else ( set "BACK_STATUS=ACTIVE " )
+call :CHECK_PORT %BACKEND_PORT% BACK_STATUS
+call :CHECK_PORT %FRONTEND_PORT% FRONT_STATUS
+call :CHECK_PORT %MANAGER_PORT% MGR_STATUS
 
-netstat -ano | findstr LISTENING | findstr :%FRONTEND_PORT% >nul
-if errorlevel 1 ( set "FRONT_STATUS=OFFLINE" ) else ( set "FRONT_STATUS=ACTIVE " )
+call :PRINT_STATUS "  Backend  API Core " %BACKEND_PORT% "!BACK_STATUS!"
+call :PRINT_STATUS "  Frontend  Portal  " %FRONTEND_PORT% "!FRONT_STATUS!"
+call :PRINT_STATUS "  Web Control Panel " %MANAGER_PORT% "!MGR_STATUS!"
 
-echo    Web Control Panel (Port %MANAGER_PORT%) : [!MGR_STATUS!]
-echo    Backend API Core  (Port %BACKEND_PORT%) : [!BACK_STATUS!]
-echo    Frontend Portal   (Port %FRONTEND_PORT%) : [!FRONT_STATUS!]
+echo   !GRAY!──────────────────────────────────────────────────────!RESET!
 echo.
-echo  ────────────────────────────────────────────────────────────
-echo   [ Actions ]
+
+:: ── Actions ────────────────────────────────────────────────
+echo   !BOLD!!WHITE![ ACTIONS ]!RESET!
 echo.
-echo    [1] Launch Full Local Development Environment (All Services)
-echo    [2] Launch Web Control Panel Only
-echo    [3] Clean the Cache
-echo    [4] Free the Ports
-echo    [5] Check .NET Availability
-echo    [6] Compile Production Publish Build
-echo    [7] Exit (Auto-Close, Free Port ^& Clean Cache)
+echo   !BOLD!!CYAN! [1]!RESET!  !WHITE!Launch Full Development Stack !GRAY!(BI-API + BI-APP + BI-MGR)!RESET!
+echo   !BOLD!!CYAN! [2]!RESET!  !WHITE!Launch Web Control Panel Only!RESET!
+echo   !BOLD!!CYAN! [3]!RESET!  !WHITE!Check Dependencies!RESET!
+echo   !BOLD!!CYAN! [4]!RESET!  !WHITE!Free Ports!RESET!
+echo   !BOLD!!CYAN! [5]!RESET!  !WHITE!Clean Build Cache!RESET!
+echo   !BOLD!!YELLOW! [6]!RESET!  !WHITE!Compile IIS Production Build!RESET!
+echo   !BOLD!!RED! [7]!RESET!  !WHITE!Exit!RESET!
 echo.
-echo  ────────────────────────────────────────────────────────────
+echo   !GRAY!──────────────────────────────────────────────────────!RESET!
+echo.
 set "choice="
-set /p choice="Select an action [1-7]: "
+set /p "choice=  !BOLD!Select option!RESET! !GRAY![1-7]:!RESET! "
+echo.
 
-if "%choice%"=="1" goto LAUNCH_ALL
-if "%choice%"=="2" goto LAUNCH_WEB
-if "%choice%"=="3" goto CLEAN_CACHE
-if "%choice%"=="4" goto FREE_PORTS
-if "%choice%"=="5" goto CHECK_DOTNET
-if "%choice%"=="6" goto COMPILE_PUBLISH
-if "%choice%"=="7" goto FORCE_EXIT
-goto MENU
+if "!choice!"=="1" goto :LAUNCH_ALL
+if "!choice!"=="2" goto :LAUNCH_MGR
+if "!choice!"=="3" goto :CHECK_DEPS
+if "!choice!"=="4" goto :FREE_PORTS
+if "!choice!"=="5" goto :CLEAN_CACHE
+if "!choice!"=="6" goto :COMPILE_IIS
+if "!choice!"=="7" goto :EXIT
 
+call :WARN "Invalid choice. Please select 1-7."
+timeout /t 1 >nul
+goto :MENU
+
+
+:: ============================================================
 :LAUNCH_ALL
+:: ============================================================
 cls
+call :SECTION_HEADER "LAUNCHING FULL DEVELOPMENT STACK"
+
+call :INFO "Building solution..."
 echo.
-echo  ============================================================
-echo   LAUNCHING FULL LOCAL DEVELOPMENT ENVIRONMENT
-echo  ============================================================
-echo.
-echo  Building solution sequentially to prevent file lock collisions...
-dotnet build "%ROOT_DIR%BI-Service.slnx" > build.log
+dotnet build "!ROOT_DIR!BI-Service.slnx" --nologo
 if errorlevel 1 (
-    echo  [x] Backend Build Failed! Displaying log:
-    type build.log
-    pause
-    goto MENU
-)
-echo.
-
-:: 1. Start Main Backend API
-netstat -ano | findstr LISTENING | findstr :%BACKEND_PORT% >nul
-if not errorlevel 1 (
-    echo  Backend Port %BACKEND_PORT% is already active. Stopping...
-    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :%BACKEND_PORT%') do ( taskkill /F /T /PID %%a >nul 2>&1 )
-)
-echo  Starting Main Backend API on Port %BACKEND_PORT%...
-start "BI Portal Backend Core" /D "%BACKEND_DIR%" cmd /c "dotnet run --no-build"
-
-:: 2. Start Frontend Dev Server
-netstat -ano | findstr LISTENING | findstr :%FRONTEND_PORT% >nul
-if not errorlevel 1 (
-    echo  Frontend Port %FRONTEND_PORT% is already active. Stopping...
-    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :%FRONTEND_PORT%') do ( taskkill /F /T /PID %%a >nul 2>&1 )
-)
-echo  Starting Vue Frontend Dev Server on Port %FRONTEND_PORT%...
-start "BI Portal Frontend" /D "%FRONTEND_DIR%" cmd /c "npm run dev"
-
-goto LAUNCH_WEB
-
-:LAUNCH_WEB
-cls
-echo.
-echo  ============================================================
-echo   LAUNCHING WEB CONTROL PANEL
-echo  ============================================================
-echo.
-echo  Building Web Manager...
-dotnet build "%MANAGER_DIR%\BI-MGR.csproj" > build.log
-if errorlevel 1 (
-    echo  [x] Web Manager Build Failed! Displaying log:
-    type build.log
-    pause
-    goto MENU
-)
-echo.
-:: Check if already running, free it first
-netstat -ano | findstr LISTENING | findstr :%MANAGER_PORT% >nul
-if not errorlevel 1 (
-    echo  Port %MANAGER_PORT% is already active. Stopping existing session...
-    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :%MANAGER_PORT%') do ( taskkill /F /T /PID %%a >nul 2>&1 )
-)
-
-echo  Starting Web Manager Service on Port %MANAGER_PORT%...
-start "BI Portal Manager Core" /D "%MANAGER_DIR%" cmd /c "dotnet run --no-build > manager_startup.log 2>&1"
-
-echo  Waiting for service initialization...
-set "BOOT_SUCCESS=0"
-<nul set /p "= Booting services: ["
-
-:: Poll every 500ms, up to 24 times (12 seconds max)
-for /L %%i in (1,1,24) do (
-    if !BOOT_SUCCESS!==0 (
-        netstat -ano | findstr LISTENING | findstr :%MANAGER_PORT% >nul
-        if not errorlevel 1 (
-            set "BOOT_SUCCESS=1"
-            <nul set /p "=■■■"
-        ) else (
-            <nul set /p "=■"
-            powershell -Command "Start-Sleep -m 500"
-        )
-    )
-)
-echo ] Done.
-echo.
-
-:: Verify if running
-if !BOOT_SUCCESS!==0 (
-    echo  [x] The server failed to respond on Port %MANAGER_PORT% within 12 seconds.
-    echo  [x] Please review '%MANAGER_DIR%\manager_startup.log' for details.
     echo.
+    call :ERROR "Build failed. Resolve errors above before launching."
     pause
-) else (
-    echo  [+] Web Control Panel is online.
-
-    :: Extract and display the generated password if it exists
-    findstr /C:"A secure random password has been generated:" "%MANAGER_DIR%\manager_startup.log" >nul 2>&1
-    if not errorlevel 1 (
-        echo.
-        echo  ============================================================
-        echo   [!] NEW TEMPORARY SUPERADMIN PASSWORD [!]
-        for /f "tokens=*" %%p in ('findstr /C:"A secure random password has been generated:" "%MANAGER_DIR%\manager_startup.log"') do (
-            set "line=%%p"
-            set "pwd=!line:*A secure random password has been generated: =!"
-            echo   Password: !pwd!
-        )
-        echo  ============================================================
-        echo  Please copy this password. You will need it to log in.
-        echo.
-        pause
-    )
-
-    echo  [+] Redirecting your browser to http://localhost:%MANAGER_PORT% ...
-    
-    set "BrowserProgId="
-    for /f "tokens=2* skip=2" %%a in ('reg query HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice /v ProgId 2^>nul') do set "BrowserProgId=%%b"
-    
-    echo !BrowserProgId! | findstr /i "Chrome" >nul
-    if not errorlevel 1 (
-        start chrome "http://localhost:%MANAGER_PORT%"
-        goto BROWSER_DONE
-    )
-    echo !BrowserProgId! | findstr /i "Edge" >nul
-    if not errorlevel 1 (
-        start msedge "http://localhost:%MANAGER_PORT%"
-        goto BROWSER_DONE
-    )
-    echo !BrowserProgId! | findstr /i "Firefox" >nul
-    if not errorlevel 1 (
-        start firefox "http://localhost:%MANAGER_PORT%"
-        goto BROWSER_DONE
-    )
-    echo !BrowserProgId! | findstr /i "Brave" >nul
-    if not errorlevel 1 (
-        start brave "http://localhost:%MANAGER_PORT%"
-        goto BROWSER_DONE
-    )
-    
-    :: Fallback if unknown browser
-    start "" "http://localhost:%MANAGER_PORT%"
-    
-    :BROWSER_DONE
-    timeout /t 2 >nul
-)
-goto MENU
-
-:CLEAN_CACHE
-cls
-echo.
-echo  ============================================================
-echo   CLEANING SYSTEM CACHE
-echo  ============================================================
-echo.
-
-:: Animated Loading Bar
-powershell -Command "Write-Host -NoNewline ' Clearing temporary folders: ['; 1..20 | %% { Write-Host -NoNewline '■'; Start-Sleep -m 60 }; Write-Host '] Done.'"
-echo.
-
-set "cleaned=0"
-for /d /r "%BACKEND_DIR%" %%d in (bin obj) do (
-    if exist "%%d" (
-        rmdir /s /q "%%d" >nul 2>&1
-        echo   - Cleared: %%d
-        set /a cleaned+=1
-    )
-)
-
-for /d /r "%MANAGER_DIR%" %%d in (bin obj) do (
-    if exist "%%d" (
-        rmdir /s /q "%%d" >nul 2>&1
-        echo   - Cleared: %%d
-        set /a cleaned+=1
-    )
-)
-
-if exist "%FRONTEND_DIR%\node_modules\.vite" (
-    rmdir /s /q "%FRONTEND_DIR%\node_modules\.vite" >nul 2>&1
-    echo   - Cleared: %FRONTEND_DIR%\node_modules\.vite
-    set /a cleaned+=1
+    goto :MENU
 )
 
 echo.
-if !cleaned! GTR 0 (
-    echo  [+] Cache clean-up completed successfully.
-) else (
-    echo  [+] No temporary directories were found. The system is already clean.
-)
-echo.
-pause
-goto MENU
+call :INFO "Releasing occupied ports..."
 
-:FREE_PORTS
-cls
-echo.
-echo  ============================================================
-echo   FREEING ALL NETWORK PORTS
-echo  ============================================================
-echo.
-
-:: Animated Loading Bar
-powershell -Command "Write-Host -NoNewline ' Terminating active ports:   ['; 1..20 | %% { Write-Host -NoNewline '■'; Start-Sleep -m 50 }; Write-Host '] Done.'"
-echo.
-
-set "freed=0"
-for %%p in (%MANAGER_PORT% %BACKEND_PORT% %FRONTEND_PORT%) do (
+for %%p in (!BACKEND_PORT! !FRONTEND_PORT! !MANAGER_PORT!) do (
     netstat -ano | findstr LISTENING | findstr :%%p >nul
     if not errorlevel 1 (
         for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :%%p') do (
             taskkill /F /T /PID %%a >nul 2>&1
-            echo   - Freed Port %%p (PID: %%a)
+        )
+    )
+)
+
+echo.
+call :INFO "Starting !CYAN!BI-API!RESET! (Backend) on port !BOLD!!WHITE!!BACKEND_PORT!!RESET!..."
+start "BMS  Backend Core [:!BACKEND_PORT!]" /D "!BACKEND_DIR!" cmd /k "dotnet run --no-build"
+
+call :INFO "Starting !CYAN!BI-APP!RESET! (Frontend) on port !BOLD!!WHITE!!FRONTEND_PORT!!RESET!..."
+start "BMS  Frontend Portal [:!FRONTEND_PORT!]" /D "!FRONTEND_DIR!" cmd /k "npm run dev"
+
+echo.
+goto :LAUNCH_MGR_INTERNAL
+
+
+:: ============================================================
+:LAUNCH_MGR
+:: ============================================================
+cls
+call :SECTION_HEADER "LAUNCHING WEB CONTROL PANEL"
+
+:LAUNCH_MGR_INTERNAL
+call :INFO "Building !CYAN!BI-MGR!RESET!..."
+echo.
+dotnet build "!MANAGER_DIR!\BI-MGR.csproj" --nologo
+if errorlevel 1 (
+    echo.
+    call :ERROR "BI-MGR build failed. Check output above."
+    pause
+    goto :MENU
+)
+echo.
+
+netstat -ano | findstr LISTENING | findstr :!MANAGER_PORT! >nul
+if not errorlevel 1 (
+    call :WARN "Port !MANAGER_PORT! in use. Releasing..."
+    for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :!MANAGER_PORT!') do (
+        taskkill /F /T /PID %%a >nul 2>&1
+    )
+)
+
+call :INFO "Starting !CYAN!BI-MGR!RESET! (Manager) on port !BOLD!!WHITE!!MANAGER_PORT!!RESET!..."
+start "BMS  Web Control Panel [:!MANAGER_PORT!]" /D "!MANAGER_DIR!" cmd /k "dotnet run --no-build > manager_startup.log 2>&1 & type manager_startup.log"
+
+:: Wait for manager to boot (up to 12s)
+echo.
+set /p "=  Booting services: [" <nul
+set "BOOT_SUCCESS=0"
+for /L %%i in (1,1,24) do (
+    if !BOOT_SUCCESS!==0 (
+        netstat -ano | findstr LISTENING | findstr :!MANAGER_PORT! >nul
+        if not errorlevel 1 (
+            set "BOOT_SUCCESS=1"
+            set /p "=!GREEN!●!RESET!" <nul
+        ) else (
+            set /p "=!GRAY!·!RESET!" <nul
+            powershell -NoProfile -Command "Start-Sleep -m 500" >nul
+        )
+    )
+)
+echo  ]
+echo.
+
+if !BOOT_SUCCESS!==0 (
+    call :ERROR "Manager did not respond on port !MANAGER_PORT! within 12s."
+    call :WARN "Review: !MANAGER_DIR!\manager_startup.log"
+    echo.
+    pause
+    goto :MENU
+)
+
+call :SUCCESS "Web Control Panel is online at !CYAN!http://localhost:!MANAGER_PORT!!RESET!"
+echo.
+
+:: Check for generated password
+findstr /C:"A secure random password has been generated:" "!MANAGER_DIR!\manager_startup.log" >nul 2>&1
+if not errorlevel 1 (
+    echo   !YELLOW!╔══════════════════════════════════════════════════╗!RESET!
+    echo   !YELLOW!║    ⚠  NEW TEMPORARY SUPERADMIN PASSWORD  ⚠     ║!RESET!
+    for /f "tokens=*" %%p in ('findstr /C:"A secure random password has been generated:" "!MANAGER_DIR!\manager_startup.log"') do (
+        set "line=%%p"
+        set "pwd=!line:*A secure random password has been generated: =!"
+        echo   !YELLOW!║  Password: !BOLD!!WHITE!!pwd!!RESET!!YELLOW!                           ║!RESET!
+    )
+    echo   !YELLOW!╚══════════════════════════════════════════════════╝!RESET!
+    echo.
+    pause
+)
+
+:: Open browser
+call :INFO "Opening browser → !CYAN!http://localhost:!MANAGER_PORT!!RESET!"
+set "BrowserProgId="
+for /f "tokens=2* skip=2" %%a in ('reg query HKCU\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice /v ProgId 2^>nul') do set "BrowserProgId=%%b"
+echo !BrowserProgId! | findstr /i "Chrome" >nul && start chrome "http://localhost:!MANAGER_PORT!" && goto :BROWSER_DONE
+echo !BrowserProgId! | findstr /i "Edge"   >nul && start msedge "http://localhost:!MANAGER_PORT!" && goto :BROWSER_DONE
+echo !BrowserProgId! | findstr /i "Firefox">nul && start firefox "http://localhost:!MANAGER_PORT!" && goto :BROWSER_DONE
+echo !BrowserProgId! | findstr /i "Brave"  >nul && start brave "http://localhost:!MANAGER_PORT!"   && goto :BROWSER_DONE
+start "" "http://localhost:!MANAGER_PORT!"
+
+:BROWSER_DONE
+timeout /t 2 >nul
+goto :MENU
+
+
+:: ============================================================
+:CHECK_DEPS
+:: ============================================================
+cls
+call :SECTION_HEADER "DEPENDENCY CHECK"
+
+set "DEPS_OK=1"
+
+:: .NET SDK
+echo   !BOLD!Checking .NET SDK...!RESET!
+dotnet --version >nul 2>&1
+if errorlevel 1 (
+    call :ERROR ".NET SDK not found. Install from https://dotnet.microsoft.com/download"
+    set "DEPS_OK=0"
+) else (
+    for /f "delims=" %%v in ('dotnet --version 2^>nul') do (
+        call :SUCCESS ".NET SDK  →  %%v"
+    )
+)
+
+:: .NET SDK list
+dotnet --list-sdks 2>nul | findstr /r "[0-9]" >nul 2>&1
+if not errorlevel 1 (
+    echo.
+    echo   !GRAY!Installed SDKs:!RESET!
+    for /f "delims=" %%s in ('dotnet --list-sdks 2^>nul') do echo     !DIM!%%s!RESET!
+)
+
+echo.
+
+:: Node.js
+echo   !BOLD!Checking Node.js...!RESET!
+node --version >nul 2>&1
+if errorlevel 1 (
+    call :ERROR "Node.js not found. Install from https://nodejs.org"
+    set "DEPS_OK=0"
+) else (
+    for /f "delims=" %%v in ('node --version 2^>nul') do (
+        call :SUCCESS "Node.js  →  %%v"
+    )
+)
+
+echo.
+
+:: npm
+echo   !BOLD!Checking npm...!RESET!
+npm --version >nul 2>&1
+if errorlevel 1 (
+    call :ERROR "npm not found."
+    set "DEPS_OK=0"
+) else (
+    for /f "delims=" %%v in ('npm --version 2^>nul') do (
+        call :SUCCESS "npm  →  v%%v"
+    )
+)
+
+echo.
+
+:: node_modules presence
+echo   !BOLD!Checking BI-APP node_modules...!RESET!
+if exist "!FRONTEND_DIR!\node_modules\" (
+    call :SUCCESS "node_modules present"
+) else (
+    call :WARN "node_modules missing in BI-APP."
+    echo.
+    set /p "install_choice=  !YELLOW!Run npm install now?!RESET! !GRAY![Y/N]:!RESET! "
+    if /i "!install_choice!"=="Y" (
+        echo.
+        call :INFO "Running npm install..."
+        pushd "!FRONTEND_DIR!"
+        npm install
+        popd
+        call :SUCCESS "npm install complete."
+    )
+)
+
+echo.
+
+:: IIS ASP.NET Core Module
+echo   !BOLD!Checking ASP.NET Core IIS Module...!RESET!
+reg query "HKLM\SOFTWARE\Microsoft\IIS Extensions\IIS AspNetCore Module V2" >nul 2>&1
+if not errorlevel 1 (
+    call :SUCCESS "ASP.NET Core IIS Module V2  →  INSTALLED"
+) else (
+    call :WARN "ASP.NET Core IIS Module V2  →  NOT INSTALLED !GRAY!(only required for IIS deployment)!RESET!"
+)
+
+echo.
+
+if !DEPS_OK!==1 (
+    call :SUCCESS "All core dependencies satisfied!"
+) else (
+    call :ERROR "One or more dependencies are missing. Install them before proceeding."
+)
+
+echo.
+pause
+goto :MENU
+
+
+:: ============================================================
+:FREE_PORTS
+:: ============================================================
+cls
+call :SECTION_HEADER "FREEING PORTS"
+
+set "freed=0"
+for %%p in (!BACKEND_PORT! !FRONTEND_PORT! !MANAGER_PORT!) do (
+    netstat -ano | findstr LISTENING | findstr :%%p >nul
+    if not errorlevel 1 (
+        for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :%%p') do (
+            taskkill /F /T /PID %%a >nul 2>&1
+            call :SUCCESS "Released port %%p  !GRAY!(PID %%a)!RESET!"
             set /a freed+=1
         )
     )
@@ -287,335 +367,189 @@ for %%p in (%MANAGER_PORT% %BACKEND_PORT% %FRONTEND_PORT%) do (
 
 echo.
 if !freed! GTR 0 (
-    echo  [+] Network ports successfully cleared.
+    call :SUCCESS "!freed! port(s) released."
 ) else (
-    echo  [+] All ports are already free and inactive.
+    call :INFO "No ports were in use. All clear."
 )
 echo.
 pause
-goto MENU
+goto :MENU
 
-:COMPILE_PUBLISH
+
+:: ============================================================
+:CLEAN_CACHE
+:: ============================================================
 cls
-echo.
-echo  ============================================================
-echo   COMPILE PRODUCTION PUBLISH BUILD
-echo  ============================================================
-echo.
-echo  Select Component to Compile:
-echo   [1] Full Stack (Backend + Frontend)
-echo   [2] Backend Services Only
-echo   [3] Frontend Proxy Only
-echo   [4] Cancel
-echo.
-set "comp_choice="
-set /p comp_choice="Select an option [1-4]: "
+call :SECTION_HEADER "CLEAN BUILD CACHE"
 
-if "%comp_choice%"=="4" goto MENU
-if "%comp_choice%"=="" goto COMPILE_PUBLISH
+set "cleaned=0"
+call :INFO "Scanning for build artifacts..."
 
-set "COMPILE_BACKEND=0"
-set "COMPILE_FRONTEND=0"
-if "%comp_choice%"=="1" ( set "COMPILE_BACKEND=1" & set "COMPILE_FRONTEND=1" )
-if "%comp_choice%"=="2" ( set "COMPILE_BACKEND=1" )
-if "%comp_choice%"=="3" ( set "COMPILE_FRONTEND=1" )
+for /d /r "!BACKEND_DIR!" %%d in (bin obj) do (
+    if exist "%%d" (
+        rmdir /s /q "%%d" >nul 2>&1
+        call :SUCCESS "Removed: !GRAY!%%d!RESET!"
+        set /a cleaned+=1
+    )
+)
 
-set "TARGET_ARCH=win-x64"
-set "BACKEND_DEPLOY_TYPE=STANDALONE"
+for /d /r "!MANAGER_DIR!" %%d in (bin obj) do (
+    if exist "%%d" (
+        rmdir /s /q "%%d" >nul 2>&1
+        call :SUCCESS "Removed: !GRAY!%%d!RESET!"
+        set /a cleaned+=1
+    )
+)
 
-if "%COMPILE_BACKEND%"=="0" goto SKIP_BACKEND_PROMPT
-
-echo.
-echo  Select Backend Deployment Target:
-echo   [1] Standalone Executable (Self-Contained)
-echo   [2] IIS Web Server (Framework-Dependent)
-echo.
-set "deploy_choice="
-set /p deploy_choice="Select an option [1-2]: "
-if "!deploy_choice!"=="2" (
-    set "BACKEND_DEPLOY_TYPE=IIS"
-    goto SKIP_BACKEND_PROMPT
+if exist "!FRONTEND_DIR!\node_modules\.vite" (
+    rmdir /s /q "!FRONTEND_DIR!\node_modules\.vite" >nul 2>&1
+    call :SUCCESS "Removed: !GRAY!BI-APP/node_modules/.vite (Vite cache)!RESET!"
+    set /a cleaned+=1
 )
 
 echo.
-echo  Select Target Architecture for Standalone:
-echo   [1] Windows x64 (Standard 64-bit)
-echo   [2] Windows x86 (Standard 32-bit)
-echo.
-set "arch_choice="
-set /p arch_choice="Select an option [1-2]: "
-if "!arch_choice!"=="1" set "TARGET_ARCH=win-x64"
-if "!arch_choice!"=="2" set "TARGET_ARCH=win-x86"
-
-:SKIP_BACKEND_PROMPT
-
-set "FRONTEND_DEPLOY_TYPE=PROXY"
-
-if "%COMPILE_FRONTEND%"=="0" goto SKIP_FRONTEND_PROMPT
-
-echo.
-echo  Select Frontend Deployment Target:
-echo   [1] Node.js Proxy Server (Default, Server-Side Rendered / Proxy)
-echo   [2] Standard Static SaaS (HTML/JS/CSS only, perfect for NGINX/IIS/CDN)
-echo.
-set "front_deploy_choice="
-set /p front_deploy_choice="Select an option [1-2]: "
-if "!front_deploy_choice!"=="2" (
-    set "FRONTEND_DEPLOY_TYPE=STATIC"
+if !cleaned! GTR 0 (
+    call :SUCCESS "Cleaned !cleaned! director^(ies^)."
+) else (
+    call :INFO "Nothing to clean. Cache is already empty."
 )
-
-:SKIP_FRONTEND_PROMPT
-
 echo.
-echo  [+] Preparing output directory...
-set "PUB_DIR=%ROOT_DIR%Publish"
-if not exist "%PUB_DIR%" mkdir "%PUB_DIR%"
+pause
+goto :MENU
 
-if "%COMPILE_BACKEND%"=="1" goto DO_COMPILE_BACKEND
-goto CHECK_FRONTEND
 
-:DO_COMPILE_BACKEND
-if exist "%PUB_DIR%\BI-API" rmdir /s /q "%PUB_DIR%\BI-API"
-if exist "%PUB_DIR%\BI-MGR" rmdir /s /q "%PUB_DIR%\BI-MGR"
-if exist "%PUB_DIR%\BI-API-Standalone" rmdir /s /q "%PUB_DIR%\BI-API-Standalone"
-if exist "%PUB_DIR%\BI-MGR-Standalone" rmdir /s /q "%PUB_DIR%\BI-MGR-Standalone"
-
-echo.
-echo  [+] Dropping app_offline.htm to release IIS locks...
-if exist "%PUB_DIR%\BI-API" echo Updating... > "%PUB_DIR%\BI-API\app_offline.htm"
-if exist "%PUB_DIR%\BI-MGR" echo Updating... > "%PUB_DIR%\BI-MGR\app_offline.htm"
-:: Wait briefly to ensure IIS unloads the app domains
-powershell -Command "Start-Sleep -s 2"
-
-echo.
-echo  [+] Cleaning source binaries before publish...
-dotnet clean "%BACKEND_DIR%\BI-API.csproj" -c Release >nul 2>&1
-dotnet clean "%MANAGER_DIR%\BI-MGR.csproj" -c Release >nul 2>&1
-
-if "!BACKEND_DEPLOY_TYPE!"=="IIS" goto COMPILE_IIS
-goto COMPILE_STANDALONE
-
+:: ============================================================
 :COMPILE_IIS
+:: ============================================================
+cls
+call :SECTION_HEADER "COMPILE IIS PRODUCTION BUILD"
+
+echo   !GRAY!Target: IIS Framework-Dependent Deployment!RESET!
 echo.
-echo  [+] Compiling Core Services for IIS Deployment (Optimized)...
-echo  - Building Main Backend API (IIS)...
-dotnet publish "%BACKEND_DIR%\BI-API.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\BI-API" > build.log
-if errorlevel 1 ( type build.log & echo  [x] BI-API Build Failed. & pause & goto MENU )
 
-echo  - Building BI SaaS Manager API (IIS)...
-dotnet publish "%MANAGER_DIR%\BI-MGR.csproj" -c Release -p:EnvironmentName=Production -p:UseAppHost=false -o "%PUB_DIR%\BI-MGR" > build.log
-if errorlevel 1 ( type build.log & echo  [x] BI-MGR Build Failed. & pause & goto MENU )
-
-echo  - Copying Assets skipped.
+set /p "confirm_choice=  !YELLOW!This will overwrite existing Publish/IIS output. Continue?!RESET! !GRAY![Y/N]:!RESET! "
+if /i not "!confirm_choice!"=="Y" goto :MENU
 
 echo.
-echo  [+] Cleaning up unnecessary compiler metadata and dev configs...
-del /f /q "%PUB_DIR%\BI-API\appsettings.Development.json" >nul 2>&1
-del /f /q "%PUB_DIR%\BI-MGR\appsettings.Development.json" >nul 2>&1
-del /f /q "%PUB_DIR%\BI-API\*.staticwebassets.endpoints.json" >nul 2>&1
-del /f /q "%PUB_DIR%\BI-MGR\*.staticwebassets.endpoints.json" >nul 2>&1
+call :INFO "Preparing output directories..."
+
+if not exist "!PUB_DIR!\IIS" mkdir "!PUB_DIR!\IIS"
+if exist "!PUB_DIR!\IIS\BI-API" rmdir /s /q "!PUB_DIR!\IIS\BI-API"
+if exist "!PUB_DIR!\IIS\BI-MGR" rmdir /s /q "!PUB_DIR!\IIS\BI-MGR"
+if exist "!PUB_DIR!\IIS\BI-APP" rmdir /s /q "!PUB_DIR!\IIS\BI-APP"
+
+:: Drop app_offline.htm to gracefully unload IIS app domains
+if exist "!PUB_DIR!\IIS\BI-API" echo Updating... > "!PUB_DIR!\IIS\BI-API\app_offline.htm"
+if exist "!PUB_DIR!\IIS\BI-MGR" echo Updating... > "!PUB_DIR!\IIS\BI-MGR\app_offline.htm"
+powershell -NoProfile -Command "Start-Sleep -s 2" >nul
+
+:: ── Backend API ────────────────────────────────────────────
+echo.
+call :INFO "Publishing !CYAN!BI-API!RESET!  (IIS, Framework-Dependent)..."
+dotnet clean "!BACKEND_DIR!\BI-API.csproj" -c Release --nologo >nul 2>&1
+dotnet publish "!BACKEND_DIR!\BI-API.csproj" ^
+    -c Release ^
+    --nologo ^
+    -p:EnvironmentName=Production ^
+    -p:UseAppHost=false ^
+    -o "!PUB_DIR!\IIS\BI-API"
+if errorlevel 1 (
+    call :ERROR "BI-API publish failed."
+    pause
+    goto :MENU
+)
+call :SUCCESS "BI-API published."
+
+:: ── Manager ───────────────────────────────────────────────
+echo.
+call :INFO "Publishing !CYAN!BI-MGR!RESET!  (IIS, Framework-Dependent)..."
+dotnet clean "!MANAGER_DIR!\BI-MGR.csproj" -c Release --nologo >nul 2>&1
+dotnet publish "!MANAGER_DIR!\BI-MGR.csproj" ^
+    -c Release ^
+    --nologo ^
+    -p:EnvironmentName=Production ^
+    -p:UseAppHost=false ^
+    -o "!PUB_DIR!\IIS\BI-MGR"
+if errorlevel 1 (
+    call :ERROR "BI-MGR publish failed."
+    pause
+    goto :MENU
+)
+call :SUCCESS "BI-MGR published."
+
+:: ── Frontend ──────────────────────────────────────────────
+echo.
+call :INFO "Building !CYAN!BI-APP!RESET!  (Static Assets)..."
+if not exist "!FRONTEND_DIR!\node_modules\" (
+    call :WARN "node_modules missing. Running npm install..."
+    pushd "!FRONTEND_DIR!"
+    call npm install >nul 2>&1
+    popd
+)
+pushd "!FRONTEND_DIR!"
+call npm run build
+if errorlevel 1 (
+    popd
+    call :ERROR "BI-APP frontend build failed."
+    pause
+    goto :MENU
+)
+popd
+call :SUCCESS "BI-APP built."
 
 echo.
-echo  [+] Generating Sync Job Script for IIS...
+call :INFO "Copying frontend static assets..."
+mkdir "!PUB_DIR!\IIS\BI-APP"
+xcopy /E /I /Q "!FRONTEND_DIR!\dist\*" "!PUB_DIR!\IIS\BI-APP\" >nul
+
+:: ── Cleanup ───────────────────────────────────────────────
+echo.
+call :INFO "Cleaning up dev-only files..."
+del /f /q "!PUB_DIR!\IIS\BI-API\appsettings.Development.json" >nul 2>&1
+del /f /q "!PUB_DIR!\IIS\BI-MGR\appsettings.Development.json" >nul 2>&1
+del /f /q "!PUB_DIR!\IIS\BI-API\*.staticwebassets.endpoints.json" >nul 2>&1
+del /f /q "!PUB_DIR!\IIS\BI-MGR\*.staticwebassets.endpoints.json" >nul 2>&1
+if exist "!PUB_DIR!\IIS\BI-API\app_offline.htm" del /f /q "!PUB_DIR!\IIS\BI-API\app_offline.htm"
+if exist "!PUB_DIR!\IIS\BI-MGR\app_offline.htm" del /f /q "!PUB_DIR!\IIS\BI-MGR\app_offline.htm"
+
+:: ── Sync job script ───────────────────────────────────────
+call :INFO "Generating scheduled sync helper script..."
 (
 echo @echo off
-echo echo ==================================================
-echo echo Running BMS Background Sync Job...
-echo echo ==================================================
+echo echo Running BMS scheduled sync...
 echo cd /d "%%~dp0BI-MGR"
 echo dotnet BI-MGR.dll --sync-all
-echo echo.
-echo echo Sync process completed.
 echo timeout /t 10
-) > "%PUB_DIR%\run_scheduled_sync_iis.bat"
+) > "!PUB_DIR!\IIS\run_scheduled_sync.bat"
 
-echo.
-echo  [+] Initializing Database Assets...
-pushd "%PUB_DIR%\BI-MGR"
+:: ── Init DB assets ────────────────────────────────────────
+call :INFO "Initializing database assets..."
+pushd "!PUB_DIR!\IIS\BI-MGR"
 dotnet BI-MGR.dll --sync-all >nul 2>&1
 popd
 
 echo.
-echo  [+] Removing app_offline.htm...
-if exist "%PUB_DIR%\BI-API\app_offline.htm" del /f /q "%PUB_DIR%\BI-API\app_offline.htm"
-if exist "%PUB_DIR%\BI-MGR\app_offline.htm" del /f /q "%PUB_DIR%\BI-MGR\app_offline.htm"
-
-echo.
-echo  [+] IIS Build Complete!
-echo      Please map your IIS site paths to the respective folders:
-echo      - Core API: %PUB_DIR%\BI-API
-echo      - Manager : %PUB_DIR%\BI-MGR
-goto CHECK_FRONTEND
-
-:COMPILE_STANDALONE
-echo.
-echo  [+] Compiling Core Services (Standalone)...
-echo  - Building Main Backend API (BMS-Core.exe)...
-dotnet publish "%BACKEND_DIR%\BI-API.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\BI-API-Standalone" > build.log
-if errorlevel 1 ( type build.log & echo  [x] BI-API Standalone Build Failed. & pause & goto MENU )
-
-echo  - Building BI SaaS Manager API (BI-MGR.exe)...
-dotnet publish "%MANAGER_DIR%\BI-MGR.csproj" -c Release -r !TARGET_ARCH! --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o "%PUB_DIR%\BI-MGR-Standalone" > build.log
-if errorlevel 1 ( type build.log & echo  [x] BI-MGR Standalone Build Failed. & pause & goto MENU )
-
-echo  - Copying Assets skipped.
-
-echo.
-echo  [+] Cleaning up unnecessary compiler metadata and dev configs...
-del /f /q "%PUB_DIR%\BI-API-Standalone\*.staticwebassets.endpoints.json" >nul 2>&1
-del /f /q "%PUB_DIR%\BI-API-Standalone\*.runtimeconfig.json" >nul 2>&1
-del /f /q "%PUB_DIR%\BI-API-Standalone\appsettings.Development.json" >nul 2>&1
-if exist "%PUB_DIR%\BI-API-Standalone\wwwroot" rmdir /s /q "%PUB_DIR%\BI-API-Standalone\wwwroot" >nul 2>&1
-
-del /f /q "%PUB_DIR%\BI-MGR-Standalone\*.staticwebassets.endpoints.json" >nul 2>&1
-del /f /q "%PUB_DIR%\BI-MGR-Standalone\*.runtimeconfig.json" >nul 2>&1
-del /f /q "%PUB_DIR%\BI-MGR-Standalone\appsettings.Development.json" >nul 2>&1
-
-echo.
-echo  [+] Generating Backend Production Launcher...
-(
-echo @echo off
-echo echo Starting BI API...
-echo start "BI-API" cmd /c "cd /d BI-API-Standalone ^&^& BI-API.exe"
-echo echo Starting BI Manager...
-echo start "BI-MGR" cmd /c "cd /d BI-MGR-Standalone ^&^& BI-MGR.exe"
-) > "%PUB_DIR%\start_backend.bat"
-
-(
-echo @echo off
-echo echo ==================================================
-echo echo Running BMS Background Sync Job...
-echo echo ==================================================
-echo cd /d "%%~dp0BI-MGR-Standalone"
-echo BI-MGR.exe --sync-all
-echo echo.
-echo echo Sync process completed.
-echo timeout /t 10
-) > "%PUB_DIR%\run_scheduled_sync.bat"
-
-echo.
-echo  [+] Initializing Database Assets...
-pushd "%PUB_DIR%\BI-MGR-Standalone"
-BI-MGR.exe --sync-all >nul 2>&1
-popd
-
-:CHECK_FRONTEND
-if "%COMPILE_FRONTEND%"=="1" goto DO_COMPILE_FRONTEND
-goto FINISH_COMPILE
-
-:DO_COMPILE_FRONTEND
-if exist "%PUB_DIR%\BI-APP" rmdir /s /q "%PUB_DIR%\BI-APP"
-mkdir "%PUB_DIR%\BI-APP"
-
-echo.
-echo  [+] Compiling Frontend Vue Assets (Hash-free)...
-pushd "%FRONTEND_DIR%"
-call npm install >nul 2>&1
-call npm run build > build.log 2>&1
-if errorlevel 1 ( type build.log & echo  [x] Frontend Build Failed. & popd & pause & goto MENU )
-popd
-
-if "!FRONTEND_DEPLOY_TYPE!"=="STATIC" (
-    echo  [+] Copying Frontend Static Assets...
-    xcopy /E /I /Q "%FRONTEND_DIR%\dist\*" "%PUB_DIR%\BI-APP\" >nul
-    echo.
-    echo  [+] Static build complete! Provide the contents of \Publish\BI-APP to your Web Server ^(IIS/Nginx/CDN^).
-) else (
-    echo  [+] Copying Frontend Production Proxy...
-    xcopy /E /I /Q "%FRONTEND_DIR%\dist" "%PUB_DIR%\BI-APP\dist" >nul
-    copy /Y "%FRONTEND_DIR%\server.js" "%PUB_DIR%\BI-APP\" >nul
-    copy /Y "%FRONTEND_DIR%\package.json" "%PUB_DIR%\BI-APP\" >nul
-
-    echo.
-    echo  [+] Generating Frontend Production Launcher...
-    (
-    echo @echo off
-    echo if not exist "node_modules" ^(
-    echo     echo Installing production dependencies...
-    echo     call npm install --omit=dev
-    echo ^)
-    echo echo Starting Frontend Proxy Server...
-    echo start "BMS Frontend Proxy" cmd /k "node server.js"
-    ) > "%PUB_DIR%\BI-APP\start_frontend.bat"
-)
-
-:FINISH_COMPILE
-echo.
-echo  ============================================================
-echo   BUILD SUCCESSFUL! 
-echo   All output is cleanly organized in the /Publish directory.
-echo  ============================================================
+echo   !GREEN!╔═══════════════════════════════════════════════════════╗!RESET!
+echo   !GREEN!║   ✓  IIS BUILD SUCCESSFUL                             ║!RESET!
+echo   !GREEN!║                                                       ║!RESET!
+echo   !GREEN!║   Output: Publish\IIS\                               ║!RESET!
+echo   !GREEN!║     ├─ BI-API\   → IIS Site: Backend API             ║!RESET!
+echo   !GREEN!║     ├─ BI-MGR\   → IIS Site: SaaS Manager            ║!RESET!
+echo   !GREEN!║     └─ BI-APP\   → IIS Site: Frontend Portal         ║!RESET!
+echo   !GREEN!╚═══════════════════════════════════════════════════════╝!RESET!
 echo.
 pause
-goto MENU
+goto :MENU
 
-:CHECK_DOTNET
+
+:: ============================================================
+:EXIT
+:: ============================================================
 cls
-echo.
-echo  ============================================================
-echo   CHECKING .NET AVAILABILITY ^& HEALTH
-echo  ============================================================
-echo.
+call :SECTION_HEADER "SHUTTING DOWN"
 
-:: Animated Loading Bar
-powershell -Command "Write-Host -NoNewline ' Running environment diagnostic: ['; 1..20 | %% { Write-Host -NoNewline '■'; Start-Sleep -m 40 }; Write-Host '] Verified.'"
-echo.
-echo.
-
-dotnet --version >nul 2>&1
-if errorlevel 1 (
-    echo  [x] .NET CLI is NOT installed or not present in your system PATH.
-    echo      Please install .NET Core SDK 8.0 or newer to run the server.
-) else (
-    for /f "delims=" %%v in ('dotnet --version') do set "DOTNET_VERSION=%%v"
-    echo  [+] .NET CLI Availability  : OK
-    echo  [+] Installed CLI Version  : !DOTNET_VERSION!
-    echo.
-    echo  [+] Checking Installed SDK Runtimes...
-    dotnet --list-sdks
-    echo.
-    echo  [+] Checking ASP.NET Core IIS Module...
-    reg query "HKLM\SOFTWARE\Microsoft\IIS Extensions\IIS AspNetCore Module V2" >nul 2>&1
-    if not errorlevel 1 (
-        echo      Status: INSTALLED
-    ) else (
-        echo      Status: NOT INSTALLED ^(Required if deploying to IIS^)
-    )
-    echo.
-    echo  [+] Checking Manager Project Health...
-    if exist "%MANAGER_DIR%\BI-MGR.csproj" (
-        echo      Manager Project file found. Building dry-run test...
-        dotnet build "%MANAGER_DIR%\BI-MGR.csproj" --no-restore >nul 2>&1
-        if errorlevel 1 (
-            echo  [x] Project Build Health: FAILED. Run option [2] to clean cache and try again.
-        ) else (
-            echo  [+] Project Build Health: STABLE ^(Ready to run^)
-        )
-    ) else (
-        echo  [x] Error: Manager project file not found at %MANAGER_DIR%.
-    )
-)
-echo.
-pause
-goto MENU
-
-:FORCE_EXIT
-cls
-echo.
-echo  ============================================================
-echo   SHUTTING DOWN SYSTEM
-echo  ============================================================
-echo.
-
-:: Exit loader
-powershell -Command "Write-Host -NoNewline ' Force closing active sessions: ['; 1..25 | %% { Write-Host -NoNewline '■'; Start-Sleep -m 30 }; Write-Host '] Closed.'"
-echo.
-
-:: Close open browser windows/tabs for the BI Portal Manager and Frontend Portal
-powershell -Command "Get-Process | Where-Object { `$_.MainWindowTitle -like '*BI Portal*' -or `$_.MainWindowTitle -like '*Financial Reports*' } | ForEach-Object { `$_.CloseMainWindow() }" >nul 2>&1
-
-:: 1. Free ports (close any running manager, backend, frontend)
-for %%p in (%MANAGER_PORT% %BACKEND_PORT% %FRONTEND_PORT%) do (
+call :INFO "Releasing all ports..."
+for %%p in (!BACKEND_PORT! !FRONTEND_PORT! !MANAGER_PORT!) do (
     netstat -ano | findstr LISTENING | findstr :%%p >nul
     if not errorlevel 1 (
         for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :%%p') do (
@@ -624,19 +558,54 @@ for %%p in (%MANAGER_PORT% %BACKEND_PORT% %FRONTEND_PORT%) do (
     )
 )
 
-:: 2. Clean cache
-for /d /r "%BACKEND_DIR%" %%d in (bin obj) do (
-    if exist "%%d" rmdir /s /q "%%d" >nul 2>&1
-)
-for /d /r "%MANAGER_DIR%" %%d in (bin obj) do (
-    if exist "%%d" rmdir /s /q "%%d" >nul 2>&1
-)
-if exist "%FRONTEND_DIR%\node_modules\.vite" (
-    rmdir /s /q "%FRONTEND_DIR%\node_modules\.vite" >nul 2>&1
-)
+call :INFO "Cleaning Vite cache..."
+if exist "!FRONTEND_DIR!\node_modules\.vite" rmdir /s /q "!FRONTEND_DIR!\node_modules\.vite" >nul 2>&1
 
 echo.
-echo  [+] All systems shut down, ports freed, and cache cleaned.
-echo  [+] Goodbye.
+call :SUCCESS "All services stopped. Goodbye!"
 timeout /t 2 >nul
 exit
+
+
+:: ============================================================
+:: SUBROUTINES
+:: ============================================================
+
+:CHECK_PORT <port> <out_var>
+    netstat -ano | findstr LISTENING | findstr :"%~1" >nul 2>&1
+    if errorlevel 1 ( set "%~2=OFFLINE" ) else ( set "%~2=ONLINE" )
+goto :EOF
+
+:PRINT_STATUS <label> <port> <status>
+    set "_lbl=%~1"
+    set "_port=%~2"
+    set "_st=%~3"
+    if "!_st!"=="ONLINE" (
+        echo   !WHITE!!_lbl!!RESET!!GRAY!:%_port%!RESET!  !GREEN!● ONLINE!RESET!
+    ) else (
+        echo   !WHITE!!_lbl!!RESET!!GRAY!:%_port%!RESET!  !GRAY!○ OFFLINE!RESET!
+    )
+goto :EOF
+
+:SECTION_HEADER <title>
+    echo   !BOLD!!CYAN!┌──────────────────────────────────────────────────────┐!RESET!
+    echo   !BOLD!!CYAN!│  !WHITE!%~1!CYAN!
+    echo   !BOLD!!CYAN!└──────────────────────────────────────────────────────┘!RESET!
+    echo.
+goto :EOF
+
+:INFO <msg>
+    echo   !CYAN!→!RESET!  %~1
+goto :EOF
+
+:SUCCESS <msg>
+    echo   !GREEN!✓!RESET!  %~1
+goto :EOF
+
+:WARN <msg>
+    echo   !YELLOW!⚠!RESET!  %~1
+goto :EOF
+
+:ERROR <msg>
+    echo   !RED!✗!RESET!  !RED!%~1!RESET!
+goto :EOF
