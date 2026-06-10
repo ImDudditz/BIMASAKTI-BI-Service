@@ -4,15 +4,24 @@
   "Name": "Operating Cash Flow Stream",
   "Type": "echarts_bar",
   "Query": {
-    "Table": "GLRX0310",
-    "Dimensions": ["period"],
+    "Table": "CBRX7000",
+    "Dimensions": [
+      "period",
+      "sub_grup_cash_flow"
+    ],
     "Measures": [
       {
-        "Field": "end_balance",
+        "Field": "ptd_amount",
         "Agg": "Sum"
       }
     ],
-    "Filters": []
+    "Filters": [
+      {
+        "Field": "group_cashflow",
+        "Operator": "LIKE",
+        "Value": "%Operating%"
+      }
+    ]
   },
   "Layout": {
     "cols": 1,

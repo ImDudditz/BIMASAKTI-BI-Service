@@ -1,0 +1,33 @@
+{
+  "Id": "expense_by_account",
+  "Category": "Financials",
+  "Name": "Expense By Charge",
+  "Type": "echarts_pie",
+  "Query": {
+    "Table": "GLRX0300",
+    "Dimensions": ["account_name"],
+    "Measures": [
+      {
+        "Field": "ptd_amount",
+        "Agg": "Sum"
+      }
+    ],
+    "Filters": [
+      {
+        "Field": "bs_is",
+        "Operator": "=",
+        "Value": "Income Statement"
+      },
+      {
+        "Field": "db_cr",
+        "Operator": "=",
+        "Value": "Debet"
+      }
+    ]
+  },
+  "Layout": {
+    "cols": 1,
+    "rows": 1
+  },
+  "Formatting": {}
+}

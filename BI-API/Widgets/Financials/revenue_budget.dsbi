@@ -8,11 +8,11 @@
     "Dimensions": ["period"],
     "Measures": [
       {
-        "Field": "end_balance",
+        "Field": "ptd_amount",
         "Agg": "Sum"
       },
       {
-        "Field": "end_budget",
+        "Field": "ptd_budget",
         "Agg": "Sum"
       }
     ],

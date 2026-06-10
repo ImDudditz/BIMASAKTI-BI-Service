@@ -1,0 +1,33 @@
+{
+  "Id": "revenue_by_account",
+  "Category": "Financials",
+  "Name": "Revenue By Charge",
+  "Type": "echarts_pie",
+  "Query": {
+    "Table": "GLRX0300",
+    "Dimensions": ["account_name"],
+    "Measures": [
+      {
+        "Field": "ptd_amount",
+        "Agg": "Sum"
+      }
+    ],
+    "Filters": [
+      {
+        "Field": "bs_is",
+        "Operator": "=",
+        "Value": "Income Statement"
+      },
+      {
+        "Field": "db_cr",
+        "Operator": "=",
+        "Value": "Credit"
+      }
+    ]
+  },
+  "Layout": {
+    "cols": 1,
+    "rows": 1
+  },
+  "Formatting": {}
+}

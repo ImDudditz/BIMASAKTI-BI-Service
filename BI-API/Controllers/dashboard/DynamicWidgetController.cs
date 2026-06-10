@@ -52,8 +52,17 @@ namespace Bimasakti.BiService.Api.Controllers.Dashboard
             return Ok(userWidgets);
         }
 
+        public class WidgetDataRequest
+        {
+            [System.Text.Json.Serialization.JsonPropertyName("year")]
+            public string? Year { get; set; }
+
+            [System.Text.Json.Serialization.JsonPropertyName("period")]
+            public string? Period { get; set; }
+        }
+
         [HttpPost("data/{category}/{id}")]
-        public async Task<IActionResult> GetWidgetData(string category, string id)
+        public async Task<IActionResult> GetWidgetData(string category, string id, [FromBody] WidgetDataRequest? req)
         {
             var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
             if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
@@ -63,7 +72,7 @@ namespace Bimasakti.BiService.Api.Controllers.Dashboard
             if (config == null) return NotFound();
 
             string databasePath = DbUtils.GetSafeDbPath(companyId);
-            var data = await _dynamicDataService.ExecuteWidgetQueryAsync(databasePath, config.Query);
+            var data = await _dynamicDataService.ExecuteWidgetQueryAsync(databasePath, config.Query, req?.Year, req?.Period);
 
             return Ok(data);
         }

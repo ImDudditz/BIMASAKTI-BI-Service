@@ -124,7 +124,7 @@ const saveLayout = async () => {
 
       <div class="p-6 flex flex-col gap-4 overflow-y-auto max-h-[60vh] custom-scrollbar">
         <p class="text-sm text-slate-500 mb-2">
-          Select which widgets you want to display on your executive dashboard.
+          Select which widgets you want to display on your financial dashboard.
         </p>
 
         <div

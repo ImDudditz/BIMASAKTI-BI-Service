@@ -56,13 +56,13 @@ const isAuthPage = computed(() => {
 const activePageTitle = computed(() => {
   const path = router.currentRoute.value.path
   if (path === '/overview') return 'Executive Business Overview'
-  if (path === '/dashboard') return 'Property Management Dashboard'
+  if (path === '/dashboard') return 'Financial Dashboard'
   if (path === '/dashboard/operation') return 'Properties Operation Overview'
   if (path === '/dashboard/maintenance') return 'Service & Maintenance'
   if (path === '/balance-sheet') return 'Balance Sheet'
   if (path === '/income-statement') return 'Income Statement'
   if (path === '/settings') return 'Account Mapping Wizard'
-  return 'Property Management Dashboard'
+  return 'Financial Dashboard'
 })
 
 // --- DYNAMIC BROWSER TAB TITLE ---

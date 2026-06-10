@@ -25,6 +25,31 @@ const monthNames = {
 
 const dynamicWidgets = ref([])
 
+const kpiWidgets = computed(() => dynamicWidgets.value.filter((w) => w.type === 'kpi_cards'))
+
+const chartWidgets = computed(() => {
+  const widgets = dynamicWidgets.value.filter((w) => w.type !== 'kpi_cards')
+  
+  const targetOrder = [
+    'revenue_budget',
+    'expense_budget',
+    'operating_cash_flow',
+    'capital_growth',
+    'revenue_by_account',
+    'expense_by_account'
+  ]
+  
+  widgets.sort((a, b) => {
+    const idxA = targetOrder.indexOf(a.id)
+    const idxB = targetOrder.indexOf(b.id)
+    const valA = idxA === -1 ? 999 : idxA
+    const valB = idxB === -1 ? 999 : idxB
+    return valA - valB
+  })
+  
+  return widgets
+})
+
 const isAuthorized = computed(() => {
   return authStore.isAdmin || dynamicWidgets.value.length > 0
 })
@@ -79,7 +104,7 @@ watch([selectedYear, selectedPeriod, comparisonYears], () => {
 
 <template>
   <ReportLayout
-    title="Executive Dashboard"
+    title="Financial Dashboard"
     :subtitle="`As of ${monthNames[selectedPeriod]} ${selectedYear}`"
   >
     <template #controls>
@@ -160,7 +185,7 @@ watch([selectedYear, selectedPeriod, comparisonYears], () => {
             <div class="space-y-2">
               <h3 class="text-xl font-black text-slate-800 tracking-tight">Access Restricted</h3>
               <p class="text-sm text-slate-500 font-medium leading-relaxed">
-                You do not have permission to view the Executive Dashboard. Please contact your
+                You do not have permission to view the Financial Dashboard. Please contact your
                 system administrator to request access.
               </p>
             </div>
@@ -184,7 +209,7 @@ watch([selectedYear, selectedPeriod, comparisonYears], () => {
             class="w-10 h-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"
           ></div>
           <p class="text-indigo-600 font-medium animate-pulse text-sm mt-4">
-            Loading executive databases...
+            Loading financial databases...
           </p>
         </div>
 
@@ -220,12 +245,24 @@ watch([selectedYear, selectedPeriod, comparisonYears], () => {
         </div>
 
         <!-- Dashboard Content -->
-        <div v-else-if="dynamicWidgets.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6 w-full">
-          <DynamicWidget
-            v-for="widget in dynamicWidgets"
-            :key="widget.id"
-            :config="widget"
-          />
+        <div v-else-if="dynamicWidgets.length > 0" class="flex flex-col gap-6 pb-6 w-full">
+          <!-- KPI Cards on very top of section -->
+          <div v-if="kpiWidgets.length > 0" class="w-full">
+            <DynamicWidget
+              v-for="widget in kpiWidgets"
+              :key="widget.id"
+              :config="widget"
+            />
+          </div>
+
+          <!-- Charts Section -->
+          <div v-if="chartWidgets.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            <DynamicWidget
+              v-for="widget in chartWidgets"
+              :key="widget.id"
+              :config="widget"
+            />
+          </div>
         </div>
         <div v-else class="flex-grow flex items-center justify-center py-20 text-center">
           <p class="text-slate-400 text-sm font-medium">No dashboard widgets available.</p>
