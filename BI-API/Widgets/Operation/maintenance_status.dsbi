@@ -1,0 +1,22 @@
+{
+  "Id": "maintenance_status",
+  "Category": "Operation",
+  "Name": "Maintenance Orders Log",
+  "Type": "echarts_bar",
+  "Query": {
+    "Table": "LMRX0800",
+    "Dimensions": ["call_status"],
+    "Measures": [
+      {
+        "Field": "call_no",
+        "Agg": "Count"
+      }
+    ],
+    "Filters": []
+  },
+  "Layout": {
+    "cols": 1,
+    "rows": 1
+  },
+  "Formatting": {}
+}

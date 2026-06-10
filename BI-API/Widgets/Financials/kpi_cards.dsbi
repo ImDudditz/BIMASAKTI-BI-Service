@@ -1,0 +1,22 @@
+{
+  "Id": "kpi_cards",
+  "Category": "Financials",
+  "Name": "Financial KPI Summary Cards",
+  "Type": "echarts_bar",
+  "Query": {
+    "Table": "GLRX0310",
+    "Dimensions": ["period"],
+    "Measures": [
+      {
+        "Field": "end_balance",
+        "Agg": "Sum"
+      }
+    ],
+    "Filters": []
+  },
+  "Layout": {
+    "cols": 3,
+    "rows": 1
+  },
+  "Formatting": {}
+}

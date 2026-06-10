@@ -1,0 +1,22 @@
+{
+  "Id": "capital_growth",
+  "Category": "Financials",
+  "Name": "Capital Growth Trend",
+  "Type": "echarts_line",
+  "Query": {
+    "Table": "GLRX0310",
+    "Dimensions": ["period"],
+    "Measures": [
+      {
+        "Field": "end_balance",
+        "Agg": "Sum"
+      }
+    ],
+    "Filters": []
+  },
+  "Layout": {
+    "cols": 1,
+    "rows": 1
+  },
+  "Formatting": {}
+}

@@ -25,14 +25,6 @@ const monthNames = {
 
 const dynamicWidgets = ref([])
 
-const leftColumnWidgets = computed(() => {
-  return dynamicWidgets.value.filter((_, index) => index % 2 === 0)
-})
-
-const rightColumnWidgets = computed(() => {
-  return dynamicWidgets.value.filter((_, index) => index % 2 !== 0)
-})
-
 const isAuthorized = computed(() => {
   return authStore.isAdmin || dynamicWidgets.value.length > 0
 })
@@ -43,7 +35,7 @@ const fetchUserWidgets = async () => {
     if (!username) return
 
     const res = await api.get('/dynamic-widgets/available', { params: { username } })
-    dynamicWidgets.value = res.data.filter((w) => w.category === 'Financial' || w.category === 'Finance')
+    dynamicWidgets.value = res.data.filter((w) => w.category === 'Financials')
   } catch (err) {
     console.error('Failed to load dynamic widgets', err)
     dynamicWidgets.value = []
@@ -68,7 +60,7 @@ const loadDashboardData = async () => {
   try {
     // DynamicWidgets handle their own data fetching now
     await new Promise(resolve => setTimeout(resolve, 500))
-  } catch (err) {
+  } catch {
     error.value = 'Dashboard connection failure.'
   } finally {
     isLoading.value = false
@@ -227,21 +219,16 @@ watch([selectedYear, selectedPeriod, comparisonYears], () => {
           </button>
         </div>
 
-        <!-- Dashboard Layout Grid -->
-        <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4 pb-6 w-full">
-          <!-- Left Column -->
-          <div class="flex flex-col gap-4 w-full">
-            <template v-for="widget in leftColumnWidgets" :key="widget.id">
-              <DynamicWidget :config="widget" />
-            </template>
-          </div>
-
-          <!-- Right Column -->
-          <div class="flex flex-col gap-4 w-full">
-            <template v-for="widget in rightColumnWidgets" :key="widget.id">
-              <DynamicWidget :config="widget" />
-            </template>
-          </div>
+        <!-- Dashboard Content -->
+        <div v-else-if="dynamicWidgets.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6 w-full">
+          <DynamicWidget
+            v-for="widget in dynamicWidgets"
+            :key="widget.id"
+            :config="widget"
+          />
+        </div>
+        <div v-else class="flex-grow flex items-center justify-center py-20 text-center">
+          <p class="text-slate-400 text-sm font-medium">No dashboard widgets available.</p>
         </div>
       </div>
     </div>

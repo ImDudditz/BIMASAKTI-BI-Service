@@ -6,16 +6,7 @@
     <title>SaaS Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-    <!-- FINOS Perspective CDN -->
-    <link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer@2.10.1/dist/css/themes.css" />
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective@2.10.1/dist/cdn/perspective.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer@2.10.1/dist/cdn/perspective-viewer.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-datagrid@2.10.1/dist/cdn/perspective-viewer-datagrid.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-d3fc@2.10.1/dist/cdn/perspective-viewer-d3fc.js"></script>
-    <script type="module">
-        import perspective from "https://cdn.jsdelivr.net/npm/@finos/perspective@2.10.1/dist/cdn/perspective.js";
-        window.perspective = perspective;
-    </script>
+
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
 <div id="app" class="min-h-screen flex flex-col">
@@ -25,7 +16,7 @@
         <div>
             <button @click="tab = 'companies'" :class="{'font-bold underline': tab==='companies'}" class="mr-4 hover:text-blue-200">Companies</button>
             <button @click="tab = 'permissions'" :class="{'font-bold underline': tab==='permissions'}" class="mr-4 hover:text-blue-200">Permissions</button>
-            <button @click="openWidgetDesigner" :class="{'font-bold underline': tab==='widgets'}" class="mr-4 hover:text-blue-200">Widget Designer</button>
+
             <button @click="openAuditTab" :class="{'font-bold underline': tab==='audit'}" class="mr-4 hover:text-blue-200">Audit Logs</button>
             <button @click="logout" class="bg-blue-700 px-3 py-1 rounded hover:bg-blue-800">Logout</button>
         </div>
@@ -140,74 +131,7 @@
                     <pre class="text-green-400 text-sm font-mono whitespace-pre-wrap">{{ systemAuditLogs }}</pre>
                 </div>
             </div>
-            <!-- Widget Designer Tab -->
-            <div v-if="tab === 'widgets'" class="flex h-[90vh] gap-3">
-                <!-- Left Sidebar -->
-                <div class="w-48 bg-white p-3 rounded-lg shadow border flex flex-col h-full">
-                    <h3 class="font-bold text-lg mb-3 border-b pb-2 flex justify-between items-center">
-                        Widgets
-                        <button v-if="widgetForm.id" @click="deleteDynamicWidget" class="text-xs bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded">Delete</button>
-                    </h3>
-                    <div class="flex-1 overflow-y-auto space-y-2 pr-2">
-                        <button v-for="w in dynamicWidgets" :key="w.id" @click="selectWidget(w)" 
-                                class="w-full text-left p-3 border rounded transition flex justify-between items-center"
-                                :class="w.id === widgetForm.id ? 'bg-blue-50 border-blue-300 shadow-sm' : 'bg-gray-50 hover:bg-blue-50'">
-                            <span class="font-bold text-sm truncate">{{ w.name }}</span>
-                            <span class="text-[10px] text-gray-500 bg-gray-200 px-1.5 py-0.5 rounded">{{ w.category }}</span>
-                        </button>
-                    </div>
-                    <button @click="clearWidgetForm" class="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded font-bold">+ New Widget</button>
-                    <button @click="syncBmsSkeletons" class="w-full mt-2 bg-purple-100 hover:bg-purple-200 text-purple-700 border border-purple-300 p-2 rounded font-bold text-sm flex justify-center items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        Sync Tables
-                    </button>
-                </div>
 
-                <div class="flex-1 bg-white rounded-lg shadow border flex flex-col h-full overflow-hidden relative">
-                    <!-- Our top bar (acting as ribbon/toolbar) -->
-                    <div class="p-3 bg-[var(--excel-green)] text-white border-b flex gap-3 items-center shadow-sm z-10 text-sm">
-                        <div class="font-bold mr-4">PivotTable Analyze</div>
-                        <div class="flex-1">
-                            <input v-model="widgetForm.name" class="w-full border-b border-transparent focus:border-white text-lg font-bold bg-transparent px-1 outline-none transition placeholder-green-200" placeholder="Untitled Widget">
-                        </div>
-                        <div class="w-32 relative text-gray-800">
-                            <span class="text-[10px] font-bold text-white absolute -top-4 left-1">Data Source</span>
-                            <select v-model="widgetForm.query.table" class="w-full border p-1 text-xs rounded bg-white outline-none">
-                                <option value="">-- Table --</option>
-                                <option v-for="t in Object.keys(bmsSchema)" :key="t" :value="t">{{ t }}</option>
-                            </select>
-                        </div>
-                        <div class="w-40 relative group text-gray-800">
-                            <span class="text-[10px] font-bold text-white absolute -top-4 left-1">Widget ID</span>
-                            <input v-model="widgetForm.id" class="w-full border p-1 text-xs rounded bg-white outline-none" placeholder="e.g. sales_kpi">
-                        </div>
-                        <div class="w-32 relative text-gray-800">
-                            <span class="text-[10px] font-bold text-white absolute -top-4 left-1">Category</span>
-                            <select v-model="widgetForm.category" class="w-full border p-1 text-xs rounded bg-white outline-none">
-                                <option value="Financial">Financial</option>
-                                <option value="Tenancy">Tenancy</option>
-                                <option value="Operations">Operations</option>
-                            </select>
-                        </div>
-                        <button @click="saveDynamicWidget" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded text-sm shadow-sm transition transform hover:scale-105 border border-blue-800">Save</button>
-                    </div>
-
-                    <!-- Live Canvas Area -->
-                    <div class="flex-1 relative overflow-hidden bg-white">
-                        <perspective-viewer 
-                            v-show="widgetForm.query.table"
-                            id="pivot-viewer" 
-                            class="absolute inset-0 w-full h-full"
-                            settings="true"
-                        ></perspective-viewer>
-                        <div v-if="!widgetForm.query.table" class="flex flex-col items-center justify-center text-center text-gray-400 pointer-events-none h-full p-10 bg-white absolute inset-0">
-                            <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                            <p class="font-bold">Pivot Grid Ready</p>
-                            <p class="text-xs mt-1">Select a Data Source to begin</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
     <!-- Activity Log Modal -->
@@ -249,16 +173,7 @@
         --text-color: #323130;
     }
     
-    #pivot-viewer {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        height: 100%;
-        background: #ffffff;
-    }
+
 </style>
 <script>
 // ==========================================
@@ -274,7 +189,6 @@ const { createApp, ref, reactive, onMounted, watch, computed } = Vue;
 
 createApp({
     setup() {
-        const pivotData = ref([]);
         const isAuthenticated = ref(false);
         const password = ref('');
         const loginError = ref('');
@@ -294,12 +208,6 @@ createApp({
         const activityLogs = ref('');
 
         const systemAuditLogs = ref('Loading...');
-        
-        const dynamicWidgets = ref([]);
-        const widgetForm = reactive({
-            id: '', category: 'Operations', name: '', type: 'pivot_grid',
-            query: { table: '', rows: [], columns: [], values: [], filters: [] }
-        });
 
         const toasts = ref([]);
         const showToast = (msg, type='info') => {
@@ -459,7 +367,7 @@ createApp({
             if (!permSelectedUser.value) return;
             try {
                 const data = await api(`/manager/companies/${permSelectedCompany.value}/users/${permSelectedUser.value}/permissions`);
-                availableWidgets.forEach(w => permissions.widgets[w.key] = !!data.widgets[w.key]);
+                availableWidgets.value.forEach(w => permissions.widgets[w.key] = !!data.widgets[w.key]);
                 availableReports.forEach(r => permissions.reports[r.key] = !!data.reports[r.key]);
             } catch (e) { showToast('Failed to load permissions', 'error'); }
         };
@@ -474,232 +382,13 @@ createApp({
             } catch (e) { showToast('Failed to save permissions', 'error'); }
         };
 
-        const availableWidgets = [
-            { key: 'kpi_cards', label: 'Financial KPI Summary Cards' },
-            { key: 'capital_growth', label: 'Capital Growth Trend' },
-            { key: 'operating_cash_flow', label: 'Operating Cash Flow Stream' },
-            { key: 'revenue_budget', label: 'Revenue Budget vs Actual' },
-            { key: 'expense_budget', label: 'Expense Budget vs Actual' },
-            { key: 'operation_metrics', label: 'Property Operations Metrics' },
-            { key: 'lease_expirations', label: 'Upcoming Lease Expirations' },
-            { key: 'tickets_kpi', label: 'Tenant Helpdesk KPI Status' },
-            { key: 'maintenance_status', label: 'Maintenance Orders Log' },
-            { key: 'tickets_by_category', label: 'Tickets Distribution Chart' }
-        ];
-
-        const bmsSchema = ref({});
-
-        const loadBmsSchema = async () => {
+        const availableWidgets = ref([]);
+        const loadAvailableWidgets = async () => {
             try {
-                const res = await api('/manager/bms-schema');
-                bmsSchema.value = res;
-            } catch(e) { console.error('Failed to load bms schema', e); }
-        };
-
-        const loadDynamicWidgets = async () => {
-            try {
-                const res = await fetch(`http://${window.location.hostname}:8001/api/dynamic-widgets/available?username=admin`);
-                if(res.ok) {
-                    dynamicWidgets.value = await res.json();
-                }
-            } catch (e) { console.error('Failed to load dynamic widgets', e); }
-        };
-
-        const openWidgetDesigner = () => {
-            tab.value = 'widgets';
-            loadDynamicWidgets();
-            loadBmsSchema();
-        };
-
-        const clearWidgetForm = () => {
-            widgetForm.id = '';
-            widgetForm.name = '';
-            widgetForm.category = 'Operations';
-            widgetForm.type = 'pivot_grid';
-            widgetForm.query = { table: '', rows: [], columns: [], values: [], filters: [] };
-        };
-
-        const selectWidget = async (w) => {
-            const tableAlreadySame = widgetForm.query.table === w.query.table;
-
-            widgetForm.id = w.id;
-            widgetForm.name = w.name;
-            widgetForm.category = w.category;
-            widgetForm.type = w.type;
-            widgetForm.formatting = w.formatting || {};
-
-            const q = JSON.parse(JSON.stringify(w.query));
-            widgetForm.query = {
-                table: q.table || '',
-                rows: q.rows || q.dimensions || [],
-                columns: q.columns || [],
-                values: q.values || q.measures || [],
-                filters: q.filters || []
-            };
-
-            if (tableAlreadySame && widgetForm.query.table) {
-                const schemaColumns = bmsSchema.value[widgetForm.query.table] || [];
-                await updatePerspectiveViewer(pivotData.value, schemaColumns);
+                availableWidgets.value = await api('/manager/widgets');
+            } catch (e) {
+                showToast('Failed to load system widgets', 'error');
             }
-        };
-
-        const saveDynamicWidget = async () => {
-            if(!widgetForm.id || !widgetForm.name || !widgetForm.query.table) return showToast('Fill required fields', 'error');
-            try {
-                const viewer = document.getElementById('pivot-viewer');
-                if (viewer) {
-                    const config = await viewer.save();
-                    widgetForm.formatting = config;
-
-                    widgetForm.query.rows = config.row_pivots || [];
-                    widgetForm.query.columns = config.column_pivots || [];
-                    widgetForm.query.values = (config.columns || []).map(col => {
-                        const agg = (config.aggregates && config.aggregates[col]) || 'sum';
-                        const capitalizedAgg = agg.charAt(0).toUpperCase() + agg.slice(1).toLowerCase();
-                        return { field: col, agg: capitalizedAgg };
-                    });
-                    const configFilters = config.filter || config.filters || [];
-                    widgetForm.query.filters = configFilters.map(f => {
-                        return {
-                            field: f[0],
-                            operator: f[1] === '==' ? '=' : f[1],
-                            value: String(f[2])
-                        };
-                    });
-                }
-
-                const res = await fetch(`http://${window.location.hostname}:8001/api/dynamic-widgets/save`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(widgetForm)
-                });
-                if(res.ok) {
-                    showToast('Widget saved', 'success');
-                    loadDynamicWidgets();
-                } else showToast('Failed to save', 'error');
-            } catch(e) { 
-                console.error(e);
-                showToast('Error saving widget', 'error'); 
-            }
-        };
-
-        const deleteDynamicWidget = async () => {
-            try {
-                const res = await fetch(`http://${window.location.hostname}:8001/api/dynamic-widgets/${widgetForm.category}/${widgetForm.id}`, { method: 'DELETE' });
-                if(res.ok) {
-                    showToast('Widget deleted', 'success');
-                    clearWidgetForm();
-                    loadDynamicWidgets();
-                } else showToast('Failed to delete', 'error');
-            } catch(e) { showToast('Error deleting widget', 'error'); }
-        };
-
-        let perspectiveWorker = null;
-        let perspectiveTable = null;
-
-        const initPerspective = async () => {
-            if (!perspectiveWorker && window.perspective) {
-                perspectiveWorker = window.perspective.worker();
-            }
-        };
-
-        const mapColumnType = (colName) => {
-            const name = colName.toLowerCase();
-            if (name.includes('date') || name.includes('period') || name.includes('time')) {
-                return 'date';
-            }
-            if (name.includes('amt') || name.includes('amount') || name.includes('balance') || name.includes('total') || name.includes('qty') || name.includes('rate') || name.includes('price')) {
-                return 'float';
-            }
-            return 'string';
-        };
-
-        const updatePerspectiveViewer = async (tableData, columnsList) => {
-            await initPerspective();
-            if (!perspectiveWorker) return;
-
-            try {
-                if (perspectiveTable) {
-                    perspectiveTable.delete();
-                    perspectiveTable = null;
-                }
-
-                const schema = {};
-                columnsList.forEach(col => {
-                    schema[col] = mapColumnType(col);
-                });
-
-                perspectiveTable = await perspectiveWorker.table(schema);
-                await perspectiveTable.update(tableData);
-
-                const viewer = document.getElementById('pivot-viewer');
-                if (viewer) {
-                    await viewer.load(perspectiveTable);
-                    
-                    if (widgetForm.formatting && Object.keys(widgetForm.formatting).length > 0) {
-                        await viewer.restore({ ...widgetForm.formatting, settings: true });
-                    } else {
-                        await viewer.restore({
-                            settings: true,
-                            plugin: "Datagrid",
-                            row_pivots: ["Type_Name", "Ref_Date", "Due_Date", "Dept"].filter(c => columnsList.includes(c)),
-                            columns: ["L_Trx_Amt", "L_Rmn_Amt", "X_Local_Amt"].filter(c => columnsList.includes(c)),
-                            aggregates: {
-                                "L_Trx_Amt": "sum",
-                                "L_Rmn_Amt": "sum",
-                                "X_Local_Amt": "sum"
-                            }
-                        });
-                    }
-                }
-            } catch (err) {
-                console.error("Error updating Perspective viewer:", err);
-            }
-        };
-
-        watch(() => widgetForm.query.table, async (newTable, oldTable) => {
-            if (oldTable && newTable !== oldTable) {
-                widgetForm.query.rows = [];
-                widgetForm.query.columns = [];
-                widgetForm.query.values = [];
-                widgetForm.query.filters = [];
-                widgetForm.formatting = {};
-            }
-            if (!newTable || !bmsSchema.value[newTable]) {
-                pivotData.value = [];
-                const viewer = document.getElementById('pivot-viewer');
-                if (viewer) {
-                    viewer.reset();
-                }
-                return;
-            }
-
-            const schemaColumns = bmsSchema.value[newTable];
-            const data = [];
-            for (let i = 0; i < 100; i++) {
-                const row = {};
-                schemaColumns.forEach(col => {
-                    const type = mapColumnType(col);
-                    if (type === 'float') {
-                        row[col] = parseFloat((Math.random() * 100000).toFixed(2));
-                    } else if (type === 'date') {
-                        row[col] = `2023-0${Math.floor(Math.random() * 9) + 1}-01`;
-                    } else {
-                        row[col] = `${col.split('_')[0].toUpperCase()} ${Math.floor(Math.random() * 5) + 1}`;
-                    }
-                });
-                data.push(row);
-            }
-            pivotData.value = data;
-
-            await updatePerspectiveViewer(data, schemaColumns);
-        });
-
-        const syncBmsSkeletons = async () => {
-            try {
-                await api('/manager/sync-bms-skeletons', { method: 'POST' });
-                showToast('Skeleton sync started in background', 'success');
-            } catch (e) { showToast('Sync failed to start', 'error'); }
         };
 
         const availableReports = [
@@ -707,7 +396,10 @@ createApp({
             { key: 'income_statement', label: 'Income Statement Statement' }
         ];
 
-        onMounted(checkAuth);
+        onMounted(async () => {
+            await checkAuth();
+            await loadAvailableWidgets();
+        });
 
         return {
             isAuthenticated, password, loginError, login, logout, tab,
@@ -715,10 +407,7 @@ createApp({
             users, permSelectedCompany, permSelectedUser, permissions, loadUsers, loadPermissions, savePermissions,
             availableWidgets, availableReports, toasts,
             showLogModal, activityLogs, viewLogs, refreshLogs, closeLogs,
-            systemAuditLogs, fetchAuditLogs, openAuditTab,
-            dynamicWidgets, widgetForm, openWidgetDesigner, clearWidgetForm, selectWidget, 
-            saveDynamicWidget, deleteDynamicWidget, syncBmsSkeletons,
-            bmsSchema, loadBmsSchema, pivotData
+            systemAuditLogs, fetchAuditLogs, openAuditTab
         };
     }
 }).mount('#app');

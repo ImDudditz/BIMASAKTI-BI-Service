@@ -1,0 +1,22 @@
+{
+  "Id": "tickets_by_category",
+  "Category": "Operation",
+  "Name": "Tickets Distribution Chart",
+  "Type": "echarts_pie",
+  "Query": {
+    "Table": "LMRX0800",
+    "Dimensions": ["sla_category_1"],
+    "Measures": [
+      {
+        "Field": "call_no",
+        "Agg": "Count"
+      }
+    ],
+    "Filters": []
+  },
+  "Layout": {
+    "cols": 1,
+    "rows": 1
+  },
+  "Formatting": {}
+}

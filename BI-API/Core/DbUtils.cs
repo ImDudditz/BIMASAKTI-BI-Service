@@ -39,18 +39,26 @@ namespace Bimasakti.BiService.Api.Core
         {
             try
             {
-                string configPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
-                if (File.Exists(configPath))
+                string currentDir = Directory.GetCurrentDirectory();
+                bool isTestOrBin = currentDir.Contains("tests", StringComparison.OrdinalIgnoreCase) || 
+                                   currentDir.Contains("bin", StringComparison.OrdinalIgnoreCase) || 
+                                   currentDir.Contains("obj", StringComparison.OrdinalIgnoreCase);
+
+                if (!isTestOrBin)
                 {
-                    using var doc = JsonDocument.Parse(File.ReadAllText(configPath));
-                    if (doc.RootElement.TryGetProperty("Config", out var config) && config.TryGetProperty("ReferenceDir", out var refDir))
+                    string configPath = Path.Combine(currentDir, "appsettings.json");
+                    if (File.Exists(configPath))
                     {
-                        string dir = refDir.GetString() ?? "";
-                        if (!string.IsNullOrEmpty(dir))
+                        using var doc = JsonDocument.Parse(File.ReadAllText(configPath));
+                        if (doc.RootElement.TryGetProperty("Config", out var config) && config.TryGetProperty("ReferenceDir", out var refDir))
                         {
-                            string fullDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), dir));
-                            if (!Directory.Exists(fullDir)) Directory.CreateDirectory(fullDir);
-                            return fullDir;
+                            string dir = refDir.GetString() ?? "";
+                            if (!string.IsNullOrEmpty(dir))
+                            {
+                                string fullDir = Path.GetFullPath(Path.Combine(currentDir, dir));
+                                if (!Directory.Exists(fullDir)) Directory.CreateDirectory(fullDir);
+                                return fullDir;
+                            }
                         }
                     }
                 }

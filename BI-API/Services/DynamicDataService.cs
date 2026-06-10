@@ -47,7 +47,6 @@ namespace Bimasakti.BiService.Api.Services
                 {
                     if (!string.IsNullOrWhiteSpace(measure.Field) && !string.IsNullOrWhiteSpace(measure.Agg))
                     {
-                        // Safely handle typical aggregations
                         var agg = measure.Agg.ToUpper();
                         if (agg != "SUM" && agg != "COUNT" && agg != "AVG" && agg != "MIN" && agg != "MAX") agg = "SUM";
                         selectParts.Add($"{agg}({measure.Field}) AS {agg}_{measure.Field}");
@@ -62,7 +61,7 @@ namespace Bimasakti.BiService.Api.Services
                 var sql = $"SELECT {string.Join(", ", selectParts)} FROM {queryConfig.Table}";
 
                 // Add Filters
-                if (queryConfig.Filters.Any())
+                if (queryConfig.Filters != null && queryConfig.Filters.Any())
                 {
                     var filterParts = new List<string>();
                     for(int i = 0; i < queryConfig.Filters.Count; i++)
@@ -80,7 +79,7 @@ namespace Bimasakti.BiService.Api.Services
 
                 using var command = new SqliteCommand(sql, connection);
                 
-                if (queryConfig.Filters.Any())
+                if (queryConfig.Filters != null && queryConfig.Filters.Any())
                 {
                     for(int i = 0; i < queryConfig.Filters.Count; i++)
                     {
@@ -102,7 +101,6 @@ namespace Bimasakti.BiService.Api.Services
             }
             catch (Exception ex)
             {
-                // In production, log the exception.
                 Console.WriteLine($"Error executing dynamic query: {ex.Message}");
             }
 

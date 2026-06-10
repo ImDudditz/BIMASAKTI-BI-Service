@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using Bimasakti.BiService.Api.Core;
 using Bimasakti.BiService.Api.Models;
 
 namespace Bimasakti.BiService.Api.Services
@@ -20,7 +21,8 @@ namespace Bimasakti.BiService.Api.Services
 
         public WidgetConfigService()
         {
-            _widgetsDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Widgets");
+            var baseDir = Path.GetDirectoryName(DbUtils.GetAssetsDirectory());
+            _widgetsDirectory = Path.Combine(baseDir ?? Directory.GetCurrentDirectory(), "Widgets");
             if (!Directory.Exists(_widgetsDirectory))
             {
                 Directory.CreateDirectory(_widgetsDirectory);

@@ -1,0 +1,22 @@
+{
+  "Id": "lease_expirations",
+  "Category": "Tenant",
+  "Name": "Upcoming Lease Expirations",
+  "Type": "echarts_line",
+  "Query": {
+    "Table": "LMRX0710",
+    "Dimensions": ["charge_end_date"],
+    "Measures": [
+      {
+        "Field": "alias_unit_id",
+        "Agg": "Count"
+      }
+    ],
+    "Filters": []
+  },
+  "Layout": {
+    "cols": 2,
+    "rows": 1
+  },
+  "Formatting": {}
+}

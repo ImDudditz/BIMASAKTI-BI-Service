@@ -1,3 +1,84 @@
+<script setup>
+import { ref, onMounted, watch, computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import api from '@/services/api'
+import { useReportFilterStore } from '@/stores/reportFilters'
+import { useAuthStore } from '@/stores/auth'
+import ReportLayout from '@/components/ReportLayout.vue'
+import DynamicWidget from '@/components/widgets/DynamicWidget.vue'
+
+const filterStore = useReportFilterStore()
+const { selectedYear, selectedPeriod, availableYears, availablePeriods } = storeToRefs(filterStore)
+
+const authStore = useAuthStore()
+
+// Localized Async States
+const isLoading = ref(true)
+const error = ref(null)
+
+// Current tenant context
+const comparisonYears = ref([])
+
+const monthNames = {
+  '01': 'January', '02': 'February', '03': 'March', '04': 'April',
+  '05': 'May', '06': 'June', '07': 'July', '08': 'August',
+  '09': 'September', 10: 'October', 11: 'November', 12: 'December',
+}
+
+const dynamicWidgets = ref([])
+
+const isAuthorized = computed(() => {
+  return authStore.isAdmin || dynamicWidgets.value.length > 0
+})
+
+const fetchUserWidgets = async () => {
+  try {
+    const username = authStore.user?.username
+    if (!username) return
+
+    const res = await api.get('/dynamic-widgets/available', { params: { username } })
+    dynamicWidgets.value = res.data.filter((w) => w.category === 'Operation')
+  } catch (err) {
+    console.error('Failed to load dynamic widgets', err)
+    dynamicWidgets.value = []
+  }
+}
+
+const loadDashboardData = async () => {
+  if (!isAuthorized.value) {
+    isLoading.value = false
+    return
+  }
+
+  const company_id = authStore.user?.company_id || 'ASHMD'
+  if (!company_id || !selectedYear.value || !selectedPeriod.value) {
+    isLoading.value = false
+    return
+  }
+
+  isLoading.value = true
+  error.value = null
+
+  try {
+    // DynamicWidgets handle their own data fetching now
+    await new Promise(resolve => setTimeout(resolve, 500))
+  } catch {
+    error.value = 'Dashboard connection failure.'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(async () => {
+  await fetchUserWidgets()
+  filterStore.fetchFilters().then(() => loadDashboardData())
+})
+
+watch([selectedYear, selectedPeriod, comparisonYears], () => {
+  loadDashboardData()
+})
+</script>
+
 <template>
   <ReportLayout
     title="Service & Maintenance Dashboard"
@@ -140,115 +221,18 @@
           </button>
         </div>
 
-        <!-- Dashboard Dynamic Columns Layout -->
-        <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4 pb-6 w-full items-start">
-          <!-- Left Column -->
-          <div class="flex flex-col gap-4 w-full">
-            <template v-for="widget in leftColumnWidgets" :key="widget.id">
-              <DynamicWidget :config="widget" />
-            </template>
-          </div>
-
-          <!-- Right Column -->
-          <div class="flex flex-col gap-4 w-full">
-            <template v-for="widget in rightColumnWidgets" :key="widget.id">
-              <DynamicWidget :config="widget" />
-            </template>
-          </div>
+        <!-- Dashboard Content -->
+        <div v-else-if="dynamicWidgets.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6 w-full">
+          <DynamicWidget
+            v-for="widget in dynamicWidgets"
+            :key="widget.id"
+            :config="widget"
+          />
+        </div>
+        <div v-else class="flex-grow flex items-center justify-center py-20 text-center">
+          <p class="text-slate-400 text-sm font-medium">No dashboard widgets available.</p>
         </div>
       </div>
     </div>
   </ReportLayout>
 </template>
-
-<script setup>
-import { ref, onMounted, watch, computed, defineAsyncComponent } from 'vue'
-import { storeToRefs } from 'pinia'
-import api from '@/services/api'
-import { useReportFilterStore } from '@/stores/reportFilters'
-import { useAuthStore } from '@/stores/auth'
-import ReportLayout from '@/components/ReportLayout.vue'
-import DynamicWidget from '@/components/widgets/DynamicWidget.vue'
-
-const filterStore = useReportFilterStore()
-const { selectedYear, selectedPeriod, availableYears, availablePeriods } = storeToRefs(filterStore)
-
-const authStore = useAuthStore()
-
-// Localized Async States
-const isLoading = ref(true)
-const error = ref(null)
-
-// Current tenant context
-const companyId = ref(authStore.user?.company_id || 'ASHMD')
-const comparisonYears = ref([])
-
-const monthNames = {
-  '01': 'January', '02': 'February', '03': 'March', '04': 'April',
-  '05': 'May', '06': 'June', '07': 'July', '08': 'August',
-  '09': 'September', 10: 'October', 11: 'November', 12: 'December',
-}
-
-const dynamicWidgets = ref([])
-
-const leftColumnWidgets = computed(() => {
-  return dynamicWidgets.value.filter((_, index) => index % 2 === 0)
-})
-
-const rightColumnWidgets = computed(() => {
-  return dynamicWidgets.value.filter((_, index) => index % 2 !== 0)
-})
-
-const isAuthorized = computed(() => {
-  return authStore.isAdmin || dynamicWidgets.value.length > 0
-})
-
-const fetchUserWidgets = async () => {
-  try {
-    const username = authStore.user?.username
-    if (!username) return
-
-    const res = await api.get('/dynamic-widgets/available', { params: { username } })
-    // Only show Operations category for this dashboard
-    dynamicWidgets.value = res.data.filter((w) => w.category === 'Operations')
-  } catch (err) {
-    console.error('Failed to load dynamic widgets', err)
-    dynamicWidgets.value = []
-  }
-}
-
-const loadDashboardData = async () => {
-  if (!isAuthorized.value) {
-    isLoading.value = false
-    return
-  }
-
-  const company_id = authStore.user?.company_id || 'ASHMD'
-  if (!company_id || !selectedYear.value || !selectedPeriod.value) {
-    isLoading.value = false
-    return
-  }
-
-  isLoading.value = true
-  error.value = null
-
-  try {
-    // DynamicWidgets handle their own data fetching now
-    // We just simulate overall dashboard loading here if needed
-    await new Promise(resolve => setTimeout(resolve, 500))
-  } catch (err) {
-    error.value = 'Dashboard connection failure.'
-  } finally {
-    isLoading.value = false
-  }
-}
-
-onMounted(async () => {
-  await fetchUserWidgets()
-  filterStore.fetchFilters().then(() => loadDashboardData())
-})
-
-watch([selectedYear, selectedPeriod, comparisonYears], () => {
-  loadDashboardData()
-})
-</script>

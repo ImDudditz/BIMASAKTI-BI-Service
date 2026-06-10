@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Bimasakti.BiService.Mgr.Models;
+using Bimasakti.BiService.Api.Services;
 
 namespace Bimasakti.BiService.Mgr.Core
 {
@@ -63,9 +64,10 @@ namespace Bimasakti.BiService.Mgr.Core
                                 using var tenantDb = new CompanyDbContext(bmsDbPath);
                                 tenantDb.Database.EnsureCreated();
                                 
-                                var authSvc = new Bimasakti.BiService.Api.Services.AuthenticationService();
-                                var allWidgets = new[] { "kpi_cards", "capital_growth", "operating_cash_flow", "revenue_budget", "expense_budget", "operation_metrics", "lease_expirations", "tickets_kpi", "maintenance_status", "tickets_by_category" };
+                                var widgetConfigService = new WidgetConfigService();
+                                var allWidgets = widgetConfigService.GetAvailableWidgets().Select(w => w.Id).ToArray();
                                 var allReports = new[] { "balance_sheet", "income_statement" };
+                                var authSvc = new AuthenticationService();
                                 
                                 Action<string, string> ensureUser = (username, pass) =>
                                 {

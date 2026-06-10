@@ -2,6 +2,7 @@ using Bimasakti.BiService.Api.Controllers;
 using Bimasakti.BiService.Api.Core;
 using Bimasakti.BiService.Api.Models;
 using Bimasakti.BiService.Api.Services.Export;
+using Bimasakti.BiService.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -44,6 +45,13 @@ namespace Bimasakti.BiService.Api.Controllers
     [Route("api")]
     public class AdminDashboardController : ControllerBase
     {
+        private readonly IWidgetConfigService _widgetConfigService;
+
+        public AdminDashboardController(IWidgetConfigService widgetConfigService)
+        {
+            _widgetConfigService = widgetConfigService;
+        }
+
         // Helper to enforce admin check
         private async Task<User?> RequireAdmin(CompanyDbContext dbContext, string username, string companyId)
         {
@@ -89,9 +97,9 @@ namespace Bimasakti.BiService.Api.Controllers
 
                     if (userWidgets.Count == 0)
                     {
-                        // Default widgets if none configured
-                        var defaultWidgetKeys = new[] { "kpi_cards", "capital_growth", "operating_cash_flow", "revenue_budget", "expense_budget" };
-                        return Ok(defaultWidgetKeys.Select(key => new WidgetLayoutSpecification { WidgetKey = key }));
+                        // Default widgets if none configured - load dynamically from DSBI files
+                        var allWidgets = _widgetConfigService.GetAvailableWidgets();
+                        return Ok(allWidgets.Select(w => new WidgetLayoutSpecification { WidgetKey = w.Id, IsActive = true }));
                     }
 
                     return Ok(userWidgets.Select(widget => new WidgetLayoutSpecification

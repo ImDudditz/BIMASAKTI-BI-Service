@@ -11,12 +11,7 @@ const emit = defineEmits(['close', 'saved'])
 
 const authStore = useAuthStore()
 
-const masterWidgets = [
-  { key: 'kpi_cards', title: 'KPI Cards Strip', order: 0 },
-  { key: 'capital_growth', title: 'Capital Growth Trend', order: 1 },
-  { key: 'operating_cash_flow', title: 'Operating Cash Flow (Inflow vs Outflow)', order: 2 },
-]
-
+const masterWidgets = ref([])
 const localWidgets = ref([])
 const isSaving = ref(false)
 
@@ -26,11 +21,19 @@ const loadWidgets = async () => {
     const username = authStore.user?.username
     if (!company_id || !username) return
 
+    // Fetch master widgets dynamically from endpoint
+    const masterRes = await api.get('/dynamic-widgets/available', { params: { username } })
+    masterWidgets.value = (masterRes.data || []).map((mw, index) => ({
+      key: mw.id,
+      title: mw.name,
+      order: index
+    }))
+
     const res = await api.get('/dashboard/my-widgets', { params: { company_id, username } })
     const userWidgets = res.data || []
 
     // Merge fetched with master
-    localWidgets.value = masterWidgets
+    localWidgets.value = masterWidgets.value
       .map((mw) => {
         const existing = userWidgets.find((uw) => uw.widget_key === mw.key)
         if (existing) {

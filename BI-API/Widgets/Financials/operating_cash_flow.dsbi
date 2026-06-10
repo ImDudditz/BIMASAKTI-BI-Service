@@ -1,0 +1,22 @@
+{
+  "Id": "operating_cash_flow",
+  "Category": "Financials",
+  "Name": "Operating Cash Flow Stream",
+  "Type": "echarts_bar",
+  "Query": {
+    "Table": "GLRX0310",
+    "Dimensions": ["period"],
+    "Measures": [
+      {
+        "Field": "end_balance",
+        "Agg": "Sum"
+      }
+    ],
+    "Filters": []
+  },
+  "Layout": {
+    "cols": 1,
+    "rows": 1
+  },
+  "Formatting": {}
+}

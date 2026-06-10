@@ -1,0 +1,22 @@
+{
+  "Id": "operation_metrics",
+  "Category": "Tenant",
+  "Name": "Property Operations Metrics",
+  "Type": "echarts_bar",
+  "Query": {
+    "Table": "LMRX0710",
+    "Dimensions": ["agreement_status"],
+    "Measures": [
+      {
+        "Field": "alias_unit_id",
+        "Agg": "Count"
+      }
+    ],
+    "Filters": []
+  },
+  "Layout": {
+    "cols": 1,
+    "rows": 1
+  },
+  "Formatting": {}
+}

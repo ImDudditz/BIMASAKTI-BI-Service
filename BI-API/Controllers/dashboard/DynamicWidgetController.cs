@@ -1,37 +1,44 @@
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 using Bimasakti.BiService.Api.Services;
 using Bimasakti.BiService.Api.Models;
+using Bimasakti.BiService.Api.Core;
 using System.Linq;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
-namespace Bimasakti.BiService.Api.Controllers.dashboard
+namespace Bimasakti.BiService.Api.Controllers.Dashboard
 {
+    [Authorize]
     [ApiController]
     [Route("api/dynamic-widgets")]
     public class DynamicWidgetController : ControllerBase
     {
         private readonly IWidgetConfigService _widgetConfigService;
         private readonly IDynamicDataService _dynamicDataService;
-        private readonly string _centralDbPath;
 
         public DynamicWidgetController(IWidgetConfigService widgetConfigService, IDynamicDataService dynamicDataService)
         {
             _widgetConfigService = widgetConfigService;
             _dynamicDataService = dynamicDataService;
-            _centralDbPath = Path.Combine(Directory.GetCurrentDirectory(), "BMS_BI.db");
         }
 
         [HttpGet("available")]
         public IActionResult GetAvailableWidgets([FromQuery] string username)
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+
             var allWidgets = _widgetConfigService.GetAvailableWidgets();
 
-            using var db = new CompanyDbContext(_centralDbPath);
-            var user = db.Users.FirstOrDefault(u => u.Username == username);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
+            using var db = new CompanyDbContext(databasePath);
+            var user = db.Users.FirstOrDefault(u => u.Username.ToUpper() == username.ToUpper());
             if (user == null) return Unauthorized();
 
-            if (user.Role == "Admin")
+            if (user.Role.Equals("admin", StringComparison.OrdinalIgnoreCase))
             {
                 return Ok(allWidgets);
             }
@@ -46,21 +53,17 @@ namespace Bimasakti.BiService.Api.Controllers.dashboard
         }
 
         [HttpPost("data/{category}/{id}")]
-        public async Task<IActionResult> GetWidgetData(string category, string id, [FromQuery] string companyId)
+        public async Task<IActionResult> GetWidgetData(string category, string id)
         {
+            var companyIdClaim = HttpContext.User.FindFirst("company_id")?.Value;
+            if (string.IsNullOrEmpty(companyIdClaim)) return Unauthorized(new { detail = "Invalid token claims" });
+            string companyId = companyIdClaim.ToUpperInvariant();
+
             var config = _widgetConfigService.GetWidgetConfig(category, id);
             if (config == null) return NotFound();
 
-            // Typically tenant DBs are under a 'Tenants' or similar folder.
-            // Depending on architecture, they might just be in the root directory if it's dynamic.
-            // I'll assume they're in a 'Tenants' directory for this implementation, but can adjust if needed.
-            var tenantDbPath = Path.Combine(Directory.GetCurrentDirectory(), "Tenants", $"{companyId}.db");
-            if (!System.IO.File.Exists(tenantDbPath))
-            {
-                tenantDbPath = Path.Combine(Directory.GetCurrentDirectory(), $"{companyId}.db"); // fallback
-            }
-
-            var data = await _dynamicDataService.ExecuteWidgetQueryAsync(tenantDbPath, config.Query);
+            string databasePath = DbUtils.GetSafeDbPath(companyId);
+            var data = await _dynamicDataService.ExecuteWidgetQueryAsync(databasePath, config.Query);
 
             return Ok(data);
         }

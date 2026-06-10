@@ -19,6 +19,7 @@ using System.Security.Claims;
 using Bimasakti.BiService.Mgr.Models;
 using Bimasakti.BiService.Mgr.Core;
 using Bimasakti.BiService.Mgr.Services;
+using Bimasakti.BiService.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         };
     });
 builder.Services.AddAuthorization();
+builder.Services.AddScoped<IWidgetConfigService, WidgetConfigService>();
 
 var app = builder.Build();
 
@@ -200,6 +202,12 @@ var adminGroup = app.MapGroup("/api").RequireAuthorization();
 
 adminGroup.MapGet("/status", () => Results.Ok(new { message = "SaaS Manager Running" }));
 
+adminGroup.MapGet("/manager/widgets", (IWidgetConfigService widgetConfigService) =>
+{
+    var widgets = widgetConfigService.GetAvailableWidgets();
+    return Results.Ok(widgets.Select(w => new { key = w.Id, label = w.Name }));
+});
+
 adminGroup.MapGet("/audit-logs", () =>
 {
     try
@@ -246,7 +254,7 @@ adminGroup.MapGet("/companies/{id}", async (string id) =>
     return Results.Ok(new { companyId, urls, isActive = comp?.IsActive ?? false });
 });
 
-adminGroup.MapPost("/companies", async (PortalCompanySaveRequest req) =>
+adminGroup.MapPost("/companies", async (PortalCompanySaveRequest req, IWidgetConfigService widgetConfigService) =>
 {
     string companyId = req.CompanyId.Trim().ToUpperInvariant();
 
@@ -290,7 +298,7 @@ adminGroup.MapPost("/companies", async (PortalCompanySaveRequest req) =>
     tenantDb.Database.EnsureCreated();
 
     var authSvc = new Bimasakti.BiService.Api.Services.AuthenticationService();
-    var allWidgets = new[] { "kpi_cards", "capital_growth", "operating_cash_flow", "revenue_budget", "expense_budget", "operation_metrics", "lease_expirations", "tickets_kpi", "maintenance_status", "tickets_by_category" };
+    var allWidgets = widgetConfigService.GetAvailableWidgets().Select(w => w.Id).ToArray();
     var allReports = new[] { "balance_sheet", "income_statement" };
 
     Action<string, string> ensureUser = (username, pass) =>
@@ -328,57 +336,6 @@ adminGroup.MapPost("/companies/{id}/sync", (string id) =>
         }
     });
     return Results.Ok(new { message = $"Sync started in background for {id}" });
-});
-
-adminGroup.MapPost("/manager/sync-bms-skeletons", () =>
-{
-    Task.Run(async () =>
-    {
-        try
-        {
-            await new SkeletonSyncService().SyncBmsSkeletonsAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Skeleton Sync error: " + ex.Message);
-        }
-    });
-    return Results.Ok(new { message = "Skeleton sync started in background for BMS Company database" });
-});
-
-adminGroup.MapGet("/manager/bms-schema", async () =>
-{
-    var schema = new Dictionary<string, List<string>>();
-    try
-    {
-        string dbPath = Bimasakti.BiService.Api.Core.DbUtils.GetSafeDbPath("BMS");
-        if (System.IO.File.Exists(dbPath))
-        {
-            using var conn = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={dbPath};Mode=ReadOnly;");
-            await conn.OpenAsync();
-            var tables = new List<string>();
-            using (var cmd = new Microsoft.Data.Sqlite.SqliteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'Users' AND name NOT LIKE 'UserWidgets' AND name NOT LIKE 'UserReports';", conn))
-            using (var reader = await cmd.ExecuteReaderAsync())
-            {
-                while (await reader.ReadAsync()) tables.Add(reader.GetString(0));
-            }
-            foreach (var t in tables)
-            {
-                var cols = new List<string>();
-                using (var cmd = new Microsoft.Data.Sqlite.SqliteCommand($"PRAGMA table_info({t});", conn))
-                using (var reader = await cmd.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync()) cols.Add(reader.GetString(1));
-                }
-                schema[t] = cols;
-            }
-        }
-        return Results.Ok(schema);
-    }
-    catch (Exception ex)
-    {
-        return Results.Problem(ex.Message);
-    }
 });
 
 adminGroup.MapGet("/manager/companies/{companyId}/users", async (string companyId) =>

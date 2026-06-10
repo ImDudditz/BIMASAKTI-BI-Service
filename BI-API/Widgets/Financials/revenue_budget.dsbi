@@ -1,0 +1,26 @@
+{
+  "Id": "revenue_budget",
+  "Category": "Financials",
+  "Name": "Revenue Budget vs Actual",
+  "Type": "echarts_bar",
+  "Query": {
+    "Table": "GLRX0310",
+    "Dimensions": ["period"],
+    "Measures": [
+      {
+        "Field": "end_balance",
+        "Agg": "Sum"
+      },
+      {
+        "Field": "end_budget",
+        "Agg": "Sum"
+      }
+    ],
+    "Filters": []
+  },
+  "Layout": {
+    "cols": 1,
+    "rows": 1
+  },
+  "Formatting": {}
+}
